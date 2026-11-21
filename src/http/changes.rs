@@ -969,9 +969,17 @@ async fn push_after_combining(
     let env = state.github.git_env().await?;
     // Serialise with Get latest and other pushes on the same repo.
     let _guard = state.conflict_updates.lock().await;
-    if !state.conflicts.list(&project.id).await.is_empty() {
+    // Only this change's own combine blocks it; another change's open combine
+    // touches a different branch.
+    if state
+        .conflicts
+        .list(&project.id)
+        .await
+        .iter()
+        .any(|s| s.branch == branch)
+    {
         return Err(ApiError::conflict(
-            "Couldn't publish. Finish the open combine first.",
+            "Couldn't publish. This change has a combine to finish first.",
         ));
     }
     let author = state.github.identity().await;
