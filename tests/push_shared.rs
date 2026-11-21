@@ -259,3 +259,71 @@ async fn share_pushes_a_clean_remote_merge_without_a_session() {
 fn rev(dir: &Path, branch: &str) -> String {
     git_cli(dir, &["rev-parse", &format!("refs/heads/{branch}")])
 }
+
+#[tokio::test]
+async fn an_open_combine_on_one_change_does_not_block_publishing_another() {
+    let p = shared_project().await;
+    teammate_edits(&p, "README.md", "theirs\n");
+    std::fs::write(p.dir.join("README.md"), "mine\n").unwrap();
+    git_cli(&p.dir, &["add", "-A"]);
+    git_cli(&p.dir, &["commit", "-m", "mine"]);
+    let (status, body) = call(
+        &p.app,
+        req(
+            "POST",
+            &format!("/api/changes/{}/share", branch_path(&p.branch)),
+            Some(json!({ "project": p.id })),
+        ),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK, "{body}");
+    assert!(body["conflict"]["sessionId"].as_str().is_some(), "{body}");
+
+    let other = changes::create(&p.dir, "New post: Other").await.unwrap();
+    std::fs::write(p.dir.join("other.md"), "other\n").unwrap();
+    git_cli(&p.dir, &["add", "-A"]);
+    git_cli(&p.dir, &["commit", "-m", "other"]);
+
+    // Publishing then needs GitHub, which this test doesn't have; the push must still happen.
+    let (_, body) = call(
+        &p.app,
+        req(
+            "POST",
+            &format!("/api/changes/{}/publish", branch_path(&other.branch)),
+            Some(json!({ "project": p.id })),
+        ),
+    )
+    .await;
+    assert!(
+        !body.to_string().contains("combine"),
+        "another change's combine blocked this publish: {body}"
+    );
+    assert_eq!(
+        rev(&p.git_root.join("acme/site.git"), &other.branch),
+        rev(&p.dir, &other.branch),
+        "the other change reached GitHub"
+    );
+}
+
+#[tokio::test]
+async fn an_open_combine_blocks_publishing_the_same_change() {
+    let p = shared_project().await;
+    teammate_edits(&p, "README.md", "theirs\n");
+    std::fs::write(p.dir.join("README.md"), "mine\n").unwrap();
+    git_cli(&p.dir, &["add", "-A"]);
+    git_cli(&p.dir, &["commit", "-m", "mine"]);
+    let publish = || {
+        req(
+            "POST",
+            &format!("/api/changes/{}/publish", branch_path(&p.branch)),
+            Some(json!({ "project": p.id })),
+        )
+    };
+    let (status, body) = call(&p.app, publish()).await;
+    assert_eq!(status, StatusCode::OK, "{body}");
+    assert!(body["conflict"]["sessionId"].as_str().is_some(), "{body}");
+
+    let (status, body) = call(&p.app, publish()).await;
+    assert_eq!(status, StatusCode::CONFLICT, "{body}");
+    assert!(body.to_string().contains("combine"), "{body}");
+}
