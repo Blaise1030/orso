@@ -8,14 +8,14 @@ test("preview back and forward move through the frame's history", async ({ page,
   const address = page.getByTestId("preview-address");
   await expect(address).toHaveValue("/", { timeout: 120_000 });
   // Two navigations after the preview is up: the stack only holds pages from this document's life.
-  await address.fill("/blog");
+  await address.fill("/posts");
   await address.press("Enter");
-  await expect(address).toHaveValue("/blog", { timeout: 60_000 });
-  await address.fill("/help");
+  await expect(address).toHaveValue("/posts", { timeout: 60_000 });
+  await address.fill("/posts/hello-orso");
   await address.press("Enter");
-  await expect(address).toHaveValue("/help", { timeout: 60_000 });
+  await expect(address).toHaveValue("/posts/hello-orso", { timeout: 60_000 });
   await page.getByLabel("Back").click();
-  await expect(address).toHaveValue("/blog", { timeout: 30_000 });
+  await expect(address).toHaveValue("/posts", { timeout: 30_000 });
   await page.getByLabel("Forward").click();
-  await expect(address).toHaveValue("/help", { timeout: 30_000 });
+  await expect(address).toHaveValue("/posts/hello-orso", { timeout: 30_000 });
 });
