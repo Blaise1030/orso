@@ -1,0 +1,40 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "01M80Q3QT8QA5JEFYWP51Y7MEB",
+  "session_id": "3d57e0d8-9582-4157-8f7e-e698945f5558",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T04:09:29.892985Z",
+  "branch": "main",
+  "checkpoints_count": 8,
+  "files_touched": [
+    "docs/superpowers/specs/2026-11-22-astro-starter-template-design.md"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "6b0c54cd2b16",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 106540,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 396160,
+    "output_tokens": 5173,
+    "api_call_count": 8
+  },
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 8
+  }
+}

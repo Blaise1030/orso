@@ -1,0 +1,33 @@
+For the astro template, suggest /brainstorming instead of adding all items for the user, like models, ... and pages, how can we make it more like a starting page instead with a sample model, the sample model should not be part of the orso-plugin
+
+---
+
+C. [Image #1] Can we have something like this for the user to start or guides.
+
+---
+
+Replace it
+
+---
+
+A)
+
+---
+
+1
+
+---
+
+Sounds good
+
+---
+
+Sounds good
+
+---
+
+Looks good
+
+---
+
+Sounds good
