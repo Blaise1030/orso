@@ -47,20 +47,19 @@ Make these edits on a new branch. Commit each step separately so the user can re
 
 ### 1. Install the integration
 
-The integration is plain ESM copied into the site; there is no npm package.
+The integration is plain ESM copied into the site; there is no npm package. From the site
+root (or pass the site directory), run the Orso binary:
 
 ```sh
-tmp=$(mktemp -d)
-git clone --depth 1 --filter=blob:none --sparse https://github.com/Blaise1030/cms "$tmp"
-git -C "$tmp" sparse-checkout set packages/astro/src
-mkdir -p integrations/orso
-rsync -a --delete --exclude 'marketing*.js' "$tmp/packages/astro/src/" integrations/orso/
-rm -rf "$tmp"
+orso init
+# or: orso init path/to/site
+# orso init --force   # also replace an existing orso.json
 ```
 
-`marketing*.js` are the starter template's collections; leave them out. Add a one-line
-`integrations/orso/README.md` saying the folder is copied from orso's `packages/astro/src`
-and is replaced on update — do not hand-edit it.
+That refreshes `integrations/orso/` from the embedded sources and writes a starter
+`orso.json` when missing (or when `--force`). It prints the `orso()` snippet; it does
+**not** edit `astro.config`. Do not hand-edit `integrations/orso/` — re-run `orso init`
+to update it.
 
 Add the runtime dependencies with the repo's package manager:
 `yaml`, `js-yaml`, `jsonc-parser`, `linkedom` (all required; the config fails to load
@@ -138,8 +137,9 @@ read-only.
   Markdown description of the look. If the site uses Tailwind v4, keep the same values in an
   `@theme` block in the main CSS file; orso's Design tab asks the assistant to keep the two in
   sync.
-- `orso.json` only when the defaults don't fit. All fields are optional; `dev` must contain
-  `{port}`:
+- `orso.json`: `orso init` writes a starter for npm. Adjust it when the defaults don't fit
+  (pnpm/yarn, or the Astro app not at the repo root). All fields are optional; `dev` must
+  contain `{port}`:
 
 ```json
 {

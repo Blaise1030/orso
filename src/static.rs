@@ -165,8 +165,18 @@ pub fn orso_astro_paths() -> Vec<String> {
 /// overwritten.
 pub fn extract_template(dest: &Path) -> io::Result<()> {
     extract_embed::<Template>(dest)?;
-    extract_embed::<OrsoAstro>(&safe_join(dest, "integrations/orso")?)?;
+    extract_orso_integration(dest)?;
     Ok(())
+}
+
+/// Replace `site_root/integrations/orso` with the embedded Orso Astro integration sources.
+/// Removes any prior folder first so stale files (e.g. old presets) do not linger.
+pub fn extract_orso_integration(site_root: &Path) -> io::Result<()> {
+    let dest = safe_join(site_root, "integrations/orso")?;
+    if dest.exists() {
+        std::fs::remove_dir_all(&dest)?;
+    }
+    extract_embed::<OrsoAstro>(&dest)
 }
 
 fn extract_embed<T: RustEmbed>(dest: &Path) -> io::Result<()> {

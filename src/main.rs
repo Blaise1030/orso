@@ -71,6 +71,15 @@ enum Command {
         #[command(subcommand)]
         command: orso::ctl::CtlCommand,
     },
+    /// Copy integrations/orso into a site and write a starter orso.json.
+    Init {
+        /// Site directory (default: current directory).
+        #[arg(default_value = ".")]
+        dir: PathBuf,
+        /// Replace an existing orso.json.
+        #[arg(long)]
+        force: bool,
+    },
     /// Agent-only git launcher (internal): `orso git-shim -- <git argv>`.
     #[command(hide = true)]
     GitShim {
@@ -108,6 +117,16 @@ async fn main() -> ExitCode {
     else {
         return match command {
             Command::Ctl { command } => orso::ctl::run(command).await,
+            Command::Init { dir, force } => match orso::init::run(&dir, force) {
+                Ok(msg) => {
+                    print!("{msg}");
+                    ExitCode::SUCCESS
+                }
+                Err(e) => {
+                    eprintln!("orso: {e}");
+                    ExitCode::FAILURE
+                }
+            },
             Command::GitShim { args } => orso::git_shim::run(args),
             Command::Serve { .. } => unreachable!(),
         };
