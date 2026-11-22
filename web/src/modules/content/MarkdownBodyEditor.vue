@@ -14,6 +14,7 @@ import UEditorSuggestionMenu from "@nuxt/ui/components/EditorSuggestionMenu.vue"
 import UEditorToolbar from "@nuxt/ui/components/EditorToolbar.vue";
 import USelect from "@nuxt/ui/components/Select.vue";
 import { bodyExtensions, canRoundTrip, STARTER_KIT } from "./markdown";
+import { listNamedBlocks } from "./namedBlocks";
 import ImageDialog, { IMAGE_REGISTRY, markdownImage, type PendingImage } from "./ImageDialog.vue";
 import LinkPopover from "./LinkPopover.vue";
 import { keySound, loadPack, playSample, typesText, useTypingSound } from "@/lib/typingSound";
@@ -185,6 +186,25 @@ const blockActions: (Action & { search?: string })[] = [
   // GFM tables need a header row, so a new table always starts with one.
   { id: "table", label: "Table", icon: "i-hugeicons-table", run: block(c => c.insertTable({ rows: 3, cols: 3, withHeaderRow: true })) },
 ];
+/** Registry-backed HTML sections; new kinds are added with `registerNamedBlock`. */
+function namedBlockActions(): (Action & { search?: string })[] {
+  return listNamedBlocks().map(def => ({
+    id: `named-${def.id}`,
+    label: def.label,
+    icon: def.icon ?? "i-hugeicons-code",
+    search: `${def.label} block ${def.id}`,
+    run: block(c => c.insertContent({
+      type: "namedBlock",
+      attrs: {
+        block: def.id,
+        props: Object.fromEntries(def.props.map(p => [p.key, ""])),
+      },
+    })),
+  }));
+}
+function allBlockActions(): (Action & { search?: string })[] {
+  return [...blockActions, ...namedBlockActions()];
+}
 const inlineActions: (Action & { mark?: string })[] = [
   { id: "bold", label: "Bold", icon: "i-hugeicons-text-bold", mark: "bold", run: block(c => c.toggleBold()) },
   { id: "italic", label: "Italic", icon: "i-hugeicons-text-italic", mark: "italic", run: block(c => c.toggleItalic()) },
@@ -204,10 +224,14 @@ const handlers = {
   slash: {
     canExecute: () => true,
     isActive: () => false,
-    execute: (editor: Editor, item: { id: string }) => ({ run: () => { blockActions.find(a => a.id === item.id)?.run(editor); return true; } }),
+    execute: (editor: Editor, item: { id: string }) => ({
+      run: () => { allBlockActions().find(a => a.id === item.id)?.run(editor); return true; },
+    }),
   },
 } satisfies EditorCustomHandlers;
-const slashItems: EditorSuggestionMenuItem<typeof handlers>[] = blockActions.map(a => ({ kind: "slash", id: a.id, label: a.label, icon: a.icon, search: `·${a.search ?? a.label}` }));
+const slashItems = computed((): EditorSuggestionMenuItem<typeof handlers>[] =>
+  allBlockActions().map(a => ({ kind: "slash", id: a.id, label: a.label, icon: a.icon, search: `·${a.search ?? a.label}` })),
+);
 
 // ---- Selection toolbar ---------------------------------------------------------------------
 type BlockType = { id: string; label: string; active: (e: Editor) => boolean };
@@ -612,4 +636,27 @@ defineExpose({ richEditor: () => richEditor.value, mode, setMode });
 .content-rich :deep(.is-empty)::before { content: attr(data-placeholder); float: left; height: 0; pointer-events: none; color: var(--ui-text-muted); }
 .content-rich :deep(p), .content-rich :deep(blockquote), .content-rich :deep(pre) { margin: 0.5rem 0; }
 .content-rich :deep(h1), .content-rich :deep(h2), .content-rich :deep(h3) { margin: 1.25rem 0 0.5rem; }
+.content-rich :deep(.named-block) {
+  margin: 0.75rem 0;
+  border: 1px solid var(--ui-border);
+  border-radius: 0.5rem;
+  background: var(--ui-bg-muted);
+  padding: 0.5rem 0.75rem;
+}
+.content-rich :deep(.named-block__bar) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.content-rich :deep(.named-block__label) {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
+}
+.content-rich :deep(.named-block__fields) { display: grid; gap: 0.5rem; }
+.content-rich :deep(.named-block__missing) { margin: 0; font-size: 0.875rem; color: var(--ui-text-muted); }
 </style>

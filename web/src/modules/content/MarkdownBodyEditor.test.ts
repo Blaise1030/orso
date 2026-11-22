@@ -5,13 +5,19 @@ import { EditorView } from "@codemirror/view";
 import USelect from "@nuxt/ui/components/Select.vue";
 import MarkdownBodyEditor from "./MarkdownBodyEditor.vue";
 import { Editor } from "@tiptap/core";
-import { canRoundTrip, markdownExtensions } from "./markdown";
+import { canRoundTrip, markdownExtensions, resetMarkdownManager } from "./markdown";
+import { clearNamedBlocks, registerNamedBlock } from "./namedBlocks";
 /** A Nuxt UI component wrapper; its generic props type does not survive `findComponent`. */
 type AnyWrapper = Omit<VueWrapper, "props"> & { props(key: string): unknown };
 
 type Change = { body: string; dirty: boolean };
 const mounted: VueWrapper[] = [];
-afterEach(() => { mounted.splice(0).forEach(w => w.unmount()); vi.unstubAllGlobals(); });
+afterEach(() => {
+  mounted.splice(0).forEach(w => w.unmount());
+  clearNamedBlocks();
+  resetMarkdownManager();
+  vi.unstubAllGlobals();
+});
 
 async function render(body: string, opts: { kind?: "markdown" | "mdx"; rich?: boolean } = {}) {
   const w: VueWrapper = mount(MarkdownBodyEditor, {
@@ -440,6 +446,39 @@ describe("MarkdownBodyEditor", () => {
     expect(w.find('[data-testid="body-rich"]').exists()).toBe(false);
     expect(rawText(w)).toBe(source);
     expect(changes(w)).toEqual([]);
+  });
+
+  it("opens a registered named HTML block in rich mode with editable props", async () => {
+    registerNamedBlock({
+      id: "note",
+      label: "Note",
+      icon: "i-hugeicons-note",
+      props: [
+        { key: "title", label: "Title", type: "text" },
+        { key: "body", label: "Body", type: "textarea" },
+      ],
+    });
+    const source = 'Intro\n\n<aside data-orso-block="note" data-title="Hello" data-body="World"></aside>\n';
+    const w = await render(source);
+    expect(w.find('[data-testid="body-rich"]').exists()).toBe(true);
+    expect(w.find('[data-testid="named-block"]').exists()).toBe(true);
+    expect((w.get('[data-testid="named-block-prop-title"]').element as HTMLInputElement).value).toBe("Hello");
+    expect(changes(w)).toEqual([]);
+  });
+
+  it("slash-inserts a registered named block", async () => {
+    registerNamedBlock({
+      id: "note",
+      label: "Note",
+      icon: "i-hugeicons-note",
+      props: [{ key: "title", label: "Title", type: "text" }],
+    });
+    const w = await render("");
+    editorOf(w).chain().focus().insertContent("/").run(); await flushPromises();
+    slashItems(w).find(i => i.text().includes("Note"))!.element.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+    await flushPromises();
+    expect(w.find('[data-testid="named-block"]').exists()).toBe(true);
+    expect(last(w)?.body).toContain('data-orso-block="note"');
   });
 
   it("stays raw when a raw edit introduces unsupported Markdown", async () => {
