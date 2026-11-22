@@ -45,7 +45,7 @@ terminal open while you work. Ctrl-C stops orso.
 ## Getting started
 
 1. **Create or open a project.** Choose **New project**, then start from the built-in Astro
-   marketing template or pick an existing repo from GitHub. Sign in to GitHub when asked.
+   Astro starter template or pick an existing repo from GitHub. Sign in to GitHub when asked.
 2. **Look around.** The left rail has the project tabs:
    - **Preview**: your site running live, with the page you are on.
    - **Content**: blog posts, docs and other content collections, with a form for each entry's
