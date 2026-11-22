@@ -5,11 +5,17 @@
 #                           translations and commit them back to the same PR branch. Reviewers see
 #                           English and translations together in one PR and one preview.
 #   pull request closed  -> delete that Crowdin branch so Crowdin doesn't fill up with old ones.
+#                           Crowdin folds the branch's translations into the main tree as it goes.
 #   push to main         -> upload sources and translations into Crowdin's main (branchless) tree,
 #                           so translation memory and the main tree match what shipped.
+#   schedule (twice a    -> download the main tree's translations and open/update one
+#   day) / dispatch         "content(i18n): sync translations" PR against main. Translator work
+#                           made after a PR merged only reaches the repo this way.
 #
 # One-time setup (repo Settings -> Secrets and variables -> Actions):
 #   secrets:   CROWDIN_PERSONAL_TOKEN  (Crowdin personal access token with project access)
+#              CROWDIN_SYNC_TOKEN      (optional; fine-grained PAT with contents and pull-requests
+#                                       write, so CI and the preview run on the scheduled PR)
 #   variables: CROWDIN_PROJECT_ID      (numeric ID from the Crowdin project's Tools -> API page)
 #              CROWDIN_MT_ENGINE_ID    (optional; machine translation engine ID. When set, new
 #                                       strings are pre-translated so PRs get translations within
@@ -25,7 +31,19 @@ on:
   push:
     branches: [main]
     paths: ["site/src/content/**", "site/src/i18n/messages/**", "crowdin.yml", ".github/workflows/crowdin.yml"]
+  # Cron is UTC. 01:00 and 13:00 UTC are 09:00 and 21:00 at UTC+8.
+  schedule:
+    - cron: "0 1 * * *"
+    - cron: "0 13 * * *"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: What to run
+        type: choice
+        default: sync-main
+        options:
+          - sync-main
+          - download-translations
 
 concurrency:
   group: crowdin-${{ github.head_ref || github.ref }}
@@ -45,7 +63,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref }}
 
@@ -106,7 +124,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Crowdin branch name
         id: branch
@@ -122,12 +140,14 @@ jobs:
           command_args: delete ${{ steps.branch.outputs.name }}
 
   main-sync:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && inputs.mode != 'download-translations')
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Upload sources and translations to Crowdin's main tree
         uses: crowdin/github-action@v2
@@ -135,3 +155,43 @@ jobs:
           upload_sources: true
           upload_translations: true
           download_translations: false
+
+  # The only path that brings translator work back into the repo. Translations live in Crowdin's
+  # main tree once a PR's Crowdin branch is deleted, so download without a branch name.
+  translations-sync:
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && inputs.mode == 'download-translations')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download translations from Crowdin's main tree
+        uses: crowdin/github-action@v2
+        with:
+          upload_sources: false
+          upload_translations: false
+          download_translations: true
+          create_pull_request: false
+          push_translations: false
+
+      # A PR rather than a push to main: commits made with GITHUB_TOKEN don't trigger
+      # deploy-site.yml, so a direct push would leave the translations undeployed until someone
+      # else pushed. The PR gets CI, a Cloudflare preview, and a reviewable diff. It is opened
+      # only when the downloaded tree actually differs, and updated in place afterwards.
+      - name: Open or update the translations PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          # PRs opened with the default token don't trigger CI. Add a CROWDIN_SYNC_TOKEN secret
+          # (a fine-grained PAT) to have CI and the preview run on this PR.
+          token: ${{ secrets.CROWDIN_SYNC_TOKEN || github.token }}
+          branch: l10n/crowdin
+          delete-branch: true
+          add-paths: |
+            site/src/content
+            site/src/i18n/messages
+          commit-message: "content(i18n): sync translations from Crowdin"
+          title: "content(i18n): sync translations from Crowdin"
