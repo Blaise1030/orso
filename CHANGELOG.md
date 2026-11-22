@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.1.15
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.12...v0.1.15)
+
+### Features
+
+- **astro-starter:** Get-started home and site-owned posts sample ([a5d0e06](https://github.com/Blaise1030/CMS/commit/a5d0e06))
+- Add orso init to vendor integrations/orso and orso.json ([33dca4e](https://github.com/Blaise1030/CMS/commit/33dca4e))
+- **desktop:** Soft update nudge via GitHub releases ([dbc76db](https://github.com/Blaise1030/CMS/commit/dbc76db))
+- **changes:** Convert waiting PRs back to draft from Review menu ([dc532ce](https://github.com/Blaise1030/CMS/commit/dc532ce))
+- **content:** Add extensible named HTML blocks for rich Markdown ([bc88df8](https://github.com/Blaise1030/CMS/commit/bc88df8))
+
+### Fixes
+
+- **ci:** Update starter tests for posts and rustfmt ([6614c2f](https://github.com/Blaise1030/CMS/commit/6614c2f))
+- **ci:** Seed fixture content separately from catalog manifests ([5a06bcd](https://github.com/Blaise1030/CMS/commit/5a06bcd))
+- **ci:** Point content_history tests at starter posts path ([fb01f59](https://github.com/Blaise1030/CMS/commit/fb01f59))
+- **ci:** Restore DESIGN.md frontmatter on the starter ([d09352c](https://github.com/Blaise1030/CMS/commit/d09352c))
+- **ci:** Type PrMenu convert-to-draft mocks as PrStatus ([1a22894](https://github.com/Blaise1030/CMS/commit/1a22894))
+- **e2e:** Point content editor specs at starter posts collection ([b26bd61](https://github.com/Blaise1030/CMS/commit/b26bd61))
+
 ## v0.1.14
 
 [compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.12...v0.1.14)
