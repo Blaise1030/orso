@@ -71,7 +71,7 @@ async function openFirstEntry(page) {
 }
 
 /** The post the Content and Preview tabs both show, so the pair reads as edit → see it rendered. */
-const POST = { title: "How we run design reviews", path: "/blog/how-we-run-design-reviews/" };
+const POST = { title: "Introducing Orso", path: "/blog/introducing-orso/" };
 
 async function openPost(page) {
   await openBlog(page);

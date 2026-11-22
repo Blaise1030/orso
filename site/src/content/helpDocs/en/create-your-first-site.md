@@ -9,7 +9,7 @@ The quickest way to start is the built-in marketing template. It comes with a ho
 
 ## Create the project
 
-1. Start orso with `orso serve --open` and [sign in with GitHub](/help/sign-in-with-github/).
+1. Open Orso, or start it from a terminal with `orso serve --open`, and [sign in with GitHub](/help/sign-in-with-github/).
 2. Choose **New project**.
 3. Pick the Astro marketing template and give your site a name.
 

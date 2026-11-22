@@ -10,7 +10,7 @@ For the setup steps, see [Sign in with GitHub](/help/sign-in-with-github/).
 ## Using the GitHub CLI
 
 - Run `gh auth status` in a terminal. If you aren't signed in, run `gh auth login`.
-- Start orso from a terminal where `gh` works. If orso is started some other way, it may not find `gh`.
+- The app looks for `gh` in the usual places, including Homebrew. If you installed `gh` somewhere unusual, start orso from a terminal where `gh` works.
 - After signing in with `gh`, wait a few seconds. orso checks for a new sign-in regularly.
 
 ## Using in-app sign-in
