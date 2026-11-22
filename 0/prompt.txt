@@ -1,0 +1,89 @@
+For the add orso.json can we reference the shadcn method ? where they just call npx shadcn@latest and the script is included into a folder
+
+---
+
+B)
+
+---
+
+But this means that I would need to release a CLI
+
+---
+
+What could you recomment
+
+---
+
+Let's include that into this release
+
+---
+
+A)
+
+---
+
+But its from the binary right directly orso ,,,
+
+---
+
+A
+
+---
+
+B
+
+---
+
+1
+
+---
+
+Sounds goo
+
+---
+
+ok
+
+---
+
+Can check why the CI failed
+
+---
+
+How can we notify the user that the desktop app has updates ?
+
+---
+
+B
+
+---
+
+B
+
+---
+
+C
+
+---
+
+A
+
+---
+
+1
+
+---
+
+ok
+
+---
+
+ok
+
+---
+
+ok
+
+---
+
+Same PR
