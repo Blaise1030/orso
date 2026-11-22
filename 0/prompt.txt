@@ -1,0 +1,221 @@
+Check the test why did it failed https://github.com/Blaise1030/orso/pull/114
+
+---
+
+Check the test why did it failed https://github.com/Blaise1030/orso/pull/114 the CI
+
+---
+
+Today, rich mode is deliberately “lossless only”: canRoundTrip() rejects any html token and any stray < in text (web/src/modules/content/markdown.ts:170-203, :227), and Tiptap’s Markdown parser drops unknown block HTML instead of preserving it. That is why <div>, <iframe>, comments, etc. always fall back to Raw view.
+
+The clean way to support them is a custom raw HTML block node that stores the original HTML string. Don’t try to model arbitrary HTML as ordinary Tiptap nodes: generateJSON() only keeps tags the schema knows, so <script>, <iframe>, custom attributes, etc. are silently lost.
+
+1. Add an htmlBlock node
+In web/src/modules/content/markdown.ts:
+
+ts
+
+
+
+
+import { Editor, mergeAttributes, Node } from "@tiptap/core";
+import { VueNodeViewRenderer } from "@tiptap/vue-3";
+import HtmlBlockView from "./HtmlBlockView.vue";
+/**
+ * A raw HTML block. The source is kept verbatim; the editor renders a
+ * non-editable preview, and the Markdown serializer writes the source back.
+ */
+export const HtmlBlock = Node.create({
+  name: "htmlBlock",
+  group: "block",
+  atom: true,
+  selectable: true,
+  draggable: true,
+  addAttributes() {
+    return {
+      html: {
+        default: "",
+        // Keeps copy/paste inside the editor lossless.
+        parseHTML: (el: HTMLElement) => el.getAttribute("data-html") ?? "",
+        renderHTML: (attrs: Record<string, unknown>) => ({ "data-html": attrs.html }),
+      },
+    };
+  },
+  // Only match the editor's own wrapper, never arbitrary page HTML.
+  parseHTML() {
+    return [{ tag: "div[data-html-block]" }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    // Do not emit the raw HTML here: it would execute inside the editor.
+    return ["div", mergeAttributes(HTMLAttributes, { "data-html-block": "" })];
+  },
+  // Take over marked's block-level `html` tokens.
+  markdownTokenName: "html",
+  parseMarkdown(token) {
+    if (!token.block) return null; // inline HTML is handled elsewhere
+    const html = (token.text ?? token.raw ?? "").replace(/\s+$/, "");
+    return html ? { type: "htmlBlock", attrs: { html } } : null;
+  },
+  renderMarkdown(node) {
+    return String(node.attrs?.html ?? "");
+  },
+  addNodeView() {
+    return VueNodeViewRenderer(HtmlBlockView);
+  },
+});
+Then add it to bodyExtensions():
+
+ts
+
+
+
+
+export function bodyExtensions(resolveImage?: (src: string) => string): AnyExtension[] {
+  return [
+    HtmlBlock,
+    NumericOrderedList,
+    // ...
+  ];
+}
+Because bodyExtensions() feeds both the rich editor and markdownExtensions(), the round-trip check sees the same node.
+
+2. Teach canRoundTrip() to accept block HTML
+ts
+
+
+
+
+const SUPPORTED_TOKENS = new Set([
+  // ...
+  "html",
+]);
+interface Token {
+  type: string;
+  block?: boolean; // add this
+  // ...
+}
+And in supportedTokens():
+
+ts
+
+
+
+
+// Block-level HTML is handled by htmlBlock; inline HTML and MDX are not.
+if (token.type === "html" && !token.block) return false;
+This keeps Hi <span>there</span> and <Callout>Hi</Callout> in Raw view, while Hi\n\n<div>Box</div> becomes editable.
+
+3. Add the NodeView
+web/src/modules/content/HtmlBlockView.vue:
+
+vue
+
+
+
+
+<script setup lang="ts">
+import { NodeViewWrapper, nodeViewProps } from "@tiptap/vue-3";
+import { computed, ref, watch } from "vue";
+const props = defineProps(nodeViewProps);
+const source = computed(() => String(props.node.attrs.html ?? ""));
+const draft = ref(source.value);
+const editing = ref(false);
+watch(source, value => {
+  if (!editing.value) draft.value = value;
+});
+function toggle() {
+  if (!editing.value) {
+    draft.value = source.value;
+    editing.value = true;
+    return;
+  }
+  if (draft.value !== source.value) props.updateAttributes({ html: draft.value });
+  editing.value = false;
+}
+</script>
+<template>
+  <NodeViewWrapper class="html-block" :contenteditable="false">
+    <div class="html-block__bar">
+      <span>HTML</span>
+      <button type="button" @mousedown.prevent @click="toggle">
+        {{ editing ? "Done" : "Edit" }}
+      </button>
+    </div>
+    <textarea
+      v-if="editing"
+      v-model="draft"
+      class="html-block__source"
+      spellcheck="false"
+      @blur="toggle"
+    />
+    <!-- sandbox="" disables scripts inside the preview. -->
+    <iframe
+      v-else
+      class="html-block__preview"
+      sandbox=""
+      referrerpolicy="no-referrer"
+      :srcdoc="source"
+      title="HTML block preview"
+    />
+  </NodeViewWrapper>
+</template>
+Use a sandboxed iframe or a source-only block for the preview. Do not use v-html on author-supplied HTML: it would execute scripts in the CMS origin.
+
+4. Add an insertion action
+In MarkdownBodyEditor.vue, next to the other block actions:
+
+ts
+
+
+
+
+{
+  id: "html",
+  label: "HTML block",
+  icon: "i-hugeicons-code-square",
+  run: block(c =>
+    c.insertContent({
+      type: "htmlBlock",
+      attrs: { html: "<div>\n\n</div>" },
+    }),
+  ),
+},
+A better UX is a small dialog that asks for the HTML (like ImageDialog.vue) before inserting the block; the slash item can open it.
+
+5. Update the tests
+MarkdownBodyEditor.test.ts currently expects block HTML and comments to be rejected. With this change, move block-level HTML into the accepted list and keep these rejected:
+
+inline HTML: Hi <span>there</span>
+MDX component/import/expression
+HTML in a table cell
+reference links, footnotes, entities
+Limitations worth knowing
+Only block HTML. Inline HTML (<span>, <br>, custom inline elements) goes through a different parser path; supporting it requires either a custom inline node/mark or changing parseInlineTokens. Start with blocks.
+MDX is separate. <Callout /> is not an html block to marked; it arrives as paragraph text with inline HTML tokens. Extended MDX component support needs a custom markdownTokenizer or stays in Raw view.
+The site must render raw HTML. Astro’s Markdown pipeline does, so saved blocks will render on the blog. XSS is now an author-level capability; if authors aren’t fully trusted, sanitize at save/preview time or allowlist tags.
+renderHTML deliberately does not emit the raw HTML, so editor.getHTML()/clipboard gets a safe wrapper with data-html; Markdown output is the source of truth.
+If you want, I can implement this end-to-end (node, NodeView, slash command, round-trip rules, and tests).
+
+---
+
+Can we support propts for this HTML block ?
+
+---
+
+For example a CTA section, what should the title be, what should the description be , what should the linsk to be ...
+
+---
+
+1
+
+---
+
+I dont' need you to create the CTA section first, but it's extendable to add in other HTML components
+
+---
+
+Sounds good
+
+---
+
+Create a PR to main
