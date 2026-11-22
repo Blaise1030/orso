@@ -1,0 +1,54 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "01M8106Q0D5VPGJXKJNPKEZ16G",
+  "session_id": "3d57e0d8-9582-4157-8f7e-e698945f5558",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T06:48:24.587266Z",
+  "branch": "feat/astro-starter-template",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/superpowers/specs/2026-11-22-astro-starter-template-design.md",
+    "packages/astro/test/fixtures/schemas.mjs",
+    "src/static.rs",
+    "templates/astro-starter/AGENTS.md",
+    "templates/astro-starter/DESIGN.md",
+    "templates/astro-starter/README.md",
+    "templates/astro-starter/scripts/content-pages.test.mjs",
+    "templates/astro-starter/scripts/manifest.test.mjs",
+    "templates/astro-starter/src/content/collections.js",
+    "templates/astro-starter/src/content/posts/hello-orso.md",
+    "templates/astro-starter/src/content/posts/second-post.md",
+    "templates/astro-starter/src/layouts/Base.astro",
+    "templates/astro-starter/src/lib/pages.ts",
+    "templates/astro-starter/src/lib/posts.ts",
+    "templates/astro-starter/src/pages/index.astro",
+    "templates/astro-starter/src/pages/posts/[slug].astro",
+    "templates/astro-starter/src/pages/posts/index.astro",
+    "templates/astro-starter/src/pages/sitemap.xml.ts",
+    "templates/astro-starter/src/site.ts",
+    "tests/static.rs"
+  ],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "8a3cf921c0ad",
+  "checkpoint_transcript_start": 53,
+  "transcript_lines_at_start": 53,
+  "compact_transcript_start": 23,
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 13
+  }
+}
