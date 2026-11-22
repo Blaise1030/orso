@@ -100,6 +100,10 @@ jobs:
           push_translations: false
           create_pull_request: false
           crowdin_branch_name: ${{ steps.branch.outputs.name }}
+          # A branch starts with no translations of its own, and with this off Crowdin exports
+          # the English source into the zh/ms files — silently reverting real translations to
+          # English on the first run. Only download files that actually have translations.
+          skip_untranslated_files: true
 
       - name: Commit translations to the PR branch
         env:
@@ -177,6 +181,9 @@ jobs:
           download_translations: true
           create_pull_request: false
           push_translations: false
+          # Never export the English source into a zh/ms path: untranslated files are left
+          # alone so the site keeps whatever it already has.
+          skip_untranslated_files: true
 
       # A PR rather than a push to main: commits made with GITHUB_TOKEN don't trigger
       # deploy-site.yml, so a direct push would leave the translations undeployed until someone
