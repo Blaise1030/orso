@@ -1,0 +1,41 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "01M816DFVT9GYJCTXB35ZP94F4",
+  "session_id": "3d57e0d8-9582-4157-8f7e-e698945f5558",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-22T08:36:58.221864Z",
+  "branch": "feat/convert-pr-to-draft",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "d11b97af3ce0",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 8132,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1486592,
+    "output_tokens": 2728,
+    "api_call_count": 2
+  },
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 49,
+    "context_tokens": 233351,
+    "context_window_size": 256000
+  }
+}
