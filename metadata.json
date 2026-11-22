@@ -1,0 +1,49 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "01M8160D3QQ0FGHFSAGC49XBDF",
+  "strategy": "manual-commit",
+  "branch": "feat/convert-pr-to-draft",
+  "checkpoints_count": 7,
+  "files_touched": [
+    "e2e/fixtures/githubStub.test.ts",
+    "e2e/fixtures/githubStub.ts",
+    "src/github.rs",
+    "src/http/changes.rs",
+    "src/http/mod.rs",
+    "tests/changes.rs",
+    "web/src/core/api.ts",
+    "web/src/modules/changes/PrMenu.test.ts",
+    "web/src/modules/changes/PrMenu.vue",
+    "web/src/modules/changes/store.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 63416,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 2912896,
+    "output_tokens": 20565,
+    "api_call_count": 3
+  },
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
