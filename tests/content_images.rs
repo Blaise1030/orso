@@ -68,6 +68,7 @@ async fn env() -> Env {
     let info = state.projects.create("Site").await.unwrap();
     let dir = tmp.path().join(&info.id);
     common::write_content_manifest(&dir, "");
+    common::seed_fixture_content(&dir, "");
     common::start_fake(&state, &info.id).await;
     changes::create(&dir, "Add images").await.unwrap();
     Env {
@@ -108,6 +109,7 @@ async fn env_under_subfolder_root() -> Env {
     }
     std::fs::write(dir.join("orso.json"), r#"{"root":"site"}"#).unwrap();
     common::write_content_manifest(&dir, "site/");
+    common::seed_fixture_content(&dir, "site/");
     common::start_fake(&state, &info.id).await;
     changes::create(&dir, "Add images").await.unwrap();
     Env {

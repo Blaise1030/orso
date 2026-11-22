@@ -203,6 +203,7 @@ async fn content_project(tmp: &Path) -> (axum::Router, std::path::PathBuf, Strin
     let info = st.projects.create("Site").await.unwrap();
     let dir = tmp.join(&info.id);
     common::write_content_manifest(&dir, "");
+    common::seed_fixture_content(&dir, "");
     common::start_fake(&st, &info.id).await;
     changes::create(&dir, "Edit content").await.unwrap();
     (http::router(st.clone()), dir, info.id, st)
