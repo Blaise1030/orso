@@ -1,7 +1,6 @@
-# Astro marketing site
+# Astro starter
 
-Static Astro site styled with Tailwind CSS. The landing page is written in `src/components/sections/`
-and `src/site.ts`; Blog and Help articles live in `src/content/` (see `AGENTS.md`).
+Thin Astro scaffold for Orso: a get-started home plus one sample `posts` collection (see `AGENTS.md`).
 
 ```bash
 npm ci
@@ -10,9 +9,9 @@ npm run build   # static build into ./dist
 ```
 
 Set `PUBLIC_SITE_URL` (for example `https://www.example.com`) when you build for production, or
-change `url` in `src/site.ts`: canonical links, Open Graph tags, `sitemap.xml`, `robots.txt` and
-`llms.txt` all use it. The look is defined by design tokens in `src/styles/global.css` and
-documented in `DESIGN.md`; `npm test` checks that components use only those tokens.
+change `url` in `src/site.ts`: canonical links, Open Graph tags, `sitemap.xml` and `robots.txt`
+use it. The look is defined by design tokens in `src/styles/global.css` and documented in
+`DESIGN.md`; `npm test` checks that components use only those tokens.
 
 ## Deploys
 

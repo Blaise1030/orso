@@ -1,6 +1,6 @@
 /**
  * Test fixture mirroring the blog and help schemas in the marketing template
- * (`templates/astro-starter/src/content/collections.js`).
+ * (plugin unit-test shapes only — the astro-starter template ships a simpler `posts` model).
  *
  * It is intentionally a copy rather than an import so Node tests avoid Astro's module graph.
  */

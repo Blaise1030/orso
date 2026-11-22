@@ -1,8 +1,7 @@
-import { loadBlog } from "./blog";
-import { loadHelp } from "./help";
+import { loadPosts } from "./posts";
 
 export interface SitePage {
-  /** Site path, e.g. `/blog/welcome/`. */
+  /** Site path, e.g. `/posts/hello-orso/`. */
   path: string;
   /** Last change (YYYY-MM-DD), when known. */
   lastmod?: string;
@@ -18,16 +17,12 @@ const staticPaths = () =>
     .filter((route) => !/\[|\/_|^\/404$/.test(route))
     .map((route) => route.replace(/\/index$/, "/").replace(/([^/])$/, "$1/"));
 
-/** Every page of the built site: static pages, blog posts and categories, help docs, sections and topics. */
+/** Every page of the built site: static pages and sample posts. */
 export async function sitePages(): Promise<SitePage[]> {
-  const [{ posts, categories }, { docs, sections, topics }] = await Promise.all([loadBlog(), loadHelp()]);
+  const posts = await loadPosts();
   const pages: SitePage[] = [
     ...staticPaths().map((path) => ({ path })),
-    ...posts.map((post) => ({ path: `/blog/${post.id}/`, lastmod: post.data.pubDate })),
-    ...categories.map((category) => ({ path: `/blog/categories/${category.id}/`, lastmod: category.posts[0]?.data.pubDate })),
-    ...docs.map((doc) => ({ path: `/help/${doc.id}/` })),
-    ...sections.map((section) => ({ path: `/help/section/${section.id}/` })),
-    ...topics.map((topic) => ({ path: `/help/categories/${topic.id}/` })),
+    ...posts.map((post) => ({ path: `/posts/${post.id}/`, lastmod: post.data.date })),
   ];
   const seen = new Set<string>();
   return pages

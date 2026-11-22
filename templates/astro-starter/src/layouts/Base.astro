@@ -7,7 +7,7 @@ import { site } from "../site";
 import "../styles/global.css";
 
 interface Props {
-  /** Page title; " | Acme" is appended. Omit on the home page to get "Acme | tagline". */
+  /** Page title; " | Starter" is appended. Omit on the home page to get "Starter | tagline". */
   title?: string;
   /** Meta description; defaults to `site.description`. */
   description?: string;
@@ -15,7 +15,7 @@ interface Props {
   image?: string;
   /** Alt text for the social card image. */
   imageAlt?: string;
-  /** `article` for blog posts and help docs, `website` otherwise. */
+  /** `article` for posts, `website` otherwise. */
   type?: "website" | "article";
   /** schema.org objects, each rendered as its own JSON-LD block. Defaults to a WebPage. */
   jsonLd?: Record<string, unknown>[];
@@ -39,11 +39,8 @@ const ogImage = absoluteUrl(image);
 const jsonLd = Astro.props.jsonLd ?? [
   { "@context": "https://schema.org", "@type": "WebPage", name: title ?? site.name, description, url: canonical },
 ];
-// The nav item for the section being viewed (Blog or Help) gets aria-current.
 const here = Astro.url.pathname;
 const isCurrent = (link: string) => link.startsWith("/") && link !== "/" && here.startsWith(link);
-const product = site.nav.filter((link) => link.href.startsWith("/#"));
-const resources = site.nav.filter((link) => !link.href.startsWith("/#"));
 const external = (link: string) => /^https?:\/\//.test(link);
 ---
 
@@ -91,82 +88,36 @@ const external = (link: string) => /^https?:\/\//.test(link);
             <a
               class="shrink-0 rounded-sm px-2 py-1 text-sm text-muted transition-colors duration-quick ease-gentle hover:text-ink aria-[current=page]:text-ink"
               href={link.href}
-              aria-current={isCurrent(link.href) ? "page" : undefined}>{link.label}</a
+              aria-current={isCurrent(link.href) ? "page" : undefined}
+              rel={external(link.href) ? "noopener noreferrer" : undefined}>{link.label}</a
             >
           ))}
         </nav>
         {site.cta && (
           <a
             class="ml-auto shrink-0 rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-on-accent transition-colors duration-quick ease-gentle hover:bg-accent-hover"
-            href={site.cta.href}>{site.cta.label}</a
+            href={site.cta.href}
+            rel={external(site.cta.href) ? "noopener noreferrer" : undefined}>{site.cta.label}</a
           >
         )}
       </div>
     </header>
 
-    <main id="main" class="flex-1"><slot /></main>
+    <main id="main" class="flex flex-1 flex-col"><slot /></main>
 
-    <footer class="mt-section border-t border-line">
-      <div class="page grid gap-12 py-16 md:grid-cols-12">
-        <div class="md:col-span-5">
-          <Wordmark />
-          <p class="mt-4 max-w-sm text-sm text-muted">{site.description}</p>
-        </div>
-        <nav class="grid grid-cols-2 gap-8 sm:grid-cols-4 md:col-span-7" aria-label="Footer">
-          {[
-            { title: "Product", links: product },
-            { title: "Resources", links: resources },
-            { title: "Company", links: site.footer.links },
-            { title: "Follow", links: site.socials },
-          ].filter((group) => group.links.length > 0).map((group) => (
-            <div>
-              <p class="label">{group.title}</p>
-              <ul class="mt-4 space-y-2 text-sm">
-                {group.links.map((link) => (
-                  <li>
-                    <a
-                      class="text-muted transition-colors duration-quick ease-gentle hover:text-ink"
-                      href={link.href}
-                      rel={external(link.href) ? "noopener noreferrer" : undefined}>{link.label}</a
-                    >
-                  </li>
-                ))}
-              </ul>
-            </div>
+    <footer class="mt-auto border-t border-line">
+      <div class="page flex flex-wrap items-center justify-between gap-4 py-8">
+        <p class="text-xs text-muted">{site.footer.text}</p>
+        <nav class="flex flex-wrap gap-x-6 gap-y-2 text-sm" aria-label="Footer">
+          {site.footer.links.map((link) => (
+            <a
+              class="text-muted transition-colors duration-quick ease-gentle hover:text-ink"
+              href={link.href}
+              rel={external(link.href) ? "noopener noreferrer" : undefined}>{link.label}</a
+            >
           ))}
         </nav>
       </div>
-      <div class="page">
-        <p class="border-t border-line py-6 text-xs text-muted">{site.footer.text}</p>
-      </div>
     </footer>
-
-    <script>
-      // Sections marked data-reveal fade in when they first scroll into view. Only sections
-      // that start below the fold are hidden, and only once this script runs, so content is
-      // always visible without JavaScript. Runs again after every client-side navigation.
-      const reveal = () => {
-        if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-        const observer = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              if (!entry.isIntersecting) continue;
-              entry.target.classList.add("reveal-in");
-              entry.target.classList.remove("reveal-pending");
-              observer.unobserve(entry.target);
-            }
-          },
-          // The huge top margin counts anything above the viewport as seen, so sections skipped
-          // by a jump (an anchor link, the End key) are never left hidden.
-          { rootMargin: "100000px 0px -8% 0px" },
-        );
-        for (const element of document.querySelectorAll<HTMLElement>("[data-reveal]")) {
-          if (element.getBoundingClientRect().top < window.innerHeight * 0.92) continue;
-          element.classList.add("reveal-pending");
-          observer.observe(element);
-        }
-      };
-      document.addEventListener("astro:page-load", reveal);
-    </script>
   </body>
 </html>

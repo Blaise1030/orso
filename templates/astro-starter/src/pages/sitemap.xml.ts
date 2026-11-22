@@ -6,7 +6,7 @@ export const prerender = true;
 
 const escape = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/** Every page of the site, built from src/pages and the Blog and Help collections. */
+/** Every page of the site, built from src/pages and the posts collection. */
 export const GET: APIRoute = async () => {
   const urls = (await sitePages()).map(
     (page) => `  <url>\n    <loc>${escape(absoluteUrl(page.path))}</loc>${page.lastmod ? `\n    <lastmod>${page.lastmod}</lastmod>` : ""}\n  </url>`,

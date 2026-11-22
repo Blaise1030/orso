@@ -1,7 +1,7 @@
 # Astro starter template (get-started + sample posts)
 
 **Date:** 2026-11-22  
-**Status:** Draft — awaiting user review  
+**Status:** Approved  
 **Related:** [Orso Astro integrations copy](./2026-11-07-orso-astro-integrations-copy-design.md), [Orso-owned collections + preview path](./2026-11-14-orso-collections-preview-path-design.md)
 
 ## Problem

@@ -313,6 +313,9 @@ mod tests {
             assert!(!text.contains("file:../../packages/astro"));
             assert!(!text.contains("file:packages/astro"));
         }
+        assert!(tmp.path().join("src/content/posts/hello-orso.md").is_file());
+        assert!(!tmp.path().join("src/content/blog").exists());
+        assert!(!tmp.path().join("src/pages/blog").exists());
     }
 
     #[test]
