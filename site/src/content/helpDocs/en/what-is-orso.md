@@ -10,7 +10,7 @@ orso is a site builder you run on your own computer. You edit your site's pages 
 ## How it works
 
 - **Your site is a plain Astro project.** It lives in a Git repo on GitHub that you own. If you stop using orso, the site still builds and deploys without it.
-- **orso runs locally.** It is a single program, `orso`, that serves its editor in your browser. It only listens on your own computer.
+- **orso runs locally.** It is a single program, `orso`, that serves its editor in your browser, or in the macOS app. It only listens on your own computer.
 - **Every edit happens on a change.** A change is a Git branch with a readable title. Your live site never changes until you publish.
 - **Publishing is a pull request.** You [share a preview](/help/share-a-preview/), someone [reviews it](/help/review-a-change/), and [publishing](/help/publish-your-changes/) merges it into `main`, which deploys your live site.
 

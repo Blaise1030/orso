@@ -11,13 +11,13 @@ orso uses GitHub to clone your site, push your changes and open pull requests. T
 
 1. Install the GitHub CLI: `brew install gh`, or download it from cli.github.com.
 2. Run `gh auth login` once and follow the prompts.
-3. Start orso with `orso serve --open`.
+3. Start orso: open the Orso app, or run `orso serve --open` in a terminal.
 
 Your avatar and name appear in the top-right, and **Open a project** lists your repos.
 
 orso never stores your token in this mode. It asks `gh` whenever it needs GitHub. To sign out, run `gh auth logout`.
 
-Start orso from a terminal where `gh` works. If you launch it some other way, it may not find `gh`.
+The app looks for `gh` in the usual places, including Homebrew. If you installed `gh` somewhere unusual, start orso from a terminal where `gh` works.
 
 ## Without the GitHub CLI
 

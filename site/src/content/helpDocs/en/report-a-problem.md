@@ -9,7 +9,7 @@ If none of the troubleshooting articles help, such as [The preview is blank or b
 
 ## What to include
 
-- Your orso version, from `orso --version`.
+- Your orso version: run `orso --version` in a terminal, or tell us which release you downloaded.
 - Your operating system, such as macOS 15 or Ubuntu 24.04.
 - What you clicked or typed, step by step.
 - What you expected to happen, and what happened instead.
