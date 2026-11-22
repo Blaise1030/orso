@@ -68,6 +68,17 @@ async function onReady() {
   }
 }
 
+async function onConvertToDraft() {
+  const id = store.projectId;
+  const branch = store.active?.branch;
+  if (!id || !branch) return;
+  try {
+    await store.convertToDraft(id, branch);
+  } catch (e) {
+    if (!store.needsSignIn) toast.error(errorMessage(e));
+  }
+}
+
 const items = computed<DropdownMenuItem[][]>(() => {
   const groups: DropdownMenuItem[][] = [];
   if (status.value) groups.push([{ type: "label", slot: "status" as const }]);
@@ -100,6 +111,16 @@ const items = computed<DropdownMenuItem[][]>(() => {
         disabled: store.markingReady,
         "data-testid": "ready-for-review",
         onSelect: () => void onReady(),
+      },
+    ]);
+  } else if (status.value?.state === "open") {
+    groups.push([
+      {
+        label: store.convertingToDraft ? "Converting…" : "Convert to draft",
+        icon: "i-hugeicons-dashed-line-circle",
+        disabled: store.convertingToDraft,
+        "data-testid": "convert-to-draft",
+        onSelect: () => void onConvertToDraft(),
       },
     ]);
   }

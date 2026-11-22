@@ -1032,16 +1032,18 @@ impl From<ApiPull> for PullRequest {
 #[derive(Deserialize)]
 struct ApiGraphql {
     #[serde(default)]
-    data: Option<ApiMarkReadyData>,
+    data: Option<ApiDraftMutationData>,
     #[serde(default)]
     errors: Vec<ApiGraphqlError>,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct ApiMarkReadyData {
+struct ApiDraftMutationData {
     #[serde(default)]
     mark_pull_request_ready_for_review: Option<ApiMarkReadyPayload>,
+    #[serde(default)]
+    convert_pull_request_to_draft: Option<ApiMarkReadyPayload>,
 }
 
 #[derive(Deserialize)]
@@ -1070,6 +1072,9 @@ struct ApiGraphqlError {
 
 const MARK_READY_MUTATION: &str = "mutation($id: ID!) { \
 markPullRequestReadyForReview(input: { pullRequestId: $id }) { pullRequest { isDraft } } }";
+
+const CONVERT_TO_DRAFT_MUTATION: &str = "mutation($id: ID!) { \
+convertPullRequestToDraft(input: { pullRequestId: $id }) { pullRequest { isDraft } } }";
 
 /// GraphQL endpoint for a REST API base: `https://api.github.com` → `/graphql`;
 /// GitHub Enterprise `https://host/api/v3` → `https://host/api/graphql`.
@@ -1725,7 +1730,7 @@ impl GithubAuth {
             ApiError::enoent("This change hasn't been shared yet — share it first")
         })?;
         if pull.draft {
-            self.mark_ready_mutation(&pull.node_id).await?;
+            self.set_pr_draft_mutation(&pull.node_id, false).await?;
         }
         let mut status = match self.pr_status(repo, head_branch).await {
             Ok(Some(s)) if s.number == pull.number => s,
@@ -1749,13 +1754,80 @@ impl GithubAuth {
         Ok(status)
     }
 
-    async fn mark_ready_mutation(&self, node_id: &str) -> Result<(), ApiError> {
-        const WHAT: &str = "GitHub couldn't send this change for a greenlight";
+    /// Put `head_branch`'s open pull request back to draft (GraphQL `convertPullRequestToDraft`).
+    /// Only while waiting for a greenlight (`PrState::Open`); already-draft PRs are left as is.
+    /// The mutation is authoritative when a status re-read lags.
+    pub async fn convert_to_draft(
+        &self,
+        repo: &str,
+        head_branch: &str,
+    ) -> Result<PrStatus, ApiError> {
+        let pull = self.find_pr(repo, head_branch).await?.ok_or_else(|| {
+            ApiError::enoent("This change hasn't been shared yet — share it first")
+        })?;
+        if !pull.draft {
+            // Prefer the review-aware state; if GitHub won't say (e.g. reviews 404), treat as open.
+            let state = match self.pull_and_state(repo, head_branch).await {
+                Ok(Some((_, s, _))) => s,
+                Ok(None) => {
+                    return Err(ApiError::enoent(
+                        "This change hasn't been shared yet — share it first",
+                    ));
+                }
+                Err(_) => PrState::Open,
+            };
+            match state {
+                PrState::Open => self.set_pr_draft_mutation(&pull.node_id, true).await?,
+                PrState::Draft => {}
+                _ => {
+                    return Err(ApiError::badreq(
+                        "Only a change waiting for a greenlight can go back to draft",
+                    ));
+                }
+            }
+        }
+        let mut status = match self.pr_status(repo, head_branch).await {
+            Ok(Some(s)) if s.number == pull.number => s,
+            _ => PrStatus {
+                number: pull.number,
+                url: pull.html_url,
+                state: PrState::Draft,
+                checks: ChecksState::None,
+                preview_url: None,
+                mergeable: None,
+                mergeable_state: None,
+                up_to_date: false,
+                sent_back: None,
+                head_sha: String::new(),
+            },
+        };
+        if status.state == PrState::Open {
+            status.state = PrState::Draft;
+        }
+        Ok(status)
+    }
+
+    /// GraphQL draft toggle: `to_draft` runs `convertPullRequestToDraft`, otherwise
+    /// `markPullRequestReadyForReview`. The response must report `isDraft == to_draft`.
+    async fn set_pr_draft_mutation(&self, node_id: &str, to_draft: bool) -> Result<(), ApiError> {
+        let (query, what, permission) = if to_draft {
+            (
+                CONVERT_TO_DRAFT_MUTATION,
+                "GitHub couldn't put this change back in draft",
+                "You don't have permission to put this change back in draft",
+            )
+        } else {
+            (
+                MARK_READY_MUTATION,
+                "GitHub couldn't send this change for a greenlight",
+                "You don't have permission to send this change for a greenlight",
+            )
+        };
         if node_id.is_empty() {
-            return Err(ApiError::github(format!("{WHAT}: no GitHub id for it")));
+            return Err(ApiError::github(format!("{what}: no GitHub id for it")));
         }
         let payload = serde_json::json!({
-            "query": MARK_READY_MUTATION,
+            "query": query,
             "variables": { "id": node_id },
         });
         let (status, body) = match self.token().await {
@@ -1800,18 +1872,16 @@ impl GithubAuth {
         let excerpt =
             |n: usize| -> String { String::from_utf8_lossy(&body).chars().take(n).collect() };
         if status == reqwest::StatusCode::FORBIDDEN {
-            return Err(ApiError::sandbox(
-                "You don't have permission to send this change for a greenlight",
-            ));
+            return Err(ApiError::sandbox(permission));
         }
         if !status.is_success() {
             return Err(ApiError::github(format!(
-                "{WHAT}: GitHub returned {status}: {}",
+                "{what}: GitHub returned {status}: {}",
                 excerpt(300)
             )));
         }
         let body: ApiGraphql = serde_json::from_slice(&body)
-            .map_err(|_| ApiError::github(format!("{WHAT}: unexpected response from GitHub")))?;
+            .map_err(|_| ApiError::github(format!("{what}: unexpected response from GitHub")))?;
         if let Some(e) = body.errors.into_iter().next() {
             let msg: String = e.message.chars().take(300).collect();
             return Err(
@@ -1819,23 +1889,28 @@ impl GithubAuth {
                     .as_deref()
                     .is_some_and(|k| PERMISSION_ERRORS.contains(&k))
                 {
-                    ApiError::sandbox(format!(
-                        "You don't have permission to send this change for a greenlight: {msg}"
-                    ))
+                    ApiError::sandbox(format!("{permission}: {msg}"))
                 } else {
-                    ApiError::github(format!("{WHAT}: {msg}"))
+                    ApiError::github(format!("{what}: {msg}"))
                 },
             );
         }
-        let out_of_draft = body
+        let is_draft = body
             .data
-            .and_then(|d| d.mark_pull_request_ready_for_review)
+            .and_then(|d| {
+                d.mark_pull_request_ready_for_review
+                    .or(d.convert_pull_request_to_draft)
+            })
             .and_then(|p| p.pull_request)
-            .is_some_and(|p| !p.is_draft);
-        if !out_of_draft {
-            return Err(ApiError::github(format!("{WHAT}: it is still a draft")));
+            .map(|p| p.is_draft);
+        match is_draft {
+            Some(flag) if flag == to_draft => Ok(()),
+            Some(_) if to_draft => Err(ApiError::github(format!("{what}: it is still ready"))),
+            Some(_) => Err(ApiError::github(format!("{what}: it is still a draft"))),
+            None => Err(ApiError::github(format!(
+                "{what}: unexpected response from GitHub"
+            ))),
         }
-        Ok(())
     }
 
     /// Merge `head_branch`'s open pull request into `main` (the Publish action), or say why
@@ -4148,7 +4223,7 @@ esac"#,
             &dir,
             r#"printf '%s' '{"data":{"markPullRequestReadyForReview":{"pullRequest":{"isDraft":false}}}}'"#,
         );
-        auth.mark_ready_mutation("PR_1").await.unwrap();
+        auth.set_pr_draft_mutation("PR_1", false).await.unwrap();
         let calls = std::fs::read_to_string(dir.join("gh.calls")).unwrap();
         assert!(calls.contains("api --method POST graphql --input -"));
         let sent: serde_json::Value =
@@ -6451,6 +6526,110 @@ esac"#,
                 }]))
             }),
         )
+    }
+
+    #[tokio::test]
+    async fn convert_to_draft_sends_the_graphql_mutation_with_the_pr_node_id() {
+        use axum::extract::Json as AxJson;
+        use axum::routing::post;
+        use std::sync::{Arc, Mutex};
+
+        let seen: Arc<Mutex<Vec<serde_json::Value>>> = Arc::new(Mutex::new(Vec::new()));
+        let seen2 = seen.clone();
+        let routes = one_open_pull(false)
+            .route(
+                "/repos/acme/site/pulls/4/reviews",
+                axum::routing::get(|| async { axum::Json(serde_json::json!([])) }),
+            )
+            .route(
+                "/graphql",
+                post(move |AxJson(body): AxJson<serde_json::Value>| {
+                    let seen2 = seen2.clone();
+                    async move {
+                        seen2.lock().unwrap().push(body);
+                        axum::Json(serde_json::json!({
+                            "data": { "convertPullRequestToDraft": { "pullRequest": { "isDraft": true } } }
+                        }))
+                    }
+                }),
+            );
+        let (base, stop) = mock_api(routes).await;
+        let auth = status_auth(base, "to-draft");
+        let st = auth
+            .convert_to_draft("acme/site", "content/launch-week")
+            .await
+            .unwrap();
+        assert_eq!(st.state, PrState::Draft);
+        let sent = seen.lock().unwrap().clone();
+        assert_eq!(sent.len(), 1);
+        assert!(sent[0]["query"]
+            .as_str()
+            .unwrap()
+            .contains("convertPullRequestToDraft(input: { pullRequestId: $id })"));
+        assert_eq!(sent[0]["variables"]["id"], "PR_abc");
+        stop();
+    }
+
+    #[tokio::test]
+    async fn convert_to_draft_skips_a_pr_that_is_already_a_draft() {
+        use axum::routing::post;
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        use std::sync::Arc;
+
+        let calls = Arc::new(AtomicUsize::new(0));
+        let calls2 = calls.clone();
+        let routes = one_open_pull(true).route(
+            "/graphql",
+            post(move || {
+                calls2.fetch_add(1, Ordering::SeqCst);
+                async { axum::Json(serde_json::json!({ "data": {} })) }
+            }),
+        );
+        let (base, stop) = mock_api(routes).await;
+        let auth = status_auth(base, "to-draft-noop");
+        let st = auth
+            .convert_to_draft("acme/site", "content/launch-week")
+            .await
+            .unwrap();
+        assert_eq!(st.state, PrState::Draft);
+        assert_eq!(calls.load(Ordering::SeqCst), 0);
+        stop();
+    }
+
+    #[tokio::test]
+    async fn convert_to_draft_rejects_greenlit_and_sent_back_changes() {
+        use axum::routing::get;
+
+        for (tag, review_state) in [
+            ("to-draft-approved", "APPROVED"),
+            ("to-draft-sent-back", "CHANGES_REQUESTED"),
+        ] {
+            let routes = one_open_pull(false).route(
+                "/repos/acme/site/pulls/4/reviews",
+                get(move || async move {
+                    axum::Json(serde_json::json!([{
+                        "id": 1,
+                        "user": { "login": "grace" },
+                        "state": review_state,
+                        "body": "note",
+                        "submitted_at": "2026-01-01T00:00:00Z"
+                    }]))
+                }),
+            );
+            let (base, stop) = mock_api(routes).await;
+            let auth = status_auth(base, tag);
+            let err = auth
+                .convert_to_draft("acme/site", "content/launch-week")
+                .await
+                .unwrap_err();
+            assert_eq!(err.code, ErrorCode::Badreq, "{tag}");
+            assert!(
+                err.message.contains("waiting for a greenlight"),
+                "{tag}: {}",
+                err.message
+            );
+            stop();
+        }
     }
 
     #[tokio::test]

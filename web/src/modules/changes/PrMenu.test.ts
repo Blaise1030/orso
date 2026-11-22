@@ -50,6 +50,8 @@ async function mountWith(status: PrStatus | null, api: Record<string, unknown> =
 }
 
 const ready = "[data-testid='ready-for-review']";
+const toDraft = "[data-testid='convert-to-draft']";
+
 
 beforeEach(() => {
   vi.mocked(toast.error).mockClear();
@@ -123,6 +125,37 @@ describe("PrMenu", () => {
     expect((await mountWith(draft)).w.find(ready).exists()).toBe(true);
     expect((await mountWith({ ...draft, state: "open" })).w.find(ready).exists()).toBe(false);
   });
+
+  it("offers Convert to draft only while waiting for a greenlight", async () => {
+    expect((await mountWith({ ...draft, state: "open" })).w.find(toDraft).exists()).toBe(true);
+    expect((await mountWith(draft)).w.find(toDraft).exists()).toBe(false);
+    expect((await mountWith({ ...draft, state: "approved" })).w.find(toDraft).exists()).toBe(false);
+    expect((await mountWith({ ...draft, state: "changes_requested" })).w.find(toDraft).exists()).toBe(false);
+  });
+
+  it("converts an open PR back to draft and trusts the returned state", async () => {
+    vi.useFakeTimers();
+    try {
+      const convertChangeToDraft = vi.fn(async (): Promise<PrStatus> => ({ ...draft, state: "draft" }));
+      const changeStatus = vi.fn(async (): Promise<PrStatus> => ({ ...draft, state: "open" }));
+      const { w, store } = await mountWith({ ...draft, state: "open" }, { convertChangeToDraft, changeStatus });
+      await w.find(toDraft).trigger("click");
+      await flushPromises();
+      expect(convertChangeToDraft).toHaveBeenCalledWith("site", "content/launch-week");
+      expect(changeStatus).not.toHaveBeenCalled();
+      expect(store.status?.state).toBe("draft");
+      await openMenu();
+      expect(w.find(toDraft).exists()).toBe(false);
+      expect(w.find(ready).exists()).toBe(true);
+      changeStatus.mockResolvedValue(draft);
+      await vi.advanceTimersByTimeAsync(STATUS_POLL_MS);
+      expect(changeStatus).toHaveBeenCalledTimes(1);
+      store.stopStatusPolling();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
 
   it("marks the PR ready and trusts the returned state", async () => {
     vi.useFakeTimers();

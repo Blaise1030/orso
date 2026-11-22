@@ -2,7 +2,8 @@
 //! `POST /api/changes/{branch}/switch`, `POST /api/changes/{branch}/share`,
 //! `GET /api/changes/{branch}/status`, `GET /api/changes/live`, `GET /api/docs/branch-protection`,
 //! `POST /api/changes/update`, `POST /api/changes/{branch}/cleanup`,
-//! `POST /api/changes/{branch}/ready`, `POST /api/changes/{branch}/publish`.
+//! `POST /api/changes/{branch}/ready`, `POST /api/changes/{branch}/draft`,
+//! `POST /api/changes/{branch}/publish`.
 
 use axum::body::Bytes;
 use axum::extract::rejection::QueryRejection;
@@ -899,6 +900,31 @@ pub async fn ready(
         ApiError::badreq("this project has no GitHub remote — open a repository first")
     })?;
     let mut pr = state.github.mark_ready_for_review(&repo, &branch).await?;
+    pr.up_to_date = changes::tip_is(&project.dir, &branch, &pr.head_sha).await;
+    Ok(Json(json!({ "pr": pr })))
+}
+
+/// `POST /api/changes/{branch}/draft` `{ project }` → `{ pr: { number, url, state, checks,
+/// previewUrl } }`. Puts a change waiting for a greenlight back to draft, then returns its
+/// status (draft, even if GitHub's re-read still lags).
+pub async fn draft(
+    State(state): State<AppState>,
+    Path(branch): Path<String>,
+    body: Bytes,
+) -> Result<Json<Value>, ApiError> {
+    let req: ShareRequest = serde_json::from_slice(&body).map_err(|e| {
+        ApiError::badreq(format!("expected JSON body {{\"project\": string}}: {e}"))
+    })?;
+    let project = state
+        .projects
+        .get(&req.project)
+        .await
+        .ok_or_else(|| ApiError::enoent(format!("no such project: {}", req.project)))?;
+    changes::get(&project.dir, &branch).await?;
+    let repo = project.repo.ok_or_else(|| {
+        ApiError::badreq("this project has no GitHub remote — open a repository first")
+    })?;
+    let mut pr = state.github.convert_to_draft(&repo, &branch).await?;
     pr.up_to_date = changes::tip_is(&project.dir, &branch, &pr.head_sha).await;
     Ok(Json(json!({ "pr": pr })))
 }

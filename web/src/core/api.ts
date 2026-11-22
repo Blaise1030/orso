@@ -430,6 +430,14 @@ export function createApi(
         })
       ).pr,
 
+    /** Put a change waiting for a greenlight back to draft; returns its fresh status. */
+    convertChangeToDraft: async (project: string, branch: string): Promise<PrStatus | null> =>
+      (
+        await json<{ pr: PrStatus | null }>("POST", `/api/changes/${enc(branch)}/draft`, {
+          body: { project },
+        })
+      ).pr,
+
     /** Publish a change: push it, open + ready its PR if needed, then merge it on GitHub.
      *  A colliding remote copy comes back as a combine to finish first. */
     publishChange: async (project: string, branch: string): Promise<PublishResult> => {
