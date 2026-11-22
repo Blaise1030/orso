@@ -5,7 +5,7 @@
 use std::path::Path;
 use std::process::Command;
 
-const TEMPLATE: &str = "templates/astro-marketing";
+const TEMPLATE: &str = "templates/astro-starter";
 
 fn workflow() -> String {
     std::fs::read_to_string(Path::new(TEMPLATE).join(".github/workflows/deploy.yml")).unwrap()
@@ -15,7 +15,7 @@ fn preview_alias(raw: &str) -> String {
     let out = Command::new("bash")
         .arg(Path::new(TEMPLATE).join(".github/scripts/preview-alias.sh"))
         .arg(raw)
-        .arg("astro-marketing")
+        .arg("astro-starter")
         .output()
         .expect("run preview-alias.sh");
     assert!(
@@ -30,7 +30,7 @@ fn preview_alias(raw: &str) -> String {
 }
 
 /// What Cloudflare accepts: a letter first, then `[a-z0-9-]`, no trailing `-`, and
-/// `<alias>-astro-marketing` within one 63-character DNS label.
+/// `<alias>-astro-starter` within one 63-character DNS label.
 fn assert_valid_alias(raw: &str, alias: &str) {
     let first = alias.chars().next();
     assert!(
@@ -45,7 +45,7 @@ fn assert_valid_alias(raw: &str, alias: &str) {
     );
     assert!(!alias.ends_with('-'), "{raw:?} -> {alias:?}");
     assert!(
-        alias.len() + 1 + "astro-marketing".len() <= 63,
+        alias.len() + 1 + "astro-starter".len() <= 63,
         "{raw:?} -> {alias:?}"
     );
 }

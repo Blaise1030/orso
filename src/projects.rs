@@ -52,7 +52,7 @@ impl DevserverStatus {
 ///
 /// Deliberately has no `Debug` derive: `Clone.env` carries the GitHub token.
 pub enum Source {
-    /// The embedded astro-marketing template, committed as the first checkpoint.
+    /// The embedded astro-starter template, committed as the first checkpoint.
     Template,
     /// `git clone` of `url`; `env` authenticates git (see [`crate::github::git_auth_env`]).
     Clone {
@@ -616,7 +616,7 @@ impl ProjectRegistry {
                     &[
                         "commit",
                         "-m",
-                        "Initial commit from astro-marketing template",
+                        "Initial commit from astro-starter template",
                     ],
                 )
                 .await?;

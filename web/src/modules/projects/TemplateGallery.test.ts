@@ -7,9 +7,9 @@ describe("TemplateGallery", () => {
   it("offers the Astro template and asks the page to create", async () => {
     const w = mount(TemplateGallery);
     expect(w.text()).toContain("Create from a template");
-    const card = w.get("[data-testid='template-astro-marketing']");
-    expect(card.text()).toContain("Astro marketing");
-    expect(card.text()).toContain("Astro landing page with blog and help content");
+    const card = w.get("[data-testid='template-astro-starter']");
+    expect(card.text()).toContain("Astro starter");
+    expect(card.text()).toContain("Get-started Astro site with a sample posts model");
     await card.trigger("click");
     expect(w.emitted("create")).toHaveLength(1);
   });

@@ -4,9 +4,9 @@ target/
 node_modules/
 web/dist/
 web/node_modules/
-templates/astro-marketing/node_modules/
-templates/astro-marketing/dist/
-templates/astro-marketing/.astro/
+templates/astro-starter/node_modules/
+templates/astro-starter/dist/
+templates/astro-starter/.astro/
 .DS_Store
 .claude/worktrees/
 .claude/settings.local.json

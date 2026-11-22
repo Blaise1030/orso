@@ -1,4 +1,4 @@
-//! Embedded assets: the scaffold template (`templates/astro-marketing/`), the Orso Astro
+//! Embedded assets: the scaffold template (`templates/astro-starter/`), the Orso Astro
 //! integration sources (`packages/astro/src/`, extracted as `integrations/orso/`), and the built
 //! SPA (`web/dist`), which the daemon serves as its router fallback.
 
@@ -126,7 +126,7 @@ pub async fn serve(method: Method, uri: Uri, headers: HeaderMap) -> Response {
 /// The Astro scaffold copied into every new project. Build artifacts that may exist in a
 /// developer checkout are excluded so they never leak into scaffolds.
 #[derive(RustEmbed)]
-#[folder = "templates/astro-marketing/"]
+#[folder = "templates/astro-starter/"]
 #[exclude = "node_modules/**"]
 #[exclude = "dist/**"]
 #[exclude = ".astro/**"]
@@ -357,7 +357,7 @@ mod tests {
             );
         }
 
-        for site in ["templates/astro-marketing", "site"] {
+        for site in ["templates/astro-starter", "site"] {
             let synced_root = root.join(site).join("integrations/orso");
             for rel in &rel_paths {
                 let name = rel.to_string_lossy().replace('\\', "/");

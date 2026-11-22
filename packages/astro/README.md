@@ -28,7 +28,7 @@ import { orsoGlob } from "../integrations/orso/index.js";
 
 Canonical sources stay in `packages/astro/src/` (top-level modules plus `checks/` and
 `panel/`). `just sync-orso-integration` replaces `integrations/orso/` in
-`templates/astro-marketing/` and `site/` with the full `.js` tree, so files removed here do not
+`templates/astro-starter/` and `site/` with the full `.js` tree, so files removed here do not
 linger there. To vendor the same
 files into an existing site, sparse-checkout `packages/astro/src` and copy those `.js`
 files (including subfolders) into `integrations/orso/`. The marketing template needs

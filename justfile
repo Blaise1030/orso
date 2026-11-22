@@ -7,7 +7,7 @@ default:
 setup:
     pnpm -C web install --frozen-lockfile
     npm --prefix packages/astro ci
-    npm --prefix templates/astro-marketing ci
+    npm --prefix templates/astro-starter ci
 
 # Daemon (API on :7800) + Vite dev server (HMR, proxies /api /ws /preview to the daemon).
 # The daemon's ready link points at Vite (:5173), not :7800, which serves the embedded
@@ -30,11 +30,11 @@ test:
     pnpm -C web install --frozen-lockfile
     pnpm -C web build
     npm --prefix packages/astro ci
-    npm --prefix templates/astro-marketing ci
+    npm --prefix templates/astro-starter ci
     cargo test
     pnpm -C web test
     npm --prefix packages/astro test
-    npm --prefix templates/astro-marketing test
+    npm --prefix templates/astro-starter test
 
 # Copy `packages/astro/src` runtime files into the template integrations/orso copy.
 sync-orso-integration:

@@ -41,7 +41,7 @@ jobs:
       deployments: write
       pull-requests: write
     env:
-      WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME || 'astro-marketing' }}
+      WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME || 'astro-starter' }}
     steps:
       # On a PR, build the head commit (not the merge commit): that is the SHA the deployment
       # is recorded for.

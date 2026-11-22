@@ -58,7 +58,7 @@ assets (no Worker script; `wrangler.toml` points `[assets]` at `./dist`):
 2. In the GitHub repo, **Settings → Secrets and variables → Actions**:
    - secret `CLOUDFLARE_API_TOKEN` — API token with the *Workers Scripts: Edit* permission;
    - secret `CLOUDFLARE_ACCOUNT_ID`;
-   - variable `CLOUDFLARE_WORKER_NAME` (optional; defaults to `astro-marketing`);
+   - variable `CLOUDFLARE_WORKER_NAME` (optional; defaults to `astro-starter`);
    - variable `PUBLIC_SITE_URL` (optional; canonical live origin, e.g. a custom domain — used
      for the production GitHub deployment URL when wrangler’s output is ambiguous).
 

@@ -180,7 +180,7 @@ for the PR head commit (preview) and for `main` (live).
 - **Deploying through a hosting provider's GitHub app** (Vercel, Netlify): those already
   create GitHub Deployments with URLs; check one in the repo's Environments page.
 - **No deploy yet:** offer orso's Cloudflare Workers workflow
-  (`templates/astro-marketing/.github/workflows/deploy.yml` and
+  (`templates/astro-starter/.github/workflows/deploy.yml` and
   `.github/scripts/preview-alias.sh` in Blaise1030/cms, plus a `wrangler.toml`). The user
   sets secrets `CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) and `CLOUDFLARE_ACCOUNT_ID`,
   and optionally the variable `CLOUDFLARE_WORKER_NAME`.
