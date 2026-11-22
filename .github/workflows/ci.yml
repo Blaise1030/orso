@@ -52,11 +52,11 @@ jobs:
       - name: Clippy
         run: cargo clippy --all-targets --locked -- -D warnings
       # Content tests run packages/astro's real `POST /__orso` endpoint in a fake dev server;
-      # template and scaffold tests copy templates/astro-marketing. Both need node_modules.
+      # template and scaffold tests copy templates/astro-starter. Both need node_modules.
       - name: Install content package deps
         run: npm --prefix packages/astro ci
       - name: Install template deps
-        run: npm --prefix templates/astro-marketing ci
+        run: npm --prefix templates/astro-starter ci
       - name: Test
         run: cargo test --locked
 
@@ -146,18 +146,18 @@ jobs:
       - run: pnpm -C web test
 
   template:
-    name: Template (astro-marketing)
+    name: Template (astro-starter)
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: templates/astro-marketing
+        working-directory: templates/astro-starter
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: templates/astro-marketing/package-lock.json
+          cache-dependency-path: templates/astro-starter/package-lock.json
       - run: npm ci
       # Builds the site, then runs scripts/*.test.mjs.
       - run: npm test

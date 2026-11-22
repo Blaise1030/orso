@@ -1,4 +1,4 @@
-//! Embedded assets: the scaffold template (`templates/astro-marketing/`), the Orso Astro
+//! Embedded assets: the scaffold template (`templates/astro-starter/`), the Orso Astro
 //! integration sources (`packages/astro/src/`, extracted as `integrations/orso/`), and the built
 //! SPA (`web/dist`), which the daemon serves as its router fallback.
 
@@ -126,7 +126,7 @@ pub async fn serve(method: Method, uri: Uri, headers: HeaderMap) -> Response {
 /// The Astro scaffold copied into every new project. Build artifacts that may exist in a
 /// developer checkout are excluded so they never leak into scaffolds.
 #[derive(RustEmbed)]
-#[folder = "templates/astro-marketing/"]
+#[folder = "templates/astro-starter/"]
 #[exclude = "node_modules/**"]
 #[exclude = "dist/**"]
 #[exclude = ".astro/**"]
@@ -165,8 +165,18 @@ pub fn orso_astro_paths() -> Vec<String> {
 /// overwritten.
 pub fn extract_template(dest: &Path) -> io::Result<()> {
     extract_embed::<Template>(dest)?;
-    extract_embed::<OrsoAstro>(&safe_join(dest, "integrations/orso")?)?;
+    extract_orso_integration(dest)?;
     Ok(())
+}
+
+/// Replace `site_root/integrations/orso` with the embedded Orso Astro integration sources.
+/// Removes any prior folder first so stale files (e.g. old presets) do not linger.
+pub fn extract_orso_integration(site_root: &Path) -> io::Result<()> {
+    let dest = safe_join(site_root, "integrations/orso")?;
+    if dest.exists() {
+        std::fs::remove_dir_all(&dest)?;
+    }
+    extract_embed::<OrsoAstro>(&dest)
 }
 
 fn extract_embed<T: RustEmbed>(dest: &Path) -> io::Result<()> {
@@ -222,8 +232,9 @@ mod tests {
             "astro.config.mjs",
             "src/content.config.ts",
             "src/site.ts",
-            "src/content/blog/en/welcome.md",
+            "src/content/posts/hello-orso.md",
             "src/pages/index.astro",
+            "src/pages/posts/index.astro",
         ] {
             assert!(paths.iter().any(|p| p == want), "missing {want}: {paths:?}");
         }
@@ -313,6 +324,9 @@ mod tests {
             assert!(!text.contains("file:../../packages/astro"));
             assert!(!text.contains("file:packages/astro"));
         }
+        assert!(tmp.path().join("src/content/posts/hello-orso.md").is_file());
+        assert!(!tmp.path().join("src/content/blog").exists());
+        assert!(!tmp.path().join("src/pages/blog").exists());
     }
 
     #[test]
@@ -357,7 +371,7 @@ mod tests {
             );
         }
 
-        for site in ["templates/astro-marketing", "site"] {
+        for site in ["templates/astro-starter", "site"] {
             let synced_root = root.join(site).join("integrations/orso");
             for rel in &rel_paths {
                 let name = rel.to_string_lossy().replace('\\', "/");

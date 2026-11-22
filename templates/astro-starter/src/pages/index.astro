@@ -1,0 +1,35 @@
+---
+import Base from "../layouts/Base.astro";
+import { organization, website } from "../lib/seo";
+import { site } from "../site";
+
+const steps = [
+  { n: 1, text: "Get started by editing src/pages/index.astro" },
+  { n: 2, text: "Edit a sample post in Orso or src/content/posts/" },
+  { n: 3, text: "Save and see your changes in preview." },
+];
+---
+
+<Base description={site.description} jsonLd={[website(), organization()]}>
+  <section class="page flex flex-1 flex-col items-center justify-center py-section text-center">
+    <h1 class="font-display text-5xl font-light tracking-display text-ink md:text-6xl">{site.name}</h1>
+    <ol class="mt-10 space-y-3 font-mono text-sm text-muted md:text-base">
+      {steps.map((step) => (
+        <li>
+          <span class="text-ink">{step.n}.</span> {step.text}
+        </li>
+      ))}
+    </ol>
+    <div class="mt-12 flex flex-wrap items-center justify-center gap-3">
+      <a class="button" href="/posts/">View sample posts</a>
+      <a class="button-quiet" href={site.docsUrl} rel="noopener noreferrer">Read the docs</a>
+    </div>
+    <nav class="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted" aria-label="Starter links">
+      <a class="transition-colors duration-quick ease-gentle hover:text-ink" href={site.docsUrl} rel="noopener noreferrer">Learn</a>
+      <a class="transition-colors duration-quick ease-gentle hover:text-ink" href="/posts/">Examples</a>
+      <a class="transition-colors duration-quick ease-gentle hover:text-ink" href={site.docsUrl} rel="noopener noreferrer">
+        Go to Orso <span aria-hidden="true">-&gt;</span>
+      </a>
+    </nav>
+  </section>
+</Base>

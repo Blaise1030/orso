@@ -69,8 +69,10 @@ pub fn manifest_collection(
     })
 }
 
-/// Writes the content manifest the orso Astro integration would emit for the template's
-/// `blog` and `helpDocs` collections. `site_prefix` is `""` or a site root like `"site/"`.
+/// Writes the content manifest the orso Astro integration would emit for fixture
+/// `blog` and `helpDocs` collections (used by content HTTP tests with the fake
+/// dev server — not the starter's real `posts` model). `site_prefix` is `""` or a
+/// site root like `"site/"`.
 pub fn write_content_manifest(project: &Path, site_prefix: &str) {
     let string = json!({ "type": "string", "required": true });
     let blog = json!({
@@ -115,4 +117,59 @@ pub fn write_content_manifest(project: &Path, site_prefix: &str) {
         serde_json::to_vec_pretty(&manifest).unwrap(),
     )
     .unwrap();
+}
+
+/// Seeds sample `blog` / `helpDocs` files for the fake-devserver fixture and commits them
+/// when the project is already a git repo (so HTTP content tests start from a clean tree).
+pub fn seed_fixture_content(project: &Path, site_prefix: &str) {
+    let blog = project.join(format!("{site_prefix}src/content/blog/en"));
+    let help = project.join(format!("{site_prefix}src/content/helpDocs/en"));
+    std::fs::create_dir_all(&blog).unwrap();
+    std::fs::create_dir_all(&help).unwrap();
+    if !blog.join("welcome.md").exists() {
+        std::fs::write(
+            blog.join("welcome.md"),
+            "---\ntitle: Welcome\ndescription: Fixture\npubDate: \"2026-01-01\"\n---\nBody\n",
+        )
+        .unwrap();
+    }
+    if !help.join("getting-started.md").exists() {
+        std::fs::write(
+            help.join("getting-started.md"),
+            "---\ntitle: Getting started\ndescription: Fixture\nsection: basics\norder: 1\n---\nBody\n",
+        )
+        .unwrap();
+    }
+
+    if !project.join(".git").is_dir() {
+        return;
+    }
+    let status = std::process::Command::new("git")
+        .args(["status", "--porcelain"])
+        .current_dir(project)
+        .output()
+        .unwrap();
+    if status.stdout.is_empty() {
+        return;
+    }
+    assert!(std::process::Command::new("git")
+        .args(["add", "-A"])
+        .current_dir(project)
+        .status()
+        .unwrap()
+        .success());
+    assert!(std::process::Command::new("git")
+        .args([
+            "-c",
+            "user.name=orso",
+            "-c",
+            "user.email=orso@local",
+            "commit",
+            "-m",
+            "fixture content collections",
+        ])
+        .current_dir(project)
+        .status()
+        .unwrap()
+        .success());
 }

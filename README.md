@@ -45,7 +45,7 @@ terminal open while you work. Ctrl-C stops orso.
 ## Getting started
 
 1. **Create or open a project.** Choose **New project**, then start from the built-in Astro
-   marketing template or pick an existing repo from GitHub. Sign in to GitHub when asked.
+   Astro starter template or pick an existing repo from GitHub. Sign in to GitHub when asked.
 2. **Look around.** The left rail has the project tabs:
    - **Preview**: your site running live, with the page you are on.
    - **Content**: blog posts, docs and other content collections, with a form for each entry's
@@ -76,7 +76,7 @@ once it meets these requirements:
 | --- | --- |
 | Default branch `main` | Changes, sync and publishing |
 | Astro `>=7.3.0 <8`, with a `dev` script | Live preview |
-| orso's integration copied into `integrations/orso/`, `orso()` in the config, plus `yaml`, `js-yaml`, `jsonc-parser`, `linkedom` | Content tab and page checks |
+| `orso init` in the site (copies `integrations/orso/`, writes starter `orso.json`), then `orso()` in the config, plus `yaml`, `js-yaml`, `jsonc-parser`, `linkedom` | Content tab and page checks |
 | Collections loaded with `orsoGlob` (`*.md`, `*.mdx` or `*.json`, with a schema) | Editable content |
 | `DESIGN.md` at the root | Design tab |
 | A deploy that records GitHub Deployments with an `environment_url` | Preview and Open live site links |
@@ -86,15 +86,22 @@ once it meets these requirements:
 | Pull request preview builds with `ORSO_PREVIEW=1` (optional; never production) | Review screenshots of the preview without a screen-sharing prompt |
 | Push access to create the `orso-review-assets` branch (optional) | Screenshot comments and images on review comments; orso keeps them on that branch, deletes it when no open change needs it, and it can be deleted any time |
 
-Let your coding agent do it. Install the skills, then ask it to "set up this site for orso":
+Or from the site root, with the Orso binary on your `PATH`:
+
+```sh
+orso init          # integrations/orso/ + starter orso.json; prints the orso() snippet
+```
+
+Let your coding agent do the rest. Install the skills, then ask it to "set up this site for orso":
 
 ```sh
 npx skills add Blaise1030/cms --skill setup-orso       # adopt or update orso in a repo
 npx skills add Blaise1030/cms --skill working-in-orso  # day-to-day editing rules
 ```
 
-The skill checks the repo, wires everything in on a branch, migrates sites still using the
-old `orso-astro` package, and verifies the dev server and content manifest before it reports.
+The skill checks the repo, runs `orso init` when needed, wires `orso()` and collections on a
+branch, migrates sites still using the old `orso-astro` package, and verifies the dev server
+and content manifest before it reports.
 
 ## Publishing your site
 

@@ -553,5 +553,6 @@ describe("About settings", () => {
     expect(w.get("[data-testid='about-version']").text()).toBe("v0.1.0");
     expect(section.text()).toContain("Your data stays local");
     expect(section.text()).toContain("Sites, content, and history live on this Mac.");
+    expect(w.find("[data-testid='about-update-download']").exists()).toBe(false);
   });
 });

@@ -78,7 +78,7 @@ async fn project(tmp: &Path) -> (axum::Router, std::path::PathBuf) {
     (http::router(st), dir)
 }
 
-const WELCOME: &str = "src/content/blog/en/welcome.md";
+const WELCOME: &str = "src/content/posts/hello-orso.md";
 
 #[tokio::test]
 async fn dirty_tree_creates_checkpoint_and_clean_tree_skips() {
@@ -188,7 +188,7 @@ async fn log_and_diff_endpoints_match_git() {
         .starts_with("text/plain"));
     let diff = String::from_utf8(bytes).unwrap();
     assert!(
-        diff.starts_with("diff --git a/src/content/blog/en/welcome.md"),
+        diff.starts_with("diff --git a/src/content/posts/hello-orso.md"),
         "{diff}"
     );
     assert!(diff.contains("+changed"));
@@ -440,11 +440,7 @@ async fn tree_and_file_reads() {
 
     let (s, v) = call(
         &app,
-        req(
-            "GET",
-            "/api/tree?project=site&path=src/content/blog/en",
-            None,
-        ),
+        req("GET", "/api/tree?project=site&path=src/content/posts", None),
     )
     .await;
     assert_eq!(s, StatusCode::OK);
@@ -452,7 +448,7 @@ async fn tree_and_file_reads() {
         .as_array()
         .unwrap()
         .iter()
-        .find(|e| e["name"] == "welcome.md")
+        .find(|e| e["name"] == "hello-orso.md")
         .unwrap();
     assert_eq!(welcome["kind"], "file");
     assert_eq!(welcome["path"], WELCOME);

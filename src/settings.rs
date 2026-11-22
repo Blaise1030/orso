@@ -20,8 +20,10 @@ use std::path::{Path, PathBuf};
 pub const SETTINGS_FILE: &str = "orso.json";
 pub const HOST: &str = "127.0.0.1";
 
-const DEFAULT_INSTALL: &str = "npm install --no-audit --no-fund --no-progress";
-const DEFAULT_DEV: &str = "npm run dev -- --port {port} --host {host} --ignore-lock";
+/// Default `orso.json` `install` when the field is omitted (and for `orso init`).
+pub const DEFAULT_INSTALL: &str = "npm install --no-audit --no-fund --no-progress";
+/// Default `orso.json` `dev` when the field is omitted (and for `orso init`).
+pub const DEFAULT_DEV: &str = "npm run dev -- --port {port} --host {host} --ignore-lock";
 /// Labels on orso's pull requests when `orso.json` sets no `prLabels`.
 pub const DEFAULT_PR_LABELS: &[&str] = &["orso"];
 /// GitHub refuses label names longer than this.
