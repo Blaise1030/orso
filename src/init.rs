@@ -19,7 +19,10 @@ pub fn starter_orso_json() -> String {
         "install": DEFAULT_INSTALL,
         "dev": DEFAULT_DEV,
     });
-    format!("{}\n", serde_json::to_string_pretty(&value).expect("starter orso.json"))
+    format!(
+        "{}\n",
+        serde_json::to_string_pretty(&value).expect("starter orso.json")
+    )
 }
 
 /// Copy the Orso Astro integration into `dir` and ensure a starter `orso.json`.
@@ -96,11 +99,21 @@ mod tests {
         let custom = "{\n  \"install\": \"pnpm install\"\n}\n";
         fs::write(tmp.path().join("orso.json"), custom).unwrap();
         // Drop a stale file that refresh should remove.
-        fs::write(tmp.path().join("integrations/orso/stale-marker.js"), "// stale").unwrap();
+        fs::write(
+            tmp.path().join("integrations/orso/stale-marker.js"),
+            "// stale",
+        )
+        .unwrap();
         let msg = run(tmp.path(), false).unwrap();
-        assert_eq!(fs::read_to_string(tmp.path().join("orso.json")).unwrap(), custom);
+        assert_eq!(
+            fs::read_to_string(tmp.path().join("orso.json")).unwrap(),
+            custom
+        );
         assert!(msg.contains("kept existing"));
-        assert!(!tmp.path().join("integrations/orso/stale-marker.js").exists());
+        assert!(!tmp
+            .path()
+            .join("integrations/orso/stale-marker.js")
+            .exists());
         assert!(tmp.path().join("integrations/orso/index.js").is_file());
     }
 

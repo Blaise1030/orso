@@ -613,11 +613,7 @@ impl ProjectRegistry {
                 git(dir, &["add", "-A"]).await?;
                 git(
                     dir,
-                    &[
-                        "commit",
-                        "-m",
-                        "Initial commit from astro-starter template",
-                    ],
+                    &["commit", "-m", "Initial commit from astro-starter template"],
                 )
                 .await?;
             }

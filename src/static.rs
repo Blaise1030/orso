@@ -232,8 +232,9 @@ mod tests {
             "astro.config.mjs",
             "src/content.config.ts",
             "src/site.ts",
-            "src/content/blog/en/welcome.md",
+            "src/content/posts/hello-orso.md",
             "src/pages/index.astro",
+            "src/pages/posts/index.astro",
         ] {
             assert!(paths.iter().any(|p| p == want), "missing {want}: {paths:?}");
         }

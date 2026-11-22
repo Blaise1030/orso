@@ -20,7 +20,7 @@ use serde_json::{json, Value};
 use tower::ServiceExt;
 
 const READY_TIMEOUT: Duration = Duration::from_secs(300);
-const WELCOME: &str = "src/content/blog/en/welcome.md";
+const HELLO: &str = "src/content/posts/hello-orso.md";
 
 fn git(dir: &Path, args: &[&str]) -> String {
     let out = Command::new("git")
@@ -100,22 +100,21 @@ async fn save_through_the_integration(state: &AppState, app: &axum::Router) {
     assert!(dir.join(".astro/orso-content.json").is_file());
 
     let collections = list_collections(dir).await.unwrap();
-    for name in ["blog", "helpDocs"] {
-        let c = collections
-            .iter()
-            .find(|c| c.name == name)
-            .unwrap_or_else(|| panic!("no {name} collection: {collections:?}"));
-        assert!(c.editable, "{name} is not editable: {c:?}");
-    }
+    let posts = collections
+        .iter()
+        .find(|c| c.name == "posts")
+        .unwrap_or_else(|| panic!("no posts collection: {collections:?}"));
+    assert!(posts.editable, "posts is not editable: {posts:?}");
+    assert_eq!(collections.len(), 1, "{collections:?}");
 
-    let change = changes::create(dir, "Retitle welcome").await.unwrap();
+    let change = changes::create(dir, "Retitle hello-orso").await.unwrap();
     let branch = git(dir, &["branch", "--show-current"]);
     assert_eq!(branch, change.branch);
 
     let (s, entry) = call(
         app,
         "GET",
-        &format!("/api/content/entry?project={id}&collection=blog&id=welcome"),
+        &format!("/api/content/entry?project={id}&collection=posts&id=hello-orso"),
         None,
     )
     .await;
@@ -127,20 +126,20 @@ async fn save_through_the_integration(state: &AppState, app: &axum::Router) {
         "/api/content/entry",
         Some(json!({
             "project": id,
-            "collection": "blog",
-            "id": "welcome",
+            "collection": "posts",
+            "id": "hello-orso",
             "branch": branch,
             "hash": entry["hash"],
-            "fields": { "title": "Welcome, end to end" },
+            "fields": { "title": "Hello, end to end" },
             "body": entry["body"],
         })),
     )
     .await;
     assert_eq!(s, StatusCode::OK, "{saved}");
-    let source = std::fs::read_to_string(dir.join(WELCOME)).unwrap();
-    assert!(source.contains("Welcome, end to end"), "{source}");
+    let source = std::fs::read_to_string(dir.join(HELLO)).unwrap();
+    assert!(source.contains("Hello, end to end"), "{source}");
     let subject = git(dir, &["log", "-1", "--format=%s"]);
-    assert!(subject.contains("Update blog/welcome"), "{subject}");
+    assert!(subject.contains("Update posts/hello-orso"), "{subject}");
 }
 
 #[tokio::test]
