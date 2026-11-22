@@ -6,6 +6,7 @@ import CommandPalette from "@/app/CommandPalette.vue";
 import DaemonUnreachable from "@/app/DaemonUnreachable.vue";
 import SetupCheck from "@/app/SetupCheck.vue";
 import UpdateNotice from "@/app/UpdateNotice.vue";
+import { startDesktopUpdateCheck } from "@/app/desktopUpdateStore";
 import { SETUP_WAIT_MS, dismissSetup, setupDismissed, setupIncomplete } from "@/app/setup";
 import UIcon from "@nuxt/ui/components/Icon.vue";
 import { useToast } from "@nuxt/ui/composables/useToast";
@@ -27,11 +28,19 @@ installToast(useToast());
 // flashing the app back in.
 const retrying = ref(false);
 const showOffline = computed(() => daemon.status.value === "unreachable" || retrying.value);
+let updateCheckStarted = false;
 
 watch(daemon.status, (s) => {
   if (s === "open" || s === "unreachable") retrying.value = false;
   // First successful connect (or a retry after the daemon was down): fetch the project list.
   if (s === "open" && !projects.loaded) void projects.load();
+  if (s === "open" && !updateCheckStarted) {
+    updateCheckStarted = true;
+    void daemon.api.health().then(
+      (h) => startDesktopUpdateCheck(h.version),
+      () => {},
+    );
+  }
 });
 
 // First-run setup check: shown instead of the shell when something is missing and the user

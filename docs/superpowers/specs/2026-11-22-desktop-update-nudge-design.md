@@ -1,7 +1,7 @@
 # Desktop update nudge (soft download link)
 
 **Date:** 2026-11-22  
-**Status:** Draft — awaiting user review  
+**Status:** Approved — implementing on PR #114  
 **Related:** [Desktop release](../../desktop-release.md), existing `UpdateNotice` / `desktopUpdate.ts`
 
 ## Problem

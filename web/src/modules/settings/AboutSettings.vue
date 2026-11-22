@@ -3,12 +3,14 @@
 // lives, and a way out to the project.
 import { onMounted, ref } from "vue";
 import UBadge from "@nuxt/ui/components/Badge.vue";
+import UButton from "@nuxt/ui/components/Button.vue";
 import ULink from "@nuxt/ui/components/Link.vue";
+import { desktopUpdate } from "@/app/desktopUpdateStore";
 import { useDaemon } from "@/core/daemon";
 import SettingsRow from "./SettingsRow.vue";
 import SettingsSection from "./SettingsSection.vue";
 
-const REPO_URL = "https://github.com/Blaise1030/cms";
+const REPO_URL = "https://github.com/Blaise1030/orso";
 const DOCS_URL = `${REPO_URL}/tree/main/docs`;
 
 const daemon = useDaemon();
@@ -23,6 +25,11 @@ onMounted(async () => {
     unavailable.value = true;
   }
 });
+
+function openDownload() {
+  const url = desktopUpdate.value?.downloadUrl;
+  if (url) window.open(url, "_blank", "noopener,noreferrer");
+}
 </script>
 
 <template>
@@ -36,6 +43,20 @@ onMounted(async () => {
         <UBadge color="neutral" variant="subtle" data-testid="about-version">
           {{ version ? `v${version.replace(/^v/, "")}` : unavailable ? "Unknown" : "Checking…" }}
         </UBadge>
+      </template>
+    </SettingsRow>
+
+    <SettingsRow
+      v-if="desktopUpdate"
+      icon="i-hugeicons-download-01"
+      title="Update available"
+      :description="`orso v${desktopUpdate.version} is ready to download.`"
+      data-testid="about-update"
+    >
+      <template #actions>
+        <UButton size="sm" data-testid="about-update-download" @click="openDownload">
+          Download
+        </UButton>
       </template>
     </SettingsRow>
 
