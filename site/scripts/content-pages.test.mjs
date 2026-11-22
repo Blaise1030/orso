@@ -23,21 +23,21 @@ function build(dir) {
 }
 
 test("built sample Blog and Help articles render Markdown and navigation", () => {
-  assert.match(html(root, "blog"), /Welcome to the blog/);
-  assert.match(html(root, "blog/welcome"), /<h2[^>]*>.*Welcome/);
+  assert.match(html(root, "blog"), /Introducing Orso/);
+  assert.match(html(root, "blog/introducing-orso"), /<h2[^>]*>.*What Orso is/);
   assert.match(html(root, ""), /href="\/blog\/"[^>]*>(?:<[^>]+>)*Blog/);
   assert.match(html(root, ""), /href="\/help\/"[^>]*>(?:<[^>]+>)*Help/);
-  for (const id of ["hero", "logos", "features", "testimonials", "pricing", "faq", "cta"]) assert.match(html(root, ""), new RegExp(`id="${id}"`));
+  for (const id of ["product", "logos", "how-it-works", "proof", "faq", "cta"]) assert.match(html(root, ""), new RegExp(`id="${id}"`));
 });
 
 test("built sample blog categories link their posts", () => {
-  assert.match(html(root, "blog"), /href="\/blog\/categories\/guides\/"[^>]*>(?:<[^>]+>)*Guides/);
+  assert.match(html(root, "blog"), /href="\/blog\/categories\/announcements\/"[^>]*>(?:<[^>]+>)*Announcements/);
   assert.match(html(root, "blog/categories"), /<h1[^>]*>Blog categories/);
-  const guides = html(root, "blog/categories/guides");
-  assert.match(guides, /<h1[^>]*>Guides/);
-  assert.match(guides, /href="\/blog\/plan-a-launch-in-a-week\/"/);
-  assert.doesNotMatch(guides, /href="\/blog\/welcome\/"/);
-  assert.match(html(root, "blog/welcome"), /Keep reading/);
+  const announcements = html(root, "blog/categories/announcements");
+  assert.match(announcements, /<h1[^>]*>Announcements/);
+  assert.match(announcements, /href="\/blog\/introducing-orso\/"/);
+  assert.doesNotMatch(announcements, /No posts in this category yet/);
+  assert.match(html(root, "blog/introducing-orso"), /href="\/blog\/categories\/announcements\/"/);
   // The search palette island points at its section's index.
   assert.match(html(root, "blog"), /bundlePath&quot;:\[0,&quot;\/pagefind-blog\/&quot;\]/);
   assert.ok(existsSync(join(root, "dist", "pagefind-blog", "pagefind.js")), "pagefind-blog index");
@@ -56,7 +56,7 @@ test("built routes sort Blog and Help entries", () => fixture((dir) => {
   const blog = html(dir, "blog");
   assert.ok(blog.indexOf("Newest article") < blog.indexOf("Oldest article"));
   assert.match(blog, /href="\/blog\/a-new\/"/);
-  assert.match(blog, /href="\/#features"/);
+  assert.match(blog, /href="\/#product"/);
   const help = html(dir, "help");
   assert.ok(help.indexOf("First guide") < help.indexOf("Alpha guide"));
   assert.ok(help.indexOf("Alpha guide") < help.indexOf("Last guide"));
@@ -80,7 +80,7 @@ test("built routes sort Blog and Help entries", () => fixture((dir) => {
   assert.match(file("sitemap.xml"), /<loc>https:\/\/example\.com\/blog\/a-new\/<\/loc>/);
   assert.match(file("sitemap.xml"), /<loc>https:\/\/example\.com\/help\/z-first\/<\/loc>/);
   assert.match(file("sitemap.xml"), /<loc>https:\/\/example\.com\/privacy\/<\/loc>/);
-  assert.match(file("llms.txt"), /^# Orso\n\n> /);
+  assert.match(file("llms.txt"), /^# Project Orso\n\n> /);
   assert.match(file("llms.txt"), /- \[Newest article\]\(https:\/\/example\.com\/blog\/a-new\/\): New article/);
   assert.match(html(dir, "blog/a-new"), /<link rel="canonical" href="https:\/\/example\.com\/blog\/a-new\/"/);
   assert.match(html(dir, "blog/a-new"), /"@type":"BlogPosting"/);
