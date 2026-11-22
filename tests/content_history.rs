@@ -50,11 +50,17 @@ async fn project(tmp: &Path) -> (axum::Router, std::path::PathBuf) {
     (http::router(st), dir)
 }
 
-const WELCOME: &str = "src/content/blog/en/welcome.md";
-const WELCOME2: &str = "src/content/blog/en/welcome2.md";
+/// Sample post from the astro-starter scaffold (used by git file-history unit tests).
+const SAMPLE: &str = "src/content/posts/hello-orso.md";
+const SAMPLE2: &str = "src/content/posts/hello-orso-2.md";
+/// Fixture blog entry seeded for fake-devserver content HTTP tests.
+const BLOG_WELCOME: &str = "src/content/blog/en/welcome.md";
 
 fn append(dir: &Path, path: &str, text: &str) {
     let file = dir.join(path);
+    if let Some(parent) = file.parent() {
+        std::fs::create_dir_all(parent).unwrap();
+    }
     let mut body = std::fs::read_to_string(&file).unwrap_or_default();
     body.push_str(text);
     std::fs::write(file, body).unwrap();
@@ -65,18 +71,18 @@ async fn file_log_lists_commits_touching_path_newest_first() {
     let tmp = tempfile::tempdir().unwrap();
     let (_app, dir) = project(tmp.path()).await;
     git_cli(&dir, &["checkout", "-b", "content/x"]);
-    append(&dir, WELCOME, "\nOne.\n");
+    append(&dir, SAMPLE, "\nOne.\n");
     git::checkpoint(&dir, "one").await.unwrap().unwrap();
     append(&dir, "README.md", "\nOther.\n");
     git::checkpoint(&dir, "other").await.unwrap().unwrap();
-    append(&dir, WELCOME, "\nTwo.\n");
+    append(&dir, SAMPLE, "\nTwo.\n");
     git::checkpoint(&dir, "two").await.unwrap().unwrap();
 
-    let log = git::file_log(&dir, WELCOME).await.unwrap();
+    let log = git::file_log(&dir, SAMPLE).await.unwrap();
     assert_eq!(log[0].summary, "two");
     assert_eq!(log[1].summary, "one");
     assert!(log.iter().all(|v| v.summary != "other"));
-    assert!(log.iter().all(|v| v.path == WELCOME));
+    assert!(log.iter().all(|v| v.path == SAMPLE));
 }
 
 #[tokio::test]
@@ -85,10 +91,10 @@ async fn file_log_marks_main_commits_published() {
     let (_app, dir) = project(tmp.path()).await;
     let scaffold = git_cli(&dir, &["rev-parse", "main"]);
     git_cli(&dir, &["checkout", "-b", "content/x"]);
-    append(&dir, WELCOME, "\nDraft.\n");
+    append(&dir, SAMPLE, "\nDraft.\n");
     let draft = git::checkpoint(&dir, "draft").await.unwrap().unwrap();
 
-    let log = git::file_log(&dir, WELCOME).await.unwrap();
+    let log = git::file_log(&dir, SAMPLE).await.unwrap();
     let find = |sha: &str| log.iter().find(|v| v.sha == sha).unwrap();
     assert!(!find(&draft.sha).published);
     assert!(find(&scaffold).published);
@@ -98,16 +104,16 @@ async fn file_log_marks_main_commits_published() {
 async fn file_log_follows_renames_and_file_at_reads_old_path() {
     let tmp = tempfile::tempdir().unwrap();
     let (_app, dir) = project(tmp.path()).await;
-    append(&dir, WELCOME, "\nBefore the move.\n");
+    append(&dir, SAMPLE, "\nBefore the move.\n");
     git::checkpoint(&dir, "before").await.unwrap().unwrap();
-    git_cli(&dir, &["mv", WELCOME, WELCOME2]);
+    git_cli(&dir, &["mv", SAMPLE, SAMPLE2]);
     git::checkpoint(&dir, "moved").await.unwrap().unwrap();
 
-    let log = git::file_log(&dir, WELCOME2).await.unwrap();
+    let log = git::file_log(&dir, SAMPLE2).await.unwrap();
     assert_eq!(log[0].summary, "moved");
-    assert_eq!(log[0].path, WELCOME2);
+    assert_eq!(log[0].path, SAMPLE2);
     let old = log.iter().find(|v| v.summary == "before").unwrap();
-    assert_eq!(old.path, WELCOME);
+    assert_eq!(old.path, SAMPLE);
     assert!(git::file_at(&dir, &old.sha, &old.path)
         .await
         .unwrap()
@@ -118,27 +124,24 @@ async fn file_log_follows_renames_and_file_at_reads_old_path() {
 async fn file_log_is_empty_for_untracked_file() {
     let tmp = tempfile::tempdir().unwrap();
     let (_app, dir) = project(tmp.path()).await;
-    std::fs::write(dir.join("src/content/blog/en/new.md"), "new\n").unwrap();
-    assert_eq!(
-        git::file_log(&dir, "src/content/blog/en/new.md")
-            .await
-            .unwrap(),
-        vec![]
-    );
+    let path = "src/content/posts/new.md";
+    std::fs::create_dir_all(dir.join("src/content/posts")).unwrap();
+    std::fs::write(dir.join(path), "new\n").unwrap();
+    assert_eq!(git::file_log(&dir, path).await.unwrap(), vec![]);
 }
 
 #[tokio::test]
 async fn file_log_skips_deletion_commits() {
     let tmp = tempfile::tempdir().unwrap();
     let (_app, dir) = project(tmp.path()).await;
-    append(&dir, WELCOME, "\nFirst life.\n");
+    append(&dir, SAMPLE, "\nFirst life.\n");
     git::checkpoint(&dir, "first").await.unwrap().unwrap();
-    std::fs::remove_file(dir.join(WELCOME)).unwrap();
+    std::fs::remove_file(dir.join(SAMPLE)).unwrap();
     git::checkpoint(&dir, "deleted").await.unwrap().unwrap();
-    append(&dir, WELCOME, "Second life.\n");
+    append(&dir, SAMPLE, "Second life.\n");
     git::checkpoint(&dir, "recreated").await.unwrap().unwrap();
 
-    let log = git::file_log(&dir, WELCOME).await.unwrap();
+    let log = git::file_log(&dir, SAMPLE).await.unwrap();
     assert_eq!(log[0].summary, "recreated");
     assert!(log.iter().all(|v| v.summary != "deleted"));
     for v in &log {
@@ -168,7 +171,7 @@ async fn file_at_rejects_option_and_parent_paths() {
 async fn file_at_rejects_non_hex_sha() {
     let tmp = tempfile::tempdir().unwrap();
     let (_app, dir) = project(tmp.path()).await;
-    let err = git::file_at(&dir, "HEAD~1", WELCOME).await.unwrap_err();
+    let err = git::file_at(&dir, "HEAD~1", SAMPLE).await.unwrap_err();
     assert_eq!(err.http_status(), 400);
 }
 
@@ -210,7 +213,7 @@ async fn content_project(tmp: &Path) -> (axum::Router, std::path::PathBuf, Strin
 }
 
 fn set_title(dir: &Path, title: &str) {
-    let file = dir.join(WELCOME);
+    let file = dir.join(BLOG_WELCOME);
     let text = std::fs::read_to_string(&file).unwrap();
     let text = text
         .lines()
@@ -268,14 +271,11 @@ async fn version_endpoint_returns_parsed_old_content() {
     .await;
     assert_eq!(s, StatusCode::OK, "{v}");
     assert_eq!(v["sha"], old.sha);
-    assert_eq!(v["path"], WELCOME);
+    assert_eq!(v["path"], BLOG_WELCOME);
     assert_eq!(v["fields"]["title"], "Old");
     assert_eq!(v["parseable"], true);
     assert!(v["source"].as_str().unwrap().contains("Old"));
-    assert!(v["body"]
-        .as_str()
-        .unwrap()
-        .contains("We're glad you're here"));
+    assert!(v["body"].as_str().unwrap().contains("Body"));
     common::stop_fake(&st, &id).await;
 }
 
@@ -320,7 +320,7 @@ async fn version_endpoint_returns_old_content_after_rename() {
     )
     .await;
     assert_eq!(s, StatusCode::OK, "{v}");
-    assert_eq!(v["path"], WELCOME);
+    assert_eq!(v["path"], BLOG_WELCOME);
     assert_eq!(v["fields"]["title"], "Before rename");
     common::stop_fake(&st, &id).await;
 }
