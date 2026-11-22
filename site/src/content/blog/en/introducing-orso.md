@@ -42,6 +42,10 @@ It is free and open source under the MIT licence. There is no paid plan, and no 
 
 ## Try it
 
+Download Orso for macOS or Linux from [the download section](/#get-orso). On a Mac, open the DMG and drag Orso to Applications, then launch it.
+
+If you prefer the terminal, Homebrew works too:
+
 ```sh
 brew install blaise1030/tap/orso
 orso serve --open
