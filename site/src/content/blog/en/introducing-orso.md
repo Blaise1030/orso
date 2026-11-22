@@ -5,7 +5,6 @@ pubDate: "2026-11-22"
 categories: [announcements]
 tags: [announcement, astro, open source]
 ---
-
 ## The "can you change the pricing?" problem
 
 On most teams, a small copy change follows a long route. Someone posts in a chat, a developer finds the file, edits it, and deploys. The content team waits, and the developer loses an afternoon to work that isn't theirs.
@@ -13,6 +12,8 @@ On most teams, a small copy change follows a long route. Someone posts in a chat
 A hosted CMS fixes the wait, but it takes the content out of the repo. You get a subscription, a second place to look, and a site that is harder for everyone else to change.
 
 We wanted a third option: the content team edits the site directly, and the repo stays exactly as it is.
+
+This is a new item
 
 ## What Orso is
 
