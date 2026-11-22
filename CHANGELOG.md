@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.1.14
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.12...v0.1.14)
+
+### Features
+
+- **astro-starter:** Get-started home and site-owned posts sample ([a5d0e06](https://github.com/Blaise1030/CMS/commit/a5d0e06))
+- Add orso init to vendor integrations/orso and orso.json ([33dca4e](https://github.com/Blaise1030/CMS/commit/33dca4e))
+- **desktop:** Soft update nudge via GitHub releases ([dbc76db](https://github.com/Blaise1030/CMS/commit/dbc76db))
+
+### Fixes
+
+- **ci:** Update starter tests for posts and rustfmt ([6614c2f](https://github.com/Blaise1030/CMS/commit/6614c2f))
+- **ci:** Seed fixture content separately from catalog manifests ([5a06bcd](https://github.com/Blaise1030/CMS/commit/5a06bcd))
+- **ci:** Point content_history tests at starter posts path ([fb01f59](https://github.com/Blaise1030/CMS/commit/fb01f59))
+
 ## v0.1.13
 
 [compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.12...v0.1.13)
