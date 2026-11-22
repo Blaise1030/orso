@@ -5,7 +5,6 @@ pubDate: "2026-11-22"
 categories: [announcements]
 tags: [announcement, astro, open source]
 ---
-
 ## The "can you change the pricing?" problem
 
 On most teams, a small copy change follows a long route. Someone posts in a chat, a developer finds the file, edits it, and deploys. The content team waits, and the developer loses an afternoon to work that isn't theirs.
@@ -21,6 +20,9 @@ Orso is a site builder that runs on your own computer. It is a single program th
 - **Your site stays a plain Astro project.** There is no database and no proprietary format. If you stop using Orso, the site still builds and deploys.
 - **Every edit happens on a change.** A change is a Git branch with a readable title. Your live site never moves until the change is merged.
 - **Publishing is a pull request.** Each change gets a preview link for review, then goes live through the same process you already use for code.
+
+- [ ] First element
+- [ ] Second element
 
 ## What it does today
 
