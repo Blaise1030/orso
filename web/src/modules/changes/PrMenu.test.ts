@@ -136,8 +136,8 @@ describe("PrMenu", () => {
   it("converts an open PR back to draft and trusts the returned state", async () => {
     vi.useFakeTimers();
     try {
-      const convertChangeToDraft = vi.fn(async () => ({ ...draft, state: "draft" as const }));
-      const changeStatus = vi.fn(async () => ({ ...draft, state: "open" as const }));
+      const convertChangeToDraft = vi.fn(async (): Promise<PrStatus> => ({ ...draft, state: "draft" }));
+      const changeStatus = vi.fn(async (): Promise<PrStatus> => ({ ...draft, state: "open" }));
       const { w, store } = await mountWith({ ...draft, state: "open" }, { convertChangeToDraft, changeStatus });
       await w.find(toDraft).trigger("click");
       await flushPromises();
