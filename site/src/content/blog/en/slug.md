@@ -8,6 +8,8 @@ relatedPosts: []
 ---
 # This is the new blog title
 
+this are new items 
+
 ---
 
 ![new alt](../../../assets/blog/slug/screenshot-2026-11-23-at-3-49-48-pm.png)
