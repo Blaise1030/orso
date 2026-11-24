@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.1.16
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.15...v0.1.16)
+
+### Features
+
+- **setup:** Guided onboarding with a built-in terminal; delete a change ([224a92f](https://github.com/Blaise1030/CMS/commit/224a92f))
+
+### Fixes
+
+- **publish:** Only a change's own open combine blocks publishing it ([2b3082c](https://github.com/Blaise1030/CMS/commit/2b3082c))
+- **ci:** Format terminal module; merged cleanup now deletes the remote branch ([0b1da77](https://github.com/Blaise1030/CMS/commit/0b1da77))
+
 ## v0.1.15
 
 [compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.12...v0.1.15)
