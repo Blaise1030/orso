@@ -1,12 +1,14 @@
 <script setup lang="ts">
 // App settings → GitHub. Git and the GitHub tools are optional for local work;
-// signing in only matters when a site is shared or published.
-import { computed, onMounted, ref } from "vue";
-import UAlert from "@nuxt/ui/components/Alert.vue";
+// signing in only matters when a site is shared or published. orso signs in to
+// GitHub through the GitHub CLI: the guide shows the Terminal commands to install
+// it and run `gh auth login`, and ticks off each step once it's done.
+import { computed, onMounted, ref, watch } from "vue";
 import UBadge from "@nuxt/ui/components/Badge.vue";
 import UButton from "@nuxt/ui/components/Button.vue";
 import UIcon from "@nuxt/ui/components/Icon.vue";
-import DeviceCodeDialog from "@/modules/github/DeviceCodeDialog.vue";
+import GhGuide from "@/modules/github/GhGuide.vue";
+import { toast } from "@/lib/toast";
 import { useGithubStore } from "@/modules/github/store";
 import SettingsRow from "./SettingsRow.vue";
 import SettingsSection from "./SettingsSection.vue";
@@ -19,7 +21,7 @@ const status = computed(() => gh.setup);
 const githubSignedIn = computed(() => gh.user != null || status.value?.githubSignedIn === true);
 const loading = computed(() => !status.value && !gh.setupError);
 
-/** The git and GitHub-tools rows share one shape: ready, or a link to get it. */
+/** The git and GitHub-tools rows share one shape; the guide below says how to get them. */
 const tools = computed(() => [
   {
     id: "git",
@@ -27,8 +29,6 @@ const tools = computed(() => [
     title: "Git",
     description: "Keeps the history of every change to your sites.",
     ready: status.value?.git === true,
-    getLabel: "Get Git",
-    getUrl: "https://git-scm.com/downloads/mac",
   },
   {
     id: "tools",
@@ -36,8 +36,6 @@ const tools = computed(() => [
     title: "GitHub tools",
     description: "Connects your sites to GitHub.",
     ready: status.value?.gh === true,
-    getLabel: "Get the GitHub tools",
-    getUrl: "https://cli.github.com/",
   },
 ]);
 
@@ -49,6 +47,23 @@ async function recheck() {
     checking.value = false;
   }
 }
+
+// A failed check is a toast with Check again, not an inline alert.
+watch(
+  () => gh.setupError,
+  (failed) => {
+    if (failed) {
+      toast.error("We couldn't check GitHub just now", {
+        id: "github-setup-check",
+        description: "Make sure orso is still running, then check again.",
+        duration: 0,
+        actions: [{ label: "Check again", onClick: () => void recheck() }],
+      });
+    } else {
+      toast.dismiss("github-setup-check");
+    }
+  },
+);
 
 onMounted(() => {
   if (!gh.setup) void recheck();
@@ -80,32 +95,7 @@ onMounted(() => {
       <UIcon name="i-hugeicons-loading-03" class="size-3.5 animate-spin" /> Checking your setup…
     </p>
 
-    <div v-else-if="gh.setupError || !status" class="p-4">
-      <UAlert
-        color="error"
-        variant="subtle"
-        icon="i-hugeicons-alert-circle"
-        description="We couldn't check GitHub just now. Make sure orso is still running, then check again."
-        data-testid="github-settings-error"
-      >
-        <template #actions>
-          <UButton
-            color="neutral"
-            variant="outline"
-            size="sm"
-            icon="i-hugeicons-refresh"
-            loading-icon="i-hugeicons-refresh"
-            label="Check again"
-            :loading="checking"
-            :disabled="checking"
-            data-testid="github-settings-retry"
-            @click="recheck"
-          />
-        </template>
-      </UAlert>
-    </div>
-
-    <template v-else>
+    <template v-else-if="status">
       <SettingsRow
         v-for="tool in tools"
         :key="tool.id"
@@ -121,17 +111,6 @@ onMounted(() => {
           />
           {{ tool.title }}
         </template>
-        <UButton
-          v-if="!tool.ready"
-          variant="link"
-          color="neutral"
-          size="sm"
-          class="self-start px-0"
-          trailing-icon="i-hugeicons-link-square-02"
-          :label="tool.getLabel"
-          :to="tool.getUrl"
-          target="_blank"
-        />
         <template #actions>
           <UBadge
             color="neutral"
@@ -156,29 +135,8 @@ onMounted(() => {
             <template v-else>You're signed in to GitHub. </template>
             Share previews and publish when you are ready.
           </template>
-          <template v-else>Sign in so orso can open your sites and share your changes.</template>
+          <template v-else>Sign in so orso can open your sites and share your changes. Follow the steps below.</template>
         </template>
-
-        <template v-if="!githubSignedIn">
-          <UButton
-            v-if="status.gh && gh.deviceFlow"
-            color="neutral"
-            variant="outline"
-            size="sm"
-            class="self-start"
-            icon="i-hugeicons-login-03"
-            label="Sign in with GitHub"
-            data-testid="github-settings-sign-in"
-            @click="gh.signIn()"
-          />
-          <p v-else-if="status.gh" class="text-muted text-xs">
-            Sign in with GitHub on this Mac, then select Recheck.
-          </p>
-          <p v-else class="text-muted text-xs">Install the GitHub tools first, then sign in.</p>
-        </template>
-        <p v-if="gh.error" class="text-error text-xs" role="alert">
-          GitHub sign-in didn't finish. Please try again.
-        </p>
 
         <template #actions>
           <UBadge
@@ -188,8 +146,10 @@ onMounted(() => {
           />
         </template>
       </SettingsRow>
-    </template>
 
-    <DeviceCodeDialog />
+      <div v-if="!githubSignedIn || tools.some((tool) => !tool.ready)" class="p-4">
+        <GhGuide />
+      </div>
+    </template>
   </SettingsSection>
 </template>

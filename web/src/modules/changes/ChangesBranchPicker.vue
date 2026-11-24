@@ -10,6 +10,8 @@ import UPopover from "@nuxt/ui/components/Popover.vue";
 import { errorMessage } from "@orso/utils";
 import NewChangeDialog from "./NewChangeDialog.vue";
 import ConfirmSwitchDialog from "./ConfirmSwitchDialog.vue";
+import DeleteChangeDialog from "./DeleteChangeDialog.vue";
+import type { Change } from "@/core/types";
 import { PR_STATE_LABEL } from "./prStatus";
 import { useChangesStore } from "./store";
 
@@ -18,6 +20,8 @@ const store = useChangesStore();
 
 const open = ref(false);
 const showNewChange = ref(false);
+/** The change awaiting delete confirmation. */
+const toDelete = ref<Change | null>(null);
 
 watch(open, async (isOpen) => {
   if (!isOpen) return;
@@ -65,6 +69,13 @@ async function onLiveSite() {
   }
 }
 
+function onDelete(branch: string) {
+  const change = store.items.find((c) => c.branch === branch);
+  if (!change) return;
+  open.value = false;
+  toDelete.value = change;
+}
+
 function onNewChange() {
   open.value = false;
   showNewChange.value = true;
@@ -82,10 +93,12 @@ function prStateLabel(state: keyof typeof PR_STATE_LABEL): string {
 interface ChangeRow extends CommandPaletteItem {
   checked?: boolean;
   prState?: keyof typeof PR_STATE_LABEL;
+  /** Set on change rows (not Live site), which can be deleted. */
+  branch?: string;
 }
 
 const groups = computed<CommandPaletteGroup<ChangeRow>[]>(() => {
-  const busy = store.switching || store.cleaningUp;
+  const busy = store.switching || store.cleaningUp || store.deleting !== null;
   const rows: ChangeRow[] = [
     {
       label: "Live site",
@@ -108,6 +121,7 @@ const groups = computed<CommandPaletteGroup<ChangeRow>[]>(() => {
       slot: "change",
       checked: c.branch === store.active?.branch,
       prState: c.prState ?? undefined,
+      branch: c.branch,
       disabled: busy,
       "data-testid": "change-item",
       "data-branch": c.branch,
@@ -167,6 +181,23 @@ const groups = computed<CommandPaletteGroup<ChangeRow>[]>(() => {
             data-testid="change-pr-state"
             :label="prStateLabel(item.prState)"
           />
+          <!-- Its own action: stop the click (and the key/pointer events) from selecting the row. -->
+          <UButton
+            v-if="item.branch"
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            icon="i-hugeicons-delete-02"
+            class="text-dimmed hover:text-error -my-1 shrink-0"
+            :aria-label="`Delete ${item.label}`"
+            title="Delete this change"
+            data-testid="change-delete"
+            :disabled="item.disabled"
+            @pointerdown.stop
+            @pointerup.stop
+            @keydown.stop
+            @click.stop="onDelete(item.branch)"
+          />
         </template>
         <template #note="{ item }">
           <span class="text-muted text-xs">{{ item.label }}</span>
@@ -181,4 +212,6 @@ const groups = computed<CommandPaletteGroup<ChangeRow>[]>(() => {
   <NewChangeDialog v-model:open="showNewChange" :project-id="projectId" />
 
   <ConfirmSwitchDialog />
+
+  <DeleteChangeDialog v-model:change="toDelete" :project-id="projectId" />
 </template>

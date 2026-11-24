@@ -8,7 +8,6 @@ import { createFakeDaemon, type FakeDaemon } from "@/test/fakeDaemon";
 const h = vi.hoisted(() => ({ daemon: null as unknown as FakeDaemon }));
 vi.mock("@/core/daemon", () => ({ useDaemon: () => h.daemon }));
 
-import { useGithubStore } from "./store";
 import GithubAccount from "./GithubAccount.vue";
 
 const empty = { render: () => null };
@@ -30,23 +29,25 @@ function mountWith(status: unknown, api: Record<string, unknown> = {}) {
 enableAutoUnmount(afterEach);
 
 describe("GithubAccount", () => {
-  it("renders nothing when sign-in is not configured", async () => {
-    const w = mountWith({ configured: false, deviceFlow: false, source: null, user: null });
+  it("renders nothing when the daemon has no GitHub status", async () => {
+    h.daemon = createFakeDaemon({ githubStatus: vi.fn(async () => { throw new Error("404"); }) });
+    setActivePinia(createPinia());
+    router = createRouter({ history: createMemoryHistory(), routes: [{ path: "/", component: empty }] });
+    const w = mount(GithubAccount, { attachTo: document.body, global: { plugins: [router] } });
     await flushPromises();
     expect(w.find("[data-testid='github-sign-in']").exists()).toBe(false);
   });
 
-  it("starts the device flow and shows the code", async () => {
-    const start = vi.fn(async () => ({
-      userCode: "ABCD-1234", verificationUri: "https://github.com/login/device", expiresIn: 900, interval: 5,
-    }));
-    const w = mountWith({ configured: true, deviceFlow: true, source: null, user: null }, { githubDeviceStart: start, githubDevicePoll: vi.fn() });
+  it("signed out, links to Settings → GitHub instead of signing in itself", async () => {
+    const start = vi.fn();
+    const w = mountWith({ configured: true, deviceFlow: true, source: null, user: null }, { githubDeviceStart: start });
     await flushPromises();
-    await w.find("[data-testid='github-sign-in']").trigger("click");
+    const connect = w.find("[data-testid='github-sign-in']");
+    expect(connect.text()).toContain("Connect GitHub");
+    await connect.trigger("click");
     await flushPromises();
-    expect(start).toHaveBeenCalled();
-    expect(document.body.querySelector("[data-testid='device-code']")?.textContent?.trim()).toBe("ABCD-1234");
-    useGithubStore().cancel(); // no poll timer may outlive the test
+    expect(start).not.toHaveBeenCalled();
+    expect(router.currentRoute.value.fullPath).toBe("/settings?tab=github");
   });
 
   it("shows the signed-in account", async () => {
@@ -92,10 +93,10 @@ describe("GithubAccount", () => {
     expect(document.body.textContent).not.toContain("Sign out");
   });
 
-  it("offers no sign-in button when only the CLI could sign in and it is logged out", async () => {
+  it("offers Connect GitHub when only the CLI could sign in and it is logged out", async () => {
     const w = mountWith({ configured: false, deviceFlow: false, source: null, user: null });
     await flushPromises();
-    expect(w.find("[data-testid='github-sign-in']").exists()).toBe(false);
+    expect(w.find("[data-testid='github-sign-in']").text()).toContain("Connect GitHub");
     expect(w.find("[data-testid='github-account']").exists()).toBe(false);
   });
 });

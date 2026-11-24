@@ -518,6 +518,8 @@ fn common_dirs() -> Vec<PathBuf> {
     .collect::<Vec<_>>();
     if let Some(home) = std::env::var_os("HOME") {
         dirs.push(PathBuf::from(&home).join(".local/bin"));
+        // OpenCode's installer puts its CLI here.
+        dirs.push(PathBuf::from(&home).join(".opencode/bin"));
         dirs.push(PathBuf::from(&home).join(".cargo/bin"));
     }
     dirs

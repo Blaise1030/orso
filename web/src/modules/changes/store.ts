@@ -81,6 +81,8 @@ export const useChangesStore = defineStore("changes", () => {
   const switching = ref(false);
   const updating = ref(false);
   const cleaningUp = ref(false);
+  /** Branch of the change being deleted; null when none is. */
+  const deleting = ref<string | null>(null);
   const listing = ref(false);
   const loading = ref(false);
   const error = ref<string | null>(null);
@@ -696,6 +698,38 @@ export const useChangesStore = defineStore("changes", () => {
   }
 
   /**
+   * Delete a change for good: its open PR is closed and its branch deleted on GitHub and
+   * locally. Deleting the active change lands on `main`.
+   */
+  async function deleteChange(id: string, branch: string): Promise<{ closedPr: number | null }> {
+    const wasActive = active.value?.branch === branch;
+    if (wasActive) stopStatusPolling();
+    deleting.value = branch;
+    error.value = null;
+    try {
+      const result = await daemon.api.deleteChange(id, branch);
+      projectId.value = id;
+      items.value = items.value.filter((c) => c.branch !== branch);
+      if (wasActive) {
+        active.value = null;
+        prUrl.value = null;
+        status.value = null;
+        protectionHint.value = null;
+        await refreshTreeAndPreview("main");
+        void refreshLiveUrl();
+      }
+      void refreshSync();
+      return { closedPr: result.closedPr ?? null };
+    } catch (e) {
+      error.value = errorMessage(e);
+      if (wasActive) void refreshStatus();
+      throw e;
+    } finally {
+      deleting.value = null;
+    }
+  }
+
+  /**
    * Clean up a merged change: back on updated `main`, the change gone from the list.
    * `mainUpdated` is false when GitHub couldn't be reached to update `main`.
    */
@@ -876,6 +910,7 @@ export const useChangesStore = defineStore("changes", () => {
     switching,
     updating,
     cleaningUp,
+    deleting,
     listing,
     loading,
     error,
@@ -916,6 +951,7 @@ export const useChangesStore = defineStore("changes", () => {
     share,
     goLive,
     cleanup,
+    deleteChange,
     markReady,
     publish,
     refreshStatus,

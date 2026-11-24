@@ -17,9 +17,12 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-function mountPicker(opts: { active?: { branch: string; title: string } | null } = {}) {
+function mountPicker(
+  opts: { active?: { branch: string; title: string } | null; api?: Record<string, unknown> } = {},
+) {
   h.daemon = createFakeDaemon({
     listChanges: vi.fn(async () => []),
+    ...opts.api,
   });
   setActivePinia(createPinia());
   const store = useChangesStore();
@@ -110,5 +113,79 @@ describe("ChangesBranchPicker", () => {
 
     expect(createChange).toHaveBeenCalledWith("site", "SEO audit");
     wrapper.unmount();
+  });
+
+  describe("deleting a change", () => {
+    const OPEN = { branch: "content/draft", title: "Draft", prState: "draft" as const };
+
+    function mountWithChanges(deleteChange = vi.fn(async () => ({ branch: "main", closedPr: 7 }))) {
+      const api = {
+        listChanges: vi.fn(async () => [{ branch: "content/lw", title: "LW" }, OPEN]),
+        deleteChange,
+        changeStatus: vi.fn(async () => null),
+        changeHasEdits: vi.fn(async () => true),
+        tree: vi.fn(async () => []),
+        liveUrl: vi.fn(async () => null),
+      };
+      return { ...mountPicker({ api }), deleteChange };
+    }
+
+    function rowDelete(branch: string) {
+      return document.body.querySelector<HTMLElement>(
+        `[data-testid="change-item"][data-branch="${branch}"] [data-testid="change-delete"]`,
+      );
+    }
+
+    it("offers delete on change rows only, not on Live site", async () => {
+      const { wrapper } = mountWithChanges();
+      await openMenu(wrapper);
+      expect(rowDelete("content/draft")).not.toBeNull();
+      expect(document.body.querySelector('[data-testid="live-site"] [data-testid="change-delete"]')).toBeNull();
+    });
+
+    it("asks before deleting, without switching to the change", async () => {
+      const { store, wrapper, deleteChange } = mountWithChanges();
+      const switchTo = vi.spyOn(store, "switchTo");
+      await openMenu(wrapper);
+      rowDelete("content/draft")!.click();
+      await flushPromises();
+      expect(switchTo).not.toHaveBeenCalled();
+      expect(deleteChange).not.toHaveBeenCalled();
+      const dialog = document.body.querySelector('[data-testid="delete-change"]');
+      expect(dialog?.textContent).toContain("Delete “Draft”?");
+      expect(document.body.querySelector('[data-testid="delete-change-closes-pr"]')).not.toBeNull();
+
+      document.body.querySelector<HTMLElement>('[data-testid="delete-change-confirm"]')!.click();
+      await flushPromises();
+      expect(deleteChange).toHaveBeenCalledWith("site", "content/draft");
+      expect(store.items.map((c) => c.branch)).toEqual(["content/lw"]);
+      expect(store.active?.branch).toBe("content/lw");
+    });
+
+    it("cancel leaves the change alone", async () => {
+      const { wrapper, deleteChange } = mountWithChanges();
+      await openMenu(wrapper);
+      rowDelete("content/draft")!.click();
+      await flushPromises();
+      document.body.querySelector<HTMLElement>('[data-testid="delete-change-cancel"]')!.click();
+      await flushPromises();
+      expect(deleteChange).not.toHaveBeenCalled();
+      expect(document.body.querySelector('[data-testid="delete-change"]')).toBeNull();
+    });
+
+    it("keeps the dialog open and reports a refusal", async () => {
+      const refuse = vi.fn(async () => {
+        throw new Error("You don't have permission to close this change's pull request");
+      });
+      const { store, wrapper } = mountWithChanges(refuse);
+      await openMenu(wrapper);
+      rowDelete("content/draft")!.click();
+      await flushPromises();
+      document.body.querySelector<HTMLElement>('[data-testid="delete-change-confirm"]')!.click();
+      await flushPromises();
+      expect(h.toastError).toHaveBeenCalledWith("You don't have permission to close this change's pull request");
+      expect(document.body.querySelector('[data-testid="delete-change"]')).not.toBeNull();
+      expect(store.items.map((c) => c.branch)).toContain("content/draft");
+    });
   });
 });

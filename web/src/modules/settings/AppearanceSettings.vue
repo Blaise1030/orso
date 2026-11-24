@@ -90,8 +90,8 @@ function playSample() {
           >
             <ThemePreview
               :mode="option.id"
-              class="aspect-video w-full transition-shadow"
-              :class="themeValue === option.id ? 'ring-2 ring-primary' : 'hover:ring-1 hover:ring-accented'"
+              class="aspect-[5/3] w-full transition-[border-color,box-shadow]"
+              :class="themeValue === option.id ? 'border-primary ring-1 ring-primary' : 'hover:border-accented'"
             />
             <span :class="themeValue === option.id ? 'text-highlighted font-medium' : 'text-muted'">
               {{ option.label }}

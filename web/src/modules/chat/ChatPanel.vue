@@ -490,12 +490,6 @@ watch(
     if (finished) void assistant.load();
   },
 );
-watch(
-  () => Object.values(assistant.signIns).map((state) => state?.state ?? "").join("|"),
-  (now, before) => {
-    if (before && now !== before && now.includes("connected")) void assistant.load();
-  },
-);
 
 const offs = [
   daemon.on("chat.turn", (e) => {
@@ -775,11 +769,14 @@ function retryLast() {
   void send(text);
 }
 
-/** Start the provider's sign-in and put its steps in front of the user. */
+/**
+ * Put the assistant's setup steps in front of the user: its install guide shows
+ * the CLI's own sign-in command to run in Terminal (orso does not run sign-in).
+ */
 function startSignIn(id?: string | null) {
   const target =
     id || provider.value || assistant.chatReadyProviders[0]?.id || assistant.recommended?.id || "";
-  if (target) void assistant.signIn(target);
+  if (target) assistant.openGuide(target);
   openAssistantSetup();
 }
 

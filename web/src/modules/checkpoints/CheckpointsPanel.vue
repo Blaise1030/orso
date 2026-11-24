@@ -357,9 +357,10 @@ async function restore() {
         </template>
       </div>
       <div class="relative min-h-0 flex-1">
-      <div class="pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-linear-to-b from-background to-transparent" aria-hidden="true" />
+      <div class="pointer-events-none absolute inset-x-0 top-0 z-10 h-4 bg-linear-to-b from-background to-transparent" aria-hidden="true" />
       <div class="h-full overflow-y-auto">
-        <div class="px-3 pt-1 pb-3">
+        <!-- pt-4 clears the top fade, so the first day heading is not washed out. -->
+        <div class="px-3 pt-4 pb-3">
           <p v-if="store.loading && list.length === 0" class="text-muted flex items-center gap-2 text-sm">
             <UIcon name="i-hugeicons-loading-03" class="size-4 animate-spin" />
             Loading checkpoints…

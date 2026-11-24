@@ -3,14 +3,12 @@
 // without a chat to connect to: a ready row simply stays ready. Rows can be dragged
 // (or moved with Alt+Up/Down) into the user's order; new chats start with the first
 // connected one, marked Default.
-import { computed, onMounted, ref } from "vue";
-import UAlert from "@nuxt/ui/components/Alert.vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import UButton from "@nuxt/ui/components/Button.vue";
 import UEmpty from "@nuxt/ui/components/Empty.vue";
 import UIcon from "@nuxt/ui/components/Icon.vue";
-import type { ProviderSignInState } from "@/core/types";
 import ProviderRow from "@/modules/assistant/ProviderRow.vue";
-import SignInPanel from "@/modules/assistant/SignInPanel.vue";
+import CliGuide from "@/modules/assistant/CliGuide.vue";
 import { useAssistantStore } from "@/modules/assistant/store";
 import type { AssistantRow, RowAction } from "@/modules/assistant/rows";
 import { useAgentProvidersStore } from "@/modules/chat/providers";
@@ -96,23 +94,21 @@ async function recheck() {
   }
 }
 
-/** The sign-in step to show under a row, if one is waiting on the user. */
-function panelFor(id: string): ProviderSignInState | null {
-  const state = store.signInFor(id);
-  if (!state) return null;
-  return state.state === "browser" || state.state === "code" || state.state === "failed"
-    ? state
-    : null;
+/** An assistant's install guide shows under its row until it can chat. */
+function showGuide(row: AssistantRow): boolean {
+  return !row.chatReady && store.guideOpen(row.id);
 }
-
-/** Never rendered: the `v-if` above the panel guards it, this only keeps the prop non-null. */
-const NO_SIGN_IN: ProviderSignInState = { state: "cancelled" };
 
 function onAction(row: AssistantRow, action: RowAction) {
   switch (action) {
+    case "setup":
+    case "signIn":
+      if (store.guideOpen(row.id)) store.closeGuide(row.id);
+      else store.openGuide(row.id);
+      break;
+    // Only the site builder downloads; these stay for an older managed copy's row states.
     case "download":
     case "update":
-      // An update uses the same download route until updates get their own.
       void store.download(row.id);
       break;
     case "retry":
@@ -121,9 +117,6 @@ function onAction(row: AssistantRow, action: RowAction) {
     case "cancel":
       void store.cancel(row.id);
       break;
-    case "signIn":
-      void store.signIn(row.id);
-      break;
     case "connect":
       // There is no chat to open from settings; the row is already ready.
       break;
@@ -131,6 +124,11 @@ function onAction(row: AssistantRow, action: RowAction) {
       break;
   }
 }
+
+// Leaving the page stops the guides' polling.
+onBeforeUnmount(() => {
+  for (const id of [...store.guides]) store.closeGuide(id);
+});
 </script>
 
 <template>
@@ -158,37 +156,14 @@ function onAction(row: AssistantRow, action: RowAction) {
       <UIcon name="i-hugeicons-loading-03" class="size-3.5 animate-spin" /> Checking your setup…
     </p>
 
-    <div v-else-if="store.error && !store.snapshot" class="p-4">
-      <UAlert
-        color="error"
-        variant="subtle"
-        icon="i-hugeicons-alert-circle"
-        description="We couldn't check your setup just now. Make sure orso is still running, then check again."
-        data-testid="assistant-settings-error"
-      >
-        <template #actions>
-          <UButton
-            color="neutral"
-            variant="outline"
-            size="sm"
-            icon="i-hugeicons-refresh"
-            loading-icon="i-hugeicons-refresh"
-            label="Check again"
-            :loading="rechecking"
-            :disabled="rechecking"
-            data-testid="assistant-settings-retry"
-            @click="recheck"
-          />
-        </template>
-      </UAlert>
-    </div>
+    <!-- A failed check is a sticky toast from the store (with Check again); the empty state stays usable. -->
 
     <UEmpty
       v-else-if="!rows.length"
       variant="naked"
       icon="i-hugeicons-chat-bot"
       title="No assistants found"
-      description="Download an assistant to make changes to your site, then check again."
+      description="Install an assistant to make changes to your site, then check again."
       data-testid="assistant-settings-empty"
     >
       <template #actions>
@@ -237,15 +212,8 @@ function onAction(row: AssistantRow, action: RowAction) {
             />
           </template>
         </ProviderRow>
-        <li v-if="panelFor(row.id)" class="pb-3">
-          <SignInPanel
-            :provider-name="row.name"
-            :state="panelFor(row.id) ?? NO_SIGN_IN"
-            @submit-code="store.submitCode(row.id, $event)"
-            @cancel="store.cancelSignIn(row.id)"
-            @retry="store.signIn(row.id)"
-            @dismiss="store.clearSignIn(row.id)"
-          />
+        <li v-if="showGuide(row)" class="pb-3">
+          <CliGuide :row="row" :checking="rechecking" @recheck="recheck" />
         </li>
       </template>
     </ul>

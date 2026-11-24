@@ -267,13 +267,13 @@ pub fn agent_env(state: &AppState, project: &str) -> Vec<(String, String)> {
         ("claude", "CLAUDE_CODE_EXECUTABLE"),
         ("codex", "CODEX_PATH"),
     ] {
+        // Point the adapter at the CLI the user installed (or an older managed copy), so
+        // chats run that unmodified binary and its own sign-in, not a bundled copy.
         if let Ok(resolved) = state.resolver.resolve(provider) {
-            if resolved.managed {
-                env.push((
-                    key.into(),
-                    resolved.executable.to_string_lossy().into_owned(),
-                ));
-            }
+            env.push((
+                key.into(),
+                resolved.executable.to_string_lossy().into_owned(),
+            ));
         }
     }
     env

@@ -264,6 +264,9 @@ export function createApi(
     setupStatus: () => json<SetupStatus>("GET", "/api/setup/status"),
     /** Persist onboarding dismissal across desktop relaunches. */
     dismissSetup: () => json<{ dismissed: true }>("POST", "/api/setup/dismiss"),
+    /** Open Terminal running a setup guide's command (the daemon allows only those). */
+    runInTerminal: (command: string) =>
+      json<{ opened: true }>("POST", "/api/setup/terminal", { body: { command } }),
     /** The project rail's tab order, kept by the daemon; null until the user reorders. */
     railOrder: async (): Promise<string[] | null> =>
       (await json<{ order: string[] | null }>("GET", "/api/setup/rail-order")).order,
@@ -402,6 +405,14 @@ export function createApi(
     cleanupChange: (project: string, branch: string) =>
       json<{ branch: string; mainUpdated?: boolean }>("POST", `/api/changes/${enc(branch)}/cleanup`, {
         body: { project },
+      }),
+    /**
+     * Give up on a change: close its open pull request, delete its branch on GitHub and locally.
+     * `branch` is the checked-out branch afterwards; `closedPr` the PR closed, if any.
+     */
+    deleteChange: (project: string, branch: string) =>
+      json<{ branch: string; closedPr: number | null }>("DELETE", `/api/changes/${enc(branch)}`, {
+        query: { project },
       }),
     /** Whether a change differs from `main` at all (local; GitHub opens no PR without edits). */
     changeHasEdits: async (project: string, branch: string): Promise<boolean> =>

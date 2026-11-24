@@ -1,7 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { enableAutoUnmount, flushPromises, mount } from "@vue/test-utils";
-import { nextTick } from "vue";
 import { createPinia, setActivePinia } from "pinia";
 import { createFakeDaemon, type FakeDaemon } from "@/test/fakeDaemon";
 import { NetworkError } from "@/core/api";
@@ -9,10 +8,19 @@ import type { RuntimeStatus, SetupProvider, SetupStatus } from "@/core/types";
 
 const h = vi.hoisted(() => ({ daemon: null as unknown as FakeDaemon }));
 vi.mock("@/core/daemon", () => ({ useDaemon: () => h.daemon }));
+const toastMock = vi.hoisted(() => ({
+  error: vi.fn(),
+  warning: vi.fn(),
+  success: vi.fn(),
+  info: vi.fn(),
+  loading: vi.fn(),
+  dismiss: vi.fn(),
+}));
+vi.mock("@/lib/toast", () => ({ toast: toastMock }));
 
 import AssistantSetup from "./AssistantSetup.vue";
 import { PROVIDER_NAMES } from "./rows";
-import type { AssistantSnapshot } from "./store";
+import { useAssistantStore, type AssistantSnapshot } from "./store";
 
 const runtime = (over: Partial<RuntimeStatus> = {}): RuntimeStatus => ({
   phase: "ready",
@@ -67,6 +75,7 @@ function mountSetup(api: Record<string, unknown> = {}) {
 }
 
 enableAutoUnmount(afterEach);
+afterEach(() => vi.clearAllMocks());
 
 describe("AssistantSetup ordering", () => {
   it("puts OpenCode first, then the plan assistants, then the site builder", async () => {
@@ -110,17 +119,6 @@ describe("AssistantSetup ordering", () => {
     expect(w.get("[data-testid='assistant-assistants']").text()).not.toContain("Site builder");
   });
 
-  it("offers an advanced disclosure for an assistant the user installed", async () => {
-    const w = mountSetup();
-    await flushPromises();
-
-    expect(w.get("[data-testid='assistant-installed-toggle']").text()).toBe(
-      "I already installed an assistant",
-    );
-    expect(w.get("[data-testid='assistant-installed']").text()).toContain(
-      "orso can use an assistant you installed yourself.",
-    );
-  });
 });
 
 describe("AssistantSetup props fallback", () => {
@@ -162,87 +160,105 @@ describe("AssistantSetup props fallback", () => {
   });
 });
 
-describe("AssistantSetup downloads", () => {
-  it("downloads, shows progress and cancels", async () => {
-    const downloadRuntime = vi.fn(async () => runtime({ phase: "downloading", progress: 0 }));
-    const cancelRuntime = vi.fn(async () =>
-      runtime({ phase: "notDownloaded", version: null, source: null }),
-    );
+describe("AssistantSetup install guides", () => {
+  it("opens an install guide instead of downloading, and closes it again", async () => {
+    const downloadRuntime = vi.fn();
     const w = mountSetup({
       setupStatus: vi.fn(async () =>
         status({
           providers: [
-            provider("opencode", {
+            provider("claude", {
               runtime: runtime({ phase: "notDownloaded", version: null, source: null }),
               installed: false,
-              chatReady: false,
-              freeModels: true,
               signedIn: null,
+              chatReady: false,
             }),
           ],
         }),
       ),
       downloadRuntime,
-      cancelRuntime,
     });
     await flushPromises();
 
-    const row = () => w.get("[data-testid='assistant-row-opencode']");
-    const action = () => w.get("[data-testid='assistant-action-opencode']");
-    expect(action().text()).toBe("Download");
+    const action = () => w.get("[data-testid='assistant-action-claude']");
+    expect(action().text()).toBe("Set up");
+    expect(w.find("[data-testid='assistant-guide-claude']").exists()).toBe(false);
 
     await action().trigger("click");
     await flushPromises();
-    expect(downloadRuntime).toHaveBeenCalledWith("opencode");
-    expect(row().text()).toContain("0%");
-    expect(w.find("[data-testid='assistant-progress-opencode']").exists()).toBe(true);
-    expect(action().text()).toBe("Cancel");
-
-    h.daemon.emit({ type: "setup.runtime", runtime: "opencode", phase: "downloading", progress: 42 });
-    await nextTick();
-    expect(row().text()).toContain("42%");
+    const guide = w.get("[data-testid='assistant-guide-claude']");
+    expect(guide.text()).toContain("curl -fsSL https://claude.ai/install.sh | bash");
+    expect(guide.text()).toContain("claude auth login");
+    expect(downloadRuntime).not.toHaveBeenCalled();
 
     await action().trigger("click");
     await flushPromises();
-    expect(cancelRuntime).toHaveBeenCalledWith("opencode");
-    expect(action().text()).toBe("Download");
-    expect(w.find("[data-testid='assistant-progress-opencode']").exists()).toBe(false);
+    expect(w.find("[data-testid='assistant-guide-claude']").exists()).toBe(false);
   });
 
-  it("shows a failed download and retries it", async () => {
-    const retryRuntime = vi.fn(async () => runtime({ phase: "downloading", progress: 3 }));
+  it("opens the guide at the sign-in step for a signed-out assistant", async () => {
     const w = mountSetup({
       setupStatus: vi.fn(async () =>
-        status({
-          providers: [
-            provider("opencode", {
-              runtime: runtime({
-                phase: "downloadError",
-                version: null,
-                message: "The connection dropped.",
-              }),
-              installed: false,
-              chatReady: false,
-              freeModels: true,
-              signedIn: null,
-            }),
-          ],
-        }),
+        status({ providers: [provider("claude", { signedIn: false, chatReady: false })] }),
       ),
-      retryRuntime,
     });
     await flushPromises();
 
-    const row = w.get("[data-testid='assistant-row-opencode']");
-    expect(row.text()).toContain("Download failed");
-    const error = w.get("[data-testid='assistant-error-opencode']");
-    expect(error.text()).toContain("We couldn't download OpenCode. Check your connection and try again.");
-    expect(error.get("[data-testid='assistant-details']").text()).toContain("The connection dropped.");
-
-    await w.get("[data-testid='assistant-action-opencode']").trigger("click");
+    expect(w.get("[data-testid='assistant-row-claude']").text()).toContain("Sign-in required");
+    await w.get("[data-testid='assistant-action-claude']").trigger("click");
     await flushPromises();
-    expect(retryRuntime).toHaveBeenCalledWith("opencode");
-    expect(w.get("[data-testid='assistant-action-opencode']").text()).toBe("Cancel");
+
+    const guide = w.get("[data-testid='assistant-guide-claude']");
+    expect(guide.get("[data-testid='assistant-guide-install-claude']").attributes("data-done")).toBe("true");
+    expect(guide.get("[data-testid='assistant-guide-sign-in-claude']").text()).toContain("claude auth login");
+  });
+
+  it("rechecks from the guide", async () => {
+    const setupStatus = vi.fn(async () =>
+      status({ providers: [provider("codex", { signedIn: false, chatReady: false })] }),
+    );
+    const w = mountSetup({ setupStatus });
+    await flushPromises();
+    await w.get("[data-testid='assistant-action-codex']").trigger("click");
+    await flushPromises();
+
+    await w.get("[data-testid='assistant-guide-recheck-codex']").trigger("click");
+    await flushPromises();
+    expect(setupStatus).toHaveBeenCalledTimes(2);
+  });
+
+  it("closes its guides when it unmounts, so polling stops", async () => {
+    const w = mountSetup({
+      setupStatus: vi.fn(async () =>
+        status({ providers: [provider("codex", { signedIn: false, chatReady: false })] }),
+      ),
+    });
+    await flushPromises();
+    await w.get("[data-testid='assistant-action-codex']").trigger("click");
+    await flushPromises();
+    const store = useAssistantStore();
+    expect(store.guideOpen("codex")).toBe(true);
+
+    w.unmount();
+    expect(store.guides).toEqual([]);
+  });
+
+  it("still downloads the site builder", async () => {
+    const downloadRuntime = vi.fn(async () => runtime({ phase: "downloading", progress: 0 }));
+    const w = mountSetup({
+      setupStatus: vi.fn(async () =>
+        status({ node: runtime({ phase: "notDownloaded", version: null, source: null }) }),
+      ),
+      setupRuntimes: vi.fn(async () =>
+        snapshot({ providers: [], node: runtime({ phase: "notDownloaded", version: null, source: null }) }),
+      ),
+      downloadRuntime,
+    });
+    await flushPromises();
+
+    await w.get("[data-testid='assistant-action-node']").trigger("click");
+    await flushPromises();
+    expect(downloadRuntime).toHaveBeenCalledWith("node");
   });
 
   it("retries the whole setup check when loading fails", async () => {
@@ -253,126 +269,29 @@ describe("AssistantSetup downloads", () => {
     const w = mountSetup({ setupStatus });
     await flushPromises();
 
-    const error = w.get("[data-testid='assistant-load-error']");
-    expect(error.text()).toContain("We couldn't check your setup just now.");
-    expect(w.text()).not.toContain("127.0.0.1");
+    expect(toastMock.error).toHaveBeenCalledWith(
+      "We couldn't check your setup just now",
+      expect.objectContaining({ duration: 0 }),
+    );
+    expect(JSON.stringify(toastMock.error.mock.calls)).not.toContain("127.0.0.1");
 
-    await w.get("[data-testid='assistant-load-retry']").trigger("click");
+    // The toast's "Check again" re-runs the check and closes the toast.
+    const [, options] = toastMock.error.mock.calls.at(-1)!;
+    options.actions[0].onClick();
     await flushPromises();
     expect(setupStatus).toHaveBeenCalledTimes(2);
-    expect(w.find("[data-testid='assistant-load-error']").exists()).toBe(false);
+    expect(toastMock.dismiss).toHaveBeenCalledWith("setup-check");
     expect(w.find("[data-testid='assistant-row-opencode']").exists()).toBe(true);
   });
 
-  it("checks again when the user says they already installed one", async () => {
-    const setupStatus = vi.fn(async () => status());
-    const w = mountSetup({ setupStatus });
-    await flushPromises();
-
-    await w.get("[data-testid='assistant-recheck']").trigger("click");
-    await flushPromises();
-    expect(setupStatus).toHaveBeenCalledTimes(2);
-  });
 });
 
 describe("AssistantSetup sign-in", () => {
-  it("waits for a browser sign-in and cancels it", async () => {
-    const cancelProviderSignIn = vi.fn(async () => ({ state: "cancelled" as const }));
-    const w = mountSetup({
-      setupStatus: vi.fn(async () =>
-        status({ providers: [provider("claude", { signedIn: false, chatReady: false })] }),
-      ),
-      signInProvider: vi.fn(async () => ({
-        state: "browser" as const,
-        url: "https://example.test/login",
-      })),
-      cancelProviderSignIn,
-    });
-    await flushPromises();
-
-    expect(w.get("[data-testid='assistant-row-claude']").text()).toContain("Sign-in required");
-    await w.get("[data-testid='assistant-action-claude']").trigger("click");
-    await flushPromises();
-
-    const panel = w.get("[data-testid='assistant-sign-in']");
-    expect(panel.attributes("data-state")).toBe("browser");
-    expect(panel.text()).toContain("Finish signing in to Claude");
-    expect(panel.get("[data-testid='assistant-sign-in-open']").attributes("href")).toBe(
-      "https://example.test/login",
-    );
-
-    await panel.get("[data-testid='assistant-sign-in-cancel']").trigger("click");
-    await flushPromises();
-    expect(cancelProviderSignIn).toHaveBeenCalledWith("claude");
-    expect(w.find("[data-testid='assistant-sign-in']").exists()).toBe(false);
-  });
-
-  it("asks for the code from the sign-in page and submits it", async () => {
-    const submitProviderSignInCode = vi.fn(async () => ({ state: "connected" as const }));
-    const w = mountSetup({
-      setupStatus: vi.fn(async () =>
-        status({ providers: [provider("claude", { signedIn: false, chatReady: false })] }),
-      ),
-      signInProvider: vi.fn(async () => ({
-        state: "code" as const,
-        needsCode: true,
-        url: "https://example.test/login",
-      })),
-      submitProviderSignInCode,
-    });
-    await flushPromises();
-
-    await w.get("[data-testid='assistant-action-claude']").trigger("click");
-    await flushPromises();
-
-    const panel = w.get("[data-testid='assistant-sign-in']");
-    expect(panel.attributes("data-state")).toBe("code");
-    expect(panel.text()).toContain("Enter the code to sign in to Claude");
-
-    const code = panel.get("[data-testid='assistant-sign-in-code']");
-    expect(code.attributes("aria-label")).toBe("Sign-in code");
-    await code.setValue("ABCD-1234");
-    await panel.get("form").trigger("submit");
-    await flushPromises();
-
-    expect(submitProviderSignInCode).toHaveBeenCalledWith("claude", "ABCD-1234");
-    expect(w.find("[data-testid='assistant-sign-in']").exists()).toBe(false);
-    expect(w.get("[data-testid='assistant-row-claude']").text()).toContain("Connected");
-  });
-
-  it("shows why a sign-in failed and tries again", async () => {
-    const signInProvider = vi
-      .fn()
-      .mockResolvedValueOnce({ state: "failed" as const, message: "The browser was closed." })
-      .mockResolvedValueOnce({ state: "browser" as const, url: "https://example.test/login" });
-    const w = mountSetup({
-      setupStatus: vi.fn(async () =>
-        status({ providers: [provider("claude", { signedIn: false, chatReady: false })] }),
-      ),
-      signInProvider,
-    });
-    await flushPromises();
-
-    await w.get("[data-testid='assistant-action-claude']").trigger("click");
-    await flushPromises();
-
-    const error = w.get("[data-testid='assistant-sign-in-error']");
-    expect(error.text()).toContain("Signing in to Claude didn't finish. Please try again.");
-    expect(error.get("[data-testid='assistant-details']").text()).toContain("The browser was closed.");
-
-    await w.get("[data-testid='assistant-sign-in-retry']").trigger("click");
-    await flushPromises();
-    expect(signInProvider).toHaveBeenCalledTimes(2);
-    expect(w.get("[data-testid='assistant-sign-in']").attributes("data-state")).toBe("browser");
-  });
-
   it("does not gate OpenCode on a sign-in", async () => {
     const w = mountSetup({
       setupStatus: vi.fn(async () =>
         status({
-          providers: [
-            provider("opencode", { signedIn: null, chatReady: true, freeModels: true }),
-          ],
+          providers: [provider("opencode", { signedIn: null, chatReady: true, freeModels: true })],
         }),
       ),
     });
@@ -381,7 +300,7 @@ describe("AssistantSetup sign-in", () => {
     const row = w.get("[data-testid='assistant-row-opencode']");
     expect(row.text()).toContain("Connected");
     expect(row.text()).not.toContain("Sign-in required");
-    expect(w.get("[data-testid='assistant-action-opencode']").text()).toBe("Sign in");
+    expect(w.get("[data-testid='assistant-action-opencode']").text()).toBe("Connect");
   });
 });
 

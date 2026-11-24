@@ -13,6 +13,7 @@ import { createMemoryHistory, createRouter } from "vue-router";
 import ChatPanel from "./ChatPanel.vue";
 import ChatMessage from "./ChatMessage.vue";
 import { assistantDialogOpen } from "@/modules/assistant/dialog";
+import { useAssistantStore } from "@/modules/assistant/store";
 import { PHASE_LABEL, SYNC_ACTIONS } from "./parts";
 import { useChatSteps } from "@/lib/chatSteps";
 import { useAgentProvidersStore } from "./providers";
@@ -877,7 +878,7 @@ describe("ChatPanel", () => {
       expect(textOf(messagePosts()[0]!)).toBe("make it pop");
     });
 
-    it("starts sign-in and opens setup from a login card action", async () => {
+    it("opens setup with the assistant's sign-in steps from a login card action", async () => {
       chats = [{ id: "c1", provider: "cursor", model: null, title: "Chat", updatedAt: 1, live: true, running: false }];
       histories.c1 = {
         provider: "cursor",
@@ -890,11 +891,9 @@ describe("ChatPanel", () => {
       w.findComponent(ChatMessage).vm.$emit("assistantAction", { action: "signIn", provider: "cursor" });
       await flushPromises();
       expect(assistantDialogOpen.value).toBe(true);
-      await vi.waitFor(() =>
-        expect(
-          calls.some((c) => c.method === "POST" && c.url === `${ORIGIN}/api/setup/providers/cursor/sign-in`),
-        ).toBe(true),
-      );
+      // The guide shows the CLI's own sign-in command; orso no longer runs the sign-in.
+      expect(useAssistantStore().guideOpen("cursor")).toBe(true);
+      expect(calls.some((c) => c.url.includes("/sign-in"))).toBe(false);
     });
 
     it("uses assistant wording on the empty state", async () => {

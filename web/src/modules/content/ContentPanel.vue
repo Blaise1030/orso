@@ -349,13 +349,15 @@ function askAI(text: string) {
               <UButton
                 type="button"
                 color="neutral"
-                :variant="store.selectedCollection === c.name ? 'soft' : 'ghost'"
+                variant="ghost"
+                active-color="primary"
+                active-variant="soft"
                 size="sm"
                 block
                 icon="i-hugeicons-folder-01"
                 :label="humanize(c.name)"
                 class="justify-start"
-                :class="store.selectedCollection === c.name ? 'font-medium' : 'text-default'"
+                :active="store.selectedCollection === c.name"
                 :aria-current="store.selectedCollection === c.name ? 'page' : undefined"
                 data-testid="content-collection"
                 :data-collection-name="c.name"

@@ -1,8 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 import { createFakeDaemon, type FakeDaemon } from "@/test/fakeDaemon";
 import type {
-  ProviderSignInState,
   RuntimeStatus,
   SetupProvider,
   SetupSnapshot,
@@ -11,7 +10,17 @@ import type {
 
 const h = vi.hoisted(() => ({ daemon: null as unknown as FakeDaemon }));
 vi.mock("@/core/daemon", () => ({ useDaemon: () => h.daemon }));
+const toastMock = vi.hoisted(() => ({
+  error: vi.fn(),
+  warning: vi.fn(),
+  success: vi.fn(),
+  info: vi.fn(),
+  loading: vi.fn(),
+  dismiss: vi.fn(),
+}));
+vi.mock("@/lib/toast", () => ({ toast: toastMock }));
 
+import { GUIDE_POLL_MS } from "./install";
 import { useAssistantStore } from "./store";
 
 const runtime = (over: Partial<RuntimeStatus> = {}): RuntimeStatus => ({
@@ -69,6 +78,8 @@ function deferred<T>() {
   });
   return { promise, resolve, reject };
 }
+
+afterEach(() => vi.clearAllMocks());
 
 describe("assistant store", () => {
   it("loads and merges the status with the runtime snapshot", async () => {
@@ -335,51 +346,96 @@ describe("assistant store", () => {
     expect(store.providers[0]).toMatchObject({ chatReady: true, reason: null });
   });
 
-  it("runs the sign-in flow and marks a connected provider signed in", async () => {
-    const signInProvider = vi.fn(async (): Promise<ProviderSignInState> => ({
-      state: "browser",
-      url: "https://example.test/auth",
-    }));
-    const submitProviderSignInCode = vi.fn(
-      async (): Promise<ProviderSignInState> => ({ state: "connected" }),
-    );
-    const store = setup({
-      setupStatus: vi.fn(async () =>
-        status({ providers: [provider("claude", { signedIn: false, chatReady: false })] }),
-      ),
-      setupRuntimes: vi.fn(async () => snapshot()),
-      signInProvider,
-      submitProviderSignInCode,
-    });
-    await store.load();
+  it("polls setup status every GUIDE_POLL_MS while a guide is open, and stops when it closes", async () => {
+    vi.useFakeTimers();
+    try {
+      const setupStatus = vi.fn(async () =>
+        status({ providers: [provider("claude", { name: "Claude", signedIn: false, chatReady: false })] }),
+      );
+      const store = setup({ setupStatus, setupRuntimes: vi.fn(async () => snapshot({ providers: [] })) });
+      await store.load();
+      expect(setupStatus).toHaveBeenCalledTimes(1);
 
-    await store.signIn("claude");
-    expect(store.signInFor("claude")).toMatchObject({
-      state: "browser",
-      url: "https://example.test/auth",
-    });
+      store.openGuide("claude");
+      await vi.advanceTimersByTimeAsync(0);
+      expect(store.guideOpen("claude")).toBe(true);
 
-    await store.submitCode("claude", "ABCD-1234");
-    expect(submitProviderSignInCode).toHaveBeenCalledWith("claude", "ABCD-1234");
-    expect(store.signInFor("claude")).toMatchObject({ state: "connected" });
-    expect(store.providers[0]).toMatchObject({ signedIn: true });
+      await vi.advanceTimersByTimeAsync(GUIDE_POLL_MS);
+      expect(setupStatus).toHaveBeenCalledTimes(2);
+      await vi.advanceTimersByTimeAsync(GUIDE_POLL_MS);
+      expect(setupStatus).toHaveBeenCalledTimes(3);
+
+      store.closeGuide("claude");
+      await vi.advanceTimersByTimeAsync(0);
+      expect(store.guideOpen("claude")).toBe(false);
+      await vi.advanceTimersByTimeAsync(GUIDE_POLL_MS * 3);
+      expect(setupStatus).toHaveBeenCalledTimes(3);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
-  it("cancels a sign-in and clears it", async () => {
-    const store = setup({
-      setupStatus: vi.fn(async () => status()),
-      setupRuntimes: vi.fn(async () => snapshot()),
-      signInProvider: vi.fn(async () => ({ state: "browser", url: "https://example.test" })),
-      cancelProviderSignIn: vi.fn(async () => ({ state: "cancelled" as const })),
-    });
-    await store.load();
-    await store.signIn("opencode");
+  it("opens a guide once per assistant and keeps polling while any guide is open", async () => {
+    vi.useFakeTimers();
+    try {
+      const setupStatus = vi.fn(async () => status());
+      const store = setup({ setupStatus, setupRuntimes: vi.fn(async () => snapshot()) });
+      await store.load();
 
-    await store.cancelSignIn("opencode");
-    expect(store.signInFor("opencode")).toMatchObject({ state: "cancelled" });
+      store.openGuide("claude");
+      store.openGuide("claude");
+      store.openGuide("codex");
+      expect(store.guides).toEqual(["claude", "codex"]);
 
-    store.clearSignIn("opencode");
-    expect(store.signInFor("opencode")).toBeNull();
+      store.closeGuide("claude");
+      await vi.advanceTimersByTimeAsync(GUIDE_POLL_MS);
+      expect(setupStatus).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("closes a guide and says so once its assistant turns ready", async () => {
+    vi.useFakeTimers();
+    try {
+      const setupStatus = vi
+        .fn()
+        .mockResolvedValueOnce(
+          status({ providers: [provider("claude", { name: "Claude", signedIn: false, chatReady: false })] }),
+        )
+        .mockResolvedValue(status({ providers: [provider("claude", { name: "Claude" })] }));
+      const store = setup({ setupStatus, setupRuntimes: vi.fn(async () => snapshot({ providers: [] })) });
+      await store.load();
+      store.openGuide("claude");
+      await vi.advanceTimersByTimeAsync(0);
+
+      await vi.advanceTimersByTimeAsync(GUIDE_POLL_MS);
+
+      expect(store.guideOpen("claude")).toBe(false);
+      expect(toastMock.success).toHaveBeenCalledWith("Claude is ready", expect.objectContaining({ id: "guide-claude" }));
+      // Closed: no more polling.
+      await vi.advanceTimersByTimeAsync(GUIDE_POLL_MS * 2);
+      expect(setupStatus).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("stops polling when the store is disposed", async () => {
+    vi.useFakeTimers();
+    try {
+      const setupStatus = vi.fn(async () => status());
+      const store = setup({ setupStatus, setupRuntimes: vi.fn(async () => snapshot()) });
+      await store.load();
+      store.openGuide("claude");
+      await vi.advanceTimersByTimeAsync(0);
+
+      store.$dispose();
+      await vi.advanceTimersByTimeAsync(GUIDE_POLL_MS * 3);
+      expect(setupStatus).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("signs out and keeps OpenCode usable on free models", async () => {

@@ -5,36 +5,43 @@
 //
 // Copy rules: never show "agent", "CLI", "ACP", "SDK", "npx", "PATH" or
 // "runtime" to the user. Keep the product words: assistant, site, download.
-import { computed, onMounted, ref, watch } from "vue";
-import UAlert from "@nuxt/ui/components/Alert.vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import UAvatar from "@nuxt/ui/components/Avatar.vue";
 import UBadge from "@nuxt/ui/components/Badge.vue";
 import UButton from "@nuxt/ui/components/Button.vue";
 import UCard from "@nuxt/ui/components/Card.vue";
-import UCollapsible from "@nuxt/ui/components/Collapsible.vue";
 import UIcon from "@nuxt/ui/components/Icon.vue";
 import UPageHeader from "@nuxt/ui/components/PageHeader.vue";
 import URadioGroup from "@nuxt/ui/components/RadioGroup.vue";
 import UProgress from "@nuxt/ui/components/Progress.vue";
-import USeparator from "@nuxt/ui/components/Separator.vue";
 import { useDaemon } from "@/core/daemon";
-import type { ProviderSignInState, RuntimeStatus, SetupProvider, SetupStatus } from "@/core/types";
+import type { RuntimeStatus, SetupProvider, SetupStatus } from "@/core/types";
 import BearMark from "@/app/BearMark.vue";
 import ProviderIcon from "@/modules/chat/ProviderIcon.vue";
 import {
   PROVIDER_NAMES,
-  buildRows,
   deriveRow,
   type AssistantRow,
   type RowTone,
 } from "@/modules/assistant/rows";
 import { formatDownloadSize, sourceLabel } from "@/modules/assistant/presentation";
-import SignInPanel from "@/modules/assistant/SignInPanel.vue";
-import { useAssistantStore } from "@/modules/assistant/store";
-import DeviceCodeDialog from "@/modules/github/DeviceCodeDialog.vue";
+import CliGuide from "@/modules/assistant/CliGuide.vue";
+import { toastSetupCheckFailed, useAssistantStore } from "@/modules/assistant/store";
+import GhGuide from "@/modules/github/GhGuide.vue";
 import SettingsRow from "@/modules/settings/SettingsRow.vue";
 import { useGithubStore } from "@/modules/github/store";
 import { onboardingStartStep } from "@/app/setup";
+import {
+  freshHidesGithubUser,
+  freshProvider,
+  freshSetup,
+  freshStatus,
+  markRan,
+} from "@/app/freshSetup";
+import SetupTerminal from "@/app/SetupTerminal.vue";
+import { COMMAND_RUNNER } from "@/components/commandRunner";
+import { installGuide } from "@/modules/assistant/install";
+import { GH_COMMANDS } from "@/modules/github/guide";
 
 /** `initial`: a status the caller already fetched; without it the check fetches its own. */
 const props = defineProps<{ initial?: SetupStatus }>();
@@ -89,6 +96,8 @@ const EMPTY_RUNTIME: RuntimeStatus = {
 const step = ref<Step>(1);
 const selectedId = ref("opencode");
 const status = ref<SetupStatus | null>(props.initial ?? null);
+/** The status as onboarding shows it (dev fresh setup pretends nothing is done). */
+const view = computed(() => freshStatus(status.value));
 const checking = ref(false);
 const failed = ref(false);
 
@@ -101,6 +110,7 @@ async function recheck() {
     failed.value = false;
   } catch {
     failed.value = true;
+    toastSetupCheckFailed(() => void recheck());
   } finally {
     checking.value = false;
   }
@@ -109,7 +119,7 @@ async function recheck() {
 /** Always show four cards; a daemon that does not report one still lets the user try. */
 function cardFor(id: string): AssistantRow {
   const provider = assistant.providers.find((p) => p.id === id);
-  if (provider) return deriveRow(provider);
+  if (provider) return deriveRow(freshProvider(provider));
   const fallback: SetupProvider = {
     id,
     name: PROVIDER_NAMES[id] ?? id,
@@ -131,126 +141,169 @@ const selectedRow = computed<AssistantRow | null>(() => {
   const card = cards.value.find((row) => row.id === selectedId.value);
   if (card) return card;
   const provider = assistant.providers.find((p) => p.id === selectedId.value);
-  if (provider) return deriveRow(provider);
+  if (provider) return deriveRow(freshProvider(provider));
   return cards.value[0] ?? null;
 });
 
-/** Assistants that are already on the Mac and can chat right now. */
-/** Radio items for the two assistant groups; `row` feeds the custom label and description slots. */
+/** Radio items; `row` feeds the custom label and description slots. */
 const cardItems = computed(() => cards.value.map((row) => ({ value: row.id, row })));
-const existingItems = computed(() =>
-  existingRows.value.map((row) => ({ value: row.id, row, description: "Already on your Mac" })),
-);
-/** Each group shows the selection only when the selected assistant is one of its own. */
 const selectedCardId = computed(() =>
   cards.value.some((r) => r.id === selectedRow.value?.id) ? selectedRow.value?.id : undefined,
 );
-const selectedExistingId = computed(() =>
-  existingRows.value.some((r) => r.id === selectedRow.value?.id) ? selectedRow.value?.id : undefined,
+
+/**
+ * The selected assistant's install guide shows until it can chat. Opening it in
+ * the store starts the status polling, so the steps tick off and onboarding
+ * moves on by itself once the user has run the commands in Terminal.
+ */
+const guideRow = computed<AssistantRow | null>(() =>
+  step.value === 1 && selectedRow.value && !selectedRow.value.chatReady ? selectedRow.value : null,
 );
 
-const existingRows = computed<AssistantRow[]>(() =>
-  buildRows(
-    assistant.providers.filter(
-      (provider) => provider.chatReady === true && provider.runtime?.source === "system",
-    ),
-  ),
+watch(
+  () => guideRow.value?.id ?? null,
+  (next, previous) => {
+    if (previous) assistant.closeGuide(previous);
+    if (next) assistant.openGuide(next);
+  },
+  { immediate: true },
 );
+onBeforeUnmount(() => {
+  if (guideRow.value) assistant.closeGuide(guideRow.value.id);
+});
 
-const signInState = computed<ProviderSignInState | null>(() =>
-  selectedRow.value ? panelFor(selectedRow.value.id) : null,
-);
-
-/** Never rendered: the `v-if` guards the panel, this only keeps the prop non-null. */
-const NO_SIGN_IN: ProviderSignInState = { state: "cancelled" };
-
-/** The sign-in step to show under a card, if one is waiting on the user. */
-function panelFor(id: string): ProviderSignInState | null {
-  const state = assistant.signInFor(id);
-  if (!state) return null;
-  return state.state === "browser" || state.state === "code" || state.state === "failed"
-    ? state
-    : null;
+/** "Not installed" at the end of a card's first line, until the user installs it. */
+function notInstalled(row: AssistantRow): boolean {
+  return row.action === "setup" && row.phase !== "ready";
 }
 
+/** Whether a card has a status/version line; without one it adds no empty row. */
+function hasDetails(row: AssistantRow): boolean {
+  if (row.status) return true;
+  return row.phase === "ready" && row.version != null;
+}
+
+/** Picking an assistant that isn't ready starts its next step in the terminal. */
 function select(id: string) {
+  if (id === selectedId.value) return;
   selectedId.value = id;
+  void nextTick(() => {
+    const cmd = nextCommand.value;
+    if (cmd && terminal.value?.state !== "running") runCommand(cmd);
+  });
 }
 
-/** The CTA under the card list: set up, sign in, retry, or move on. */
-const setupLabel = computed(() => {
-  const row = selectedRow.value;
-  if (!row) return "Continue";
-  if (row.chatReady) return "Continue";
-  switch (row.phase) {
-    case "downloading":
-      return "Downloading…";
-    case "finishing":
-      return "Setting up…";
-    case "downloadError":
-      return "Retry";
-    case "ready":
-      return "Sign in";
-    default:
-      return `Set up with ${row.name}`;
+// The built-in terminal (steps 1 and 3): each guide's "Run" button and each
+// finished command feed it, so the user watches every step happen here.
+const terminal = ref<InstanceType<typeof SetupTerminal> | null>(null);
+const terminalLabel = ref<string | null>(null);
+
+/** The friendly line for a command, e.g. "Installing OpenCode". */
+function labelFor(cmd: string): string | null {
+  if (cmd === GH_COMMANDS.git) return "Installing Git";
+  if (cmd === GH_COMMANDS.install) return "Installing the GitHub tools";
+  if (cmd === GH_COMMANDS.signIn) return "Signing in to GitHub";
+  for (const id of CARD_ORDER) {
+    const guide = installGuide(id);
+    const name = PROVIDER_NAMES[id] ?? id;
+    if (guide?.install === cmd) return `Installing ${name}`;
+    if (guide?.signIn === cmd) return `Signing in to ${name}`;
   }
+  return null;
+}
+
+function runCommand(cmd: string) {
+  terminalLabel.value = labelFor(cmd);
+  terminal.value?.run(cmd);
+}
+
+provide(COMMAND_RUNNER, runCommand);
+
+/** What the current step still needs, as the command that does it; null when nothing. */
+const nextCommand = computed<string | null>(() => {
+  if (step.value === 1) {
+    const row = guideRow.value;
+    const guide = row ? installGuide(row.id) : null;
+    if (!row || !guide) return null;
+    const installed = row.phase === "ready" || row.phase === "updateAvailable";
+    if (!installed) return guide.install;
+    if (guide.signIn && row.provider.signedIn !== true) return guide.signIn;
+    return null;
+  }
+  if (step.value === 3) {
+    if (view.value?.git === false) return GH_COMMANDS.git;
+    if (view.value?.gh !== true) return GH_COMMANDS.install;
+    if (!githubSignedIn.value) return GH_COMMANDS.signIn;
+  }
+  return null;
 });
 
-const setupIcon = computed(() => {
-  const row = selectedRow.value;
-  if (!row || row.chatReady) return undefined;
-  if (row.phase === "notDownloaded") return "i-hugeicons-download-01";
-  if (row.phase === "downloadError") return "i-hugeicons-refresh";
-  if (row.phase === "ready") return "i-hugeicons-login-03";
-  return undefined;
+/** A command finished: check what changed, then start the next step's command by itself. */
+async function onTerminalExit(cmd: string, code: number | null) {
+  if (code !== 0) return;
+  markRan(cmd);
+  await recheck();
+  if (step.value === 3) await gh.loadSetup().catch(() => {});
+  const next = nextCommand.value;
+  if (next && next !== cmd) runCommand(next);
+}
+
+/** The terminal's run state and status line, shown in the form's footer. */
+const terminalState = ref<"idle" | "running" | "done" | "failed">("idle");
+const terminalStatus = ref<string | null>(null);
+
+function onTerminalStatus(state: typeof terminalState.value, text: string | null) {
+  terminalState.value = state;
+  terminalStatus.value = text;
+}
+
+// The form is one continuous scroll (Typeform-style): every step reached so far
+// stays on the page, the active one scrolls into view, and scrolling back up to
+// an earlier step makes it the active one again.
+const furthest = ref<Step>(1);
+watch(step, (n) => {
+  if (n > furthest.value) furthest.value = n;
 });
 
-const setupDisabled = computed(() => {
-  const row = selectedRow.value;
-  return !row || row.phase === "downloading" || row.phase === "finishing";
-});
+const sections = new Map<Step, HTMLElement>();
+let autoScrolling: ReturnType<typeof setTimeout> | null = null;
 
-function startSelected() {
-  const row = selectedRow.value;
-  if (!row) return;
-  if (row.chatReady) {
-    step.value = 2;
-    return;
-  }
-  switch (row.phase) {
-    case "downloadError":
-      void assistant.retry(row.id);
-      break;
-    case "ready":
-      void assistant.signIn(row.id);
-      break;
-    case "downloading":
-    case "finishing":
-      break;
-    default:
-      void assistant.download(row.id);
-  }
+function sectionRef(n: Step) {
+  return (el: unknown) => {
+    if (el instanceof HTMLElement) {
+      sections.set(n, el);
+      observer?.observe(el);
+    } else {
+      sections.delete(n);
+    }
+  };
 }
 
-function cancelSelected() {
-  if (selectedRow.value) void assistant.cancel(selectedRow.value.id);
+function scrollToStep(n: Step) {
+  const el = sections.get(n);
+  if (!el) return;
+  if (autoScrolling) clearTimeout(autoScrolling);
+  autoScrolling = setTimeout(() => (autoScrolling = null), 700);
+  el.scrollIntoView?.({ behavior: "smooth", block: "start" });
 }
 
-function onSubmitCode(id: string, code: string) {
-  void assistant.submitCode(id, code);
-}
+watch(step, (n) => void nextTick(() => scrollToStep(n)), { flush: "post" });
 
-function onCancelSignIn(id: string) {
-  void assistant.cancelSignIn(id);
-}
-
-function onRetrySignIn(id: string) {
-  void assistant.signIn(id);
-}
-
-function onDismissSignIn(id: string) {
-  assistant.clearSignIn(id);
-}
+const observer =
+  typeof IntersectionObserver === "undefined"
+    ? null
+    : new IntersectionObserver(
+        (entries) => {
+          if (autoScrolling) return;
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const n = Number((entry.target as HTMLElement).dataset.step) as Step;
+            if (n && n !== step.value && n <= furthest.value) step.value = n;
+          }
+        },
+        { threshold: 0.6 },
+      );
+onBeforeUnmount(() => observer?.disconnect());
 
 // Step 2: the site builder.
 const site = computed(() => assistant.siteBuilder);
@@ -321,10 +374,10 @@ function startSite() {
 
 // Step 3: GitHub.
 const githubSignedIn = computed(
-  () => gh.user != null || status.value?.githubSignedIn === true,
+  () => (gh.user != null && !freshHidesGithubUser()) || view.value?.githubSignedIn === true,
 );
 
-/** Git and the GitHub tools share one row shape: ready, or a link to get it. */
+/** Git and the GitHub tools share one row shape; the GitHub guide says how to get them. */
 const tools = computed(() => [
   {
     id: "git",
@@ -332,9 +385,7 @@ const tools = computed(() => [
     icon: "i-hugeicons-git-branch",
     title: "Git",
     description: "Keeps the history of every change to your sites.",
-    ready: status.value?.git === true,
-    getLabel: "Get Git",
-    getUrl: "https://git-scm.com/downloads/mac",
+    ready: view.value?.git === true,
   },
   {
     id: "tools",
@@ -342,11 +393,17 @@ const tools = computed(() => [
     icon: "i-hugeicons-git-pull-request",
     title: "GitHub tools",
     description: "Connects your sites to GitHub.",
-    ready: status.value?.gh === true,
-    getLabel: "Get the GitHub tools",
-    getUrl: "https://cli.github.com/",
+    ready: view.value?.gh === true,
   },
 ]);
+
+// The GitHub guide re-checks through the GitHub store; its newer status feeds the rows here.
+watch(
+  () => gh.setup,
+  (next) => {
+    if (next) status.value = next;
+  },
+);
 
 // A finished in-app sign-in changes what the daemon reports.
 watch(
@@ -358,7 +415,7 @@ watch(
 
 /** Prefer the live assistant snapshot; fall back to the status the shell already fetched. */
 function resolveSiteReady(): boolean {
-  const node = assistant.node ?? status.value?.node ?? null;
+  const node = assistant.node ?? view.value?.node ?? null;
   if (node == null) {
     // No status yet: stay put. Status without node: older daemon, site builder not required.
     return status.value != null;
@@ -370,13 +427,13 @@ function resolveSiteReady(): boolean {
 function syncStartStep() {
   const chatReady =
     cards.value.some((row) => row.chatReady) ||
-    status.value?.providers.some((provider) => provider.chatReady) === true;
+    view.value?.providers.some((provider) => provider.chatReady) === true;
   const target = onboardingStartStep({ chatReady, siteReady: resolveSiteReady() });
   if (target > step.value) step.value = target;
   if (chatReady) {
     const ready =
       cards.value.find((row) => row.chatReady) ??
-      status.value?.providers.find((provider) => provider.chatReady);
+      view.value?.providers.find((provider) => provider.chatReady);
     if (ready) selectedId.value = ready.id;
   }
 }
@@ -430,24 +487,34 @@ function back() {
 }
 
 function goToStep(n: Step) {
-  if (n < step.value) step.value = n;
+  if (n <= furthest.value) step.value = n;
 }
 
 function dotLabel(n: Step): string {
   const label = STEPS.find((s) => s.n === n)?.label ?? "";
   if (n === step.value) return `Step ${n} of 3: ${label}`;
-  if (n < step.value) return `Go back to step ${n}: ${label}`;
+  if (n <= furthest.value) return `Go to step ${n}: ${label}`;
   return `Step ${n} of 3: ${label}`;
 }
 </script>
 
 <template>
   <div
-    class="bg-background text-default flex min-h-screen flex-col p-6 sm:p-8"
+    class="bg-background text-default flex h-screen flex-col lg:flex-row"
     data-testid="setup-check"
   >
-    <div class="mx-auto flex w-full max-w-xl flex-1 flex-col">
-      <header class="flex justify-end">
+    <!-- The form: one continuous scroll of steps -->
+    <div class="flex min-h-0 flex-1 flex-col lg:w-1/2 lg:flex-none">
+      <header class="flex items-center justify-end gap-3 px-6 pt-5 sm:px-10">
+        <UBadge
+          v-if="freshSetup"
+          color="warning"
+          variant="subtle"
+          size="sm"
+          label="Dev: fresh setup"
+          title="Dev build: each step counts as not done until its command succeeds here."
+          data-testid="onboarding-fresh-setup"
+        />
         <UButton
           color="neutral"
           variant="ghost"
@@ -458,34 +525,33 @@ function dotLabel(n: Step): string {
         />
       </header>
 
-      <main class="flex flex-1 flex-col justify-center py-10">
-        <UAlert
-          v-if="failed"
-          color="error"
-          variant="subtle"
-          icon="i-hugeicons-alert-circle"
-          role="alert"
-          description="We couldn't check your setup just now. Make sure orso is still running, then select Recheck."
-          data-testid="setup-error"
-        />
+      <main
+        class="min-h-0 flex-1 snap-y snap-proximity overflow-y-auto px-6 sm:px-10"
+        data-testid="onboarding-scroll"
+      >
         <p
-          v-else-if="!status"
-          class="text-muted flex items-center gap-2 text-sm"
+          v-if="!status && !failed"
+          class="text-muted flex min-h-full items-center justify-center gap-2 text-sm"
           data-testid="setup-loading"
         >
           <UIcon name="i-hugeicons-loading-03" class="size-3.5 animate-spin" aria-hidden="true" />
           Checking your setup…
         </p>
 
+        <template v-else>
         <!-- 1. Assistant -->
         <section
-          v-else-if="step === 1"
-          class="flex flex-col gap-8"
+          :ref="sectionRef(1)"
+          data-step="1"
+          :data-active="step === 1 ? 'true' : undefined"
+          class="mx-auto flex min-h-full max-w-xl snap-start flex-col justify-center gap-8 py-16 transition-opacity duration-300 motion-reduce:transition-none"
+          :class="step === 1 ? '' : 'cursor-pointer opacity-40'"
           data-testid="onboarding-step-assistant"
+          @click="step !== 1 && goToStep(1)"
         >
           <UPageHeader
             title="Set up your assistant."
-            description="Download an assistant to make changes to your site. OpenCode is free to start; use the account you already have for the others."
+            description="Pick the assistant that makes changes to your site, then set it up in Terminal. OpenCode is free to start; the others use the account you already have."
             :ui="HEADER_UI"
           />
 
@@ -517,14 +583,21 @@ function dotLabel(n: Step): string {
                     class="rounded-full"
                     label="Recommended"
                   />
+                  <span
+                    v-if="notInstalled(item.row)"
+                    class="text-muted ms-auto text-xs font-normal"
+                    :data-testid="`onboarding-not-installed-${item.row.id}`"
+                  >
+                    Not installed
+                  </span>
                 </span>
               </template>
               <template #description="{ item }">
                 <span class="flex flex-col gap-1">
                   <span>{{ item.row.description }}</span>
-                  <span class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                  <span v-if="hasDetails(item.row)" class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                     <UBadge
-                      v-if="item.row.status && item.row.phase !== 'downloading' && item.row.phase !== 'finishing'"
+                      v-if="item.row.status"
                       :color="toneColor(item.row.tone)"
                       variant="soft"
                       size="sm"
@@ -533,164 +606,43 @@ function dotLabel(n: Step): string {
                       :data-testid="`onboarding-status-${item.row.id}`"
                     />
                     <span
-                      v-else-if="item.row.phase === 'downloading'"
-                      class="tabular-nums"
-                      :data-testid="`onboarding-percent-${item.row.id}`"
-                    >
-                      {{ item.row.progress ?? 0 }}%
-                    </span>
-                    <span v-else-if="item.row.phase === 'finishing'" class="inline-flex items-center gap-1">
-                      <UIcon name="i-hugeicons-loading-03" class="size-3 animate-spin" aria-hidden="true" />
-                      Setting up…
-                    </span>
-                    <span
-                      v-if="(item.row.phase === 'ready' || item.row.phase === 'updateAvailable') && item.row.version"
+                      v-if="item.row.phase === 'ready' && item.row.version"
                       :data-testid="`onboarding-version-${item.row.id}`"
                     >
                       Version {{ item.row.version }}<template v-if="sourceLabel(item.row.source)">
                         · {{ sourceLabel(item.row.source) }}</template
                       >
                     </span>
-                    <span
-                      v-else-if="item.row.phase === 'notDownloaded'"
-                      :data-testid="`onboarding-size-${item.row.id}`"
-                    >
-                      {{ formatDownloadSize(item.row.provider.runtime?.downloadBytes) ?? "" }}
-                    </span>
+                  </span>
+                  <!--
+                    The selected assistant's install guide opens inside its card. Clicks and
+                    keys stop here so its buttons don't also select the card.
+                  -->
+                  <span
+                    v-if="guideRow && guideRow.id === item.row.id"
+                    class="mt-3 block cursor-auto"
+                    @click.stop
+                    @keydown.stop
+                  >
+                    <CliGuide embedded :row="guideRow" :checking="checking" @recheck="recheck" />
                   </span>
                 </span>
               </template>
             </URadioGroup>
-
-            <!-- The selected assistant's controls sit under the group, outside the option labels. -->
-            <template v-if="selectedRow">
-              <div
-                v-if="selectedRow.phase === 'downloading'"
-                class="flex items-center gap-3"
-                :data-testid="`onboarding-progress-${selectedRow.id}`"
-              >
-                <UProgress
-                  :model-value="selectedRow.progress ?? 0"
-                  size="sm"
-                  :get-value-label="() => `Downloading ${selectedRow?.name}: ${selectedRow?.progress ?? 0}%`"
-                  class="max-w-64"
-                />
-                <span class="text-muted text-xs tabular-nums">{{ selectedRow.progress ?? 0 }}%</span>
-                <UButton
-                  color="neutral"
-                  variant="outline"
-                  size="xs"
-                  icon="i-hugeicons-cancel-01"
-                  label="Cancel"
-                  :data-testid="`onboarding-cancel-${selectedRow.id}`"
-                  @click="cancelSelected"
-                />
-              </div>
-
-              <UAlert
-                v-if="selectedRow.phase === 'downloadError'"
-                color="error"
-                variant="subtle"
-                icon="i-hugeicons-alert-circle"
-                :data-testid="`onboarding-error-${selectedRow.id}`"
-              >
-                <template #description>
-                  <p>We couldn't download {{ selectedRow.name }}. Check your connection and try again.</p>
-                  <UCollapsible v-if="selectedRow.message" :unmount-on-hide="false" class="mt-1">
-                    <UButton
-                      variant="link"
-                      color="neutral"
-                      size="xs"
-                      class="px-0 underline"
-                      label="Details"
-                      data-testid="onboarding-error-details-toggle"
-                    />
-                    <template #content>
-                      <p class="mt-1 text-xs break-words">{{ selectedRow.message }}</p>
-                    </template>
-                  </UCollapsible>
-                </template>
-              </UAlert>
-
-              <SignInPanel
-                v-if="signInState"
-                :provider-name="selectedRow.name"
-                :state="signInState ?? NO_SIGN_IN"
-                @submit-code="onSubmitCode(selectedRow.id, $event)"
-                @cancel="onCancelSignIn(selectedRow.id)"
-                @retry="onRetrySignIn(selectedRow.id)"
-                @dismiss="onDismissSignIn(selectedRow.id)"
-              />
-            </template>
-
-            <div class="flex flex-wrap items-center gap-3">
-              <UButton
-                v-if="selectedRow"
-                :icon="setupIcon"
-                :label="setupLabel"
-                :disabled="setupDisabled"
-                :data-testid="`onboarding-setup-${selectedRow.id}`"
-                @click="startSelected"
-              />
-            </div>
           </div>
 
-          <USeparator />
-
-          <section class="flex flex-col gap-3" data-testid="onboarding-existing">
-            <div class="flex flex-wrap items-start justify-between gap-2">
-              <div class="flex flex-col gap-1">
-                <h2 class="text-muted text-xs font-medium tracking-wide uppercase">
-                  Or use an assistant you already have.
-                </h2>
-                <p v-if="existingRows.length" class="text-muted text-sm">
-                  Select one to continue with it.
-                </p>
-              </div>
-              <UButton
-                color="neutral"
-                variant="ghost"
-                size="sm"
-                icon="i-hugeicons-refresh"
-                loading-icon="i-hugeicons-refresh"
-                label="Recheck"
-                :loading="checking"
-                :disabled="checking"
-                data-testid="setup-recheck"
-                @click="recheck"
-              />
-            </div>
-
-            <URadioGroup
-              v-if="existingRows.length"
-              :model-value="selectedExistingId"
-              :items="existingItems"
-              variant="card"
-              indicator="start"
-              aria-label="Existing assistants"
-              class="w-full"
-              :ui="{ fieldset: 'gap-2', item: 'w-full items-start', wrapper: 'min-w-0 flex-1' }"
-              @update:model-value="(id) => select(String(id))"
-            >
-              <template #label="{ item }">
-                <span class="flex items-center gap-2" :data-testid="`onboarding-existing-${item.row.id}`">
-                  <ProviderIcon :provider="item.row.id" class="size-4" />
-                  <span class="text-highlighted font-medium">{{ item.row.name }}</span>
-                </span>
-              </template>
-            </URadioGroup>
-            <p v-else class="text-muted text-sm">
-              If an assistant is already on your Mac, it will appear here. Select Recheck after
-              installing it.
-            </p>
-          </section>
         </section>
 
         <!-- 2. Site builder -->
         <section
-          v-else-if="step === 2"
-          class="flex flex-col gap-8"
+          v-if="furthest >= 2"
+          :ref="sectionRef(2)"
+          data-step="2"
+          :data-active="step === 2 ? 'true' : undefined"
+          class="mx-auto flex min-h-full max-w-xl snap-start flex-col justify-center gap-8 py-16 transition-opacity duration-300 motion-reduce:transition-none"
+          :class="step === 2 ? '' : 'cursor-pointer opacity-40'"
           data-testid="onboarding-step-site"
+          @click="step !== 2 && goToStep(2)"
         >
           <UPageHeader
             title="Add the site builder."
@@ -766,15 +718,6 @@ function dotLabel(n: Step): string {
               </span>
             </div>
 
-            <UAlert
-              v-if="sitePresent && site.phase === 'downloadError'"
-              color="error"
-              variant="subtle"
-              icon="i-hugeicons-alert-circle"
-              description="We couldn't download the site builder. Check your connection and try again."
-              data-testid="onboarding-site-error"
-            />
-
             <p v-if="!sitePresent" class="text-muted text-sm">
               This version of orso doesn't need a separate download.
             </p>
@@ -782,7 +725,16 @@ function dotLabel(n: Step): string {
         </section>
 
         <!-- 3. GitHub (optional) -->
-        <section v-else class="flex flex-col gap-8" data-testid="onboarding-step-github">
+        <section
+          v-if="furthest >= 3"
+          :ref="sectionRef(3)"
+          data-step="3"
+          :data-active="step === 3 ? 'true' : undefined"
+          class="mx-auto flex min-h-full max-w-xl snap-start flex-col justify-center gap-8 py-16 transition-opacity duration-300 motion-reduce:transition-none"
+          :class="step === 3 ? '' : 'cursor-pointer opacity-40'"
+          data-testid="onboarding-step-github"
+          @click="step !== 3 && goToStep(3)"
+        >
           <UPageHeader
             title="Connect GitHub."
             description="Share previews and publish when you are ready. You can do this later."
@@ -809,17 +761,6 @@ function dotLabel(n: Step): string {
                 />
                 {{ tool.title }}
               </template>
-              <UButton
-                v-if="!tool.ready"
-                variant="link"
-                color="neutral"
-                size="sm"
-                class="self-start px-0"
-                trailing-icon="i-hugeicons-link-square-02"
-                :label="tool.getLabel"
-                :to="tool.getUrl"
-                target="_blank"
-              />
               <template #actions>
                 <UBadge
                   color="neutral"
@@ -852,29 +793,6 @@ function dotLabel(n: Step): string {
                 <template v-else>Sign in so orso can open your sites and share your changes.</template>
               </template>
 
-              <template v-if="!githubSignedIn">
-                <UButton
-                  v-if="status.gh && gh.deviceFlow"
-                  color="neutral"
-                  variant="outline"
-                  size="sm"
-                  class="self-start"
-                  icon="i-hugeicons-login-03"
-                  label="Sign in with GitHub"
-                  data-testid="setup-sign-in"
-                  @click="gh.signIn()"
-                />
-                <p v-else-if="status.gh" class="text-muted text-xs">
-                  Sign in with GitHub on this Mac, then select Recheck.
-                </p>
-                <p v-else class="text-muted text-xs">
-                  Install the GitHub tools first, then sign in.
-                </p>
-              </template>
-              <p v-if="gh.error" class="text-error text-xs" role="alert">
-                GitHub sign-in didn't finish. Please try again.
-              </p>
-
               <template #actions>
                 <UBadge
                   color="neutral"
@@ -884,6 +802,8 @@ function dotLabel(n: Step): string {
               </template>
             </SettingsRow>
           </UCard>
+
+          <GhGuide v-if="!githubSignedIn || tools.some((tool) => !tool.ready)" />
 
           <div class="flex flex-wrap items-center justify-between gap-2">
             <UButton
@@ -907,11 +827,35 @@ function dotLabel(n: Step): string {
             />
           </div>
         </section>
+        </template>
       </main>
 
-      <footer class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 pt-5">
-        <div class="flex items-center">
-          <BearMark class="text-muted size-5" />
+      <footer
+        class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-4 sm:px-10"
+      >
+        <div class="flex min-w-0 items-center gap-2 text-sm" aria-live="polite">
+          <template v-if="terminalStatus">
+            <UIcon
+              v-if="terminalState === 'running'"
+              name="i-hugeicons-loading-03"
+              class="text-muted size-4 shrink-0 animate-spin"
+              aria-hidden="true"
+            />
+            <UIcon
+              v-else-if="terminalState === 'done'"
+              name="i-hugeicons-checkmark-circle-02"
+              class="text-success size-4 shrink-0"
+              aria-hidden="true"
+            />
+            <UIcon
+              v-else
+              name="i-hugeicons-alert-circle"
+              class="text-warning size-4 shrink-0"
+              aria-hidden="true"
+            />
+            <span class="truncate" data-testid="onboarding-terminal-status">{{ terminalStatus }}</span>
+          </template>
+          <BearMark v-else class="text-muted size-5" />
         </div>
 
         <div class="flex items-center justify-center gap-2" aria-label="Setup steps">
@@ -928,7 +872,7 @@ function dotLabel(n: Step): string {
             ]"
             :aria-label="dotLabel(item.n)"
             :aria-current="item.n === step ? 'step' : undefined"
-            :disabled="item.n > step"
+            :disabled="item.n > furthest"
             :data-testid="`onboarding-dot-${item.n}`"
             @click="goToStep(item.n)"
           />
@@ -953,6 +897,16 @@ function dotLabel(n: Step): string {
       </footer>
     </div>
 
-    <DeviceCodeDialog />
+    <!-- The whole right side is the terminal; each step's command runs here. -->
+    <div class="h-[40vh] shrink-0 p-3 pt-0 lg:h-auto lg:w-1/2 lg:p-4 lg:ps-0">
+      <SetupTerminal
+        ref="terminal"
+        :label="terminalLabel"
+        class="h-full overflow-hidden rounded-lg shadow-[inset_0_1px_2px_rgb(0_0_0/0.12)] ring-1 ring-black/10 dark:shadow-[inset_0_1px_3px_rgb(0_0_0/0.35)] dark:ring-white/10"
+        @exit="onTerminalExit"
+        @status="onTerminalStatus"
+      />
+    </div>
+
   </div>
 </template>

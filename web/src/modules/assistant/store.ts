@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
-import { computed, onScopeDispose, ref } from "vue";
+import { computed, onScopeDispose, ref, watch } from "vue";
 import { useDaemon } from "@/core/daemon";
 import type {
-  ProviderSignInState,
   RuntimePhase,
   RuntimeStatus,
   SetupProvider,
@@ -12,7 +11,8 @@ import type {
 } from "@/core/types";
 import { errorMessage } from "@orso/utils";
 import { toast } from "@/lib/toast";
-import { buildRows, orderIds, orderProviders, siteBuilderRow } from "./rows";
+import { GUIDE_POLL_MS } from "./install";
+import { PROVIDER_NAMES, buildRows, orderIds, orderProviders, siteBuilderRow } from "./rows";
 
 const PHASES: readonly RuntimePhase[] = [
   "notDownloaded",
@@ -22,6 +22,19 @@ const PHASES: readonly RuntimePhase[] = [
   "downloadError",
   "updateAvailable",
 ];
+
+/** One toast id for "couldn't check your setup", shared with the onboarding screen. */
+export const SETUP_CHECK_TOAST = "setup-check";
+
+/** "Couldn't check your setup": sticky, with a "Check again" that re-runs the check. */
+export function toastSetupCheckFailed(recheck: () => void) {
+  toast.error("We couldn't check your setup just now", {
+    id: SETUP_CHECK_TOAST,
+    description: "Make sure orso is still running, then check again.",
+    duration: 0,
+    actions: [{ label: "Check again", onClick: recheck }],
+  });
+}
 
 const EMPTY_RUNTIME: RuntimeStatus = {
   phase: "notDownloaded",
@@ -86,8 +99,9 @@ function mergeSnapshot(status: SetupStatus, runtimes: SetupSnapshot | null): Ass
 }
 
 /**
- * Assistant setup: download state for the assistants and the site builder,
- * plus the per-provider sign-in flows. Actions are optimistic so a row reacts
+ * Assistant setup: what the daemon reports for each assistant (installed by the
+ * user, signed in, ready to chat), the site-builder download, and which install
+ * guides are open. Actions are optimistic so a row reacts
  * on click; daemon events (`setup.runtime`) then correct the snapshot.
  */
 export const useAssistantStore = defineStore("assistant", () => {
@@ -96,8 +110,6 @@ export const useAssistantStore = defineStore("assistant", () => {
   const snapshot = ref<AssistantSnapshot | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
-  /** Sign-in flows started this session, by provider id. */
-  const signIns = ref<Record<string, ProviderSignInState | null>>({});
   /**
    * The user's assistant order (App settings → Assistants), first choice first;
    * `null` until they reorder. The daemon keeps it, so it holds across browsers
@@ -183,8 +195,10 @@ export const useAssistantStore = defineStore("assistant", () => {
       ]);
       snapshot.value = mergeSnapshot(status, runtimes);
       order.value = status.assistantOrder?.length ? status.assistantOrder : null;
+      toast.dismiss(SETUP_CHECK_TOAST);
     } catch (e) {
       error.value = errorMessage(e);
+      toastSetupCheckFailed(() => void load());
     } finally {
       loading.value = false;
     }
@@ -261,51 +275,55 @@ export const useAssistantStore = defineStore("assistant", () => {
     }
   }
 
-  function setSignIn(id: string, state: ProviderSignInState | null) {
-    signIns.value = { ...signIns.value, [id]: state };
+  /**
+   * Install guides the user has open, by provider id. orso does not download the
+   * assistants or run their sign-in: the guide shows the CLI's own commands to
+   * run in Terminal, and the store polls setup status while any guide is open so
+   * the row turns ready on its own once the user has finished.
+   */
+  const guides = ref<string[]>([]);
+
+  function openGuide(id: string) {
+    if (!guides.value.includes(id)) guides.value = [...guides.value, id];
   }
 
-  function signInFor(id: string): ProviderSignInState | null {
-    return signIns.value[id] ?? null;
+  function closeGuide(id: string) {
+    guides.value = guides.value.filter((open) => open !== id);
   }
 
-  function clearSignIn(id: string) {
-    const next = { ...signIns.value };
-    delete next[id];
-    signIns.value = next;
+  function guideOpen(id: string): boolean {
+    return guides.value.includes(id);
   }
 
-  async function startSignIn(id: string, call: () => Promise<ProviderSignInState>) {
-    try {
-      const state = await call();
-      setSignIn(id, state);
-      if (state.state === "connected") patchProvider(id, { signedIn: true, reason: null });
-      if (state.state === "failed") error.value = state.message ?? "Sign-in failed";
-    } catch (e) {
-      const message = errorMessage(e);
-      setSignIn(id, { state: "failed", message });
-      error.value = message;
+  let guidePoll: ReturnType<typeof setInterval> | null = null;
+
+  function stopGuidePoll() {
+    if (guidePoll !== null) clearInterval(guidePoll);
+    guidePoll = null;
+  }
+
+  watch(
+    () => guides.value.length > 0,
+    (polling) => {
+      if (polling && guidePoll === null) {
+        guidePoll = setInterval(() => {
+          if (!loading.value) void load();
+        }, GUIDE_POLL_MS);
+      } else if (!polling) {
+        stopGuidePoll();
+      }
+    },
+  );
+
+  // A guided assistant that turns ready closes its guide and says so.
+  watch(providers, (next) => {
+    for (const id of guides.value) {
+      if (next.find((p) => p.id === id)?.chatReady === true) {
+        closeGuide(id);
+        toast.success(`${nameOf(id)} is ready`, { id: `guide-${id}` });
+      }
     }
-  }
-
-  async function signIn(id: string) {
-    await startSignIn(id, () => daemon.api.signInProvider(id));
-  }
-
-  async function submitCode(id: string, code: string) {
-    await startSignIn(id, () => daemon.api.submitProviderSignInCode(id, code));
-  }
-
-  async function cancelSignIn(id: string) {
-    try {
-      const state = await daemon.api.cancelProviderSignIn(id);
-      setSignIn(id, state);
-    } catch (e) {
-      const message = errorMessage(e);
-      setSignIn(id, { state: "failed", message });
-      error.value = message;
-    }
-  }
+  });
 
   async function signOut(id: string) {
     try {
@@ -317,7 +335,6 @@ export const useAssistantStore = defineStore("assistant", () => {
         chatReady: provider?.freeModels ? provider.chatReady : false,
         reason: null,
       });
-      clearSignIn(id);
     } catch (e) {
       error.value = errorMessage(e);
     }
@@ -334,18 +351,59 @@ export const useAssistantStore = defineStore("assistant", () => {
     patchRuntime(event.runtime, patch);
   }
 
+  function nameOf(id: string): string {
+    if (id === "node") return "the site builder";
+    return providers.value.find((p) => p.id === id)?.name || PROVIDER_NAMES[id] || id;
+  }
+
+  /**
+   * Download failures are toasts. The row (or onboarding CTA) already says
+   * "Download failed" with a Retry button; the toast adds what went wrong.
+   * One toast per failure: it comes back only after the runtime leaves the
+   * error phase and fails again.
+   */
+  const failedDownloads = new Set<string>();
+  watch(
+    snapshot,
+    (next) => {
+      const runtimes: [string, RuntimeStatus | undefined][] = [
+        ["node", next?.node ?? undefined],
+        ...(next?.providers ?? []).map((p) => [p.id, p.runtime] as [string, RuntimeStatus | undefined]),
+      ];
+      for (const [id, runtime] of runtimes) {
+        if (runtime?.phase !== "downloadError") {
+          if (failedDownloads.delete(id)) toast.dismiss(`download-${id}`);
+          continue;
+        }
+        if (failedDownloads.has(id)) continue;
+        failedDownloads.add(id);
+        toast.error(`We couldn't download ${nameOf(id)}`, {
+          id: `download-${id}`,
+          description: runtime.message
+            ? `Check your connection and try again. (${runtime.message})`
+            : "Check your connection and try again.",
+          actions: [{ label: "Retry", onClick: () => void retry(id) }],
+        });
+      }
+    },
+    { immediate: true },
+  );
+
   const offs = [
     daemon.on("setup.runtime", applyRuntimeEvent),
     daemon.onReconnected(() => void load()),
     daemon.on("events.lagged", () => void load()),
   ];
-  onScopeDispose(() => offs.forEach((off) => off()));
+  onScopeDispose(() => {
+    offs.forEach((off) => off());
+    stopGuidePoll();
+  });
 
   return {
     snapshot,
     loading,
     error,
-    signIns,
+    guides,
     order,
     node,
     providers,
@@ -360,11 +418,9 @@ export const useAssistantStore = defineStore("assistant", () => {
     retry,
     cancel,
     verify,
-    signIn,
-    submitCode,
-    cancelSignIn,
     signOut,
-    signInFor,
-    clearSignIn,
+    openGuide,
+    closeGuide,
+    guideOpen,
   };
 });

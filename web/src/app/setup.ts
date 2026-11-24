@@ -1,4 +1,6 @@
+import { ref } from "vue";
 import type { SetupStatus } from "@/core/types";
+import { enableFreshSetup } from "@/app/freshSetup";
 
 const DISMISSED_KEY = "cms:setup-dismissed";
 
@@ -25,6 +27,23 @@ export function onboardingStartStep(s: {
   if (!s.chatReady) return 1;
   if (!s.siteReady) return 2;
   return 3;
+}
+
+/**
+ * Onboarding opened on purpose (Settings → "Setup guide"), even when setup is
+ * complete or was skipped. Leaving onboarding (Skip setup / Start building) clears it.
+ */
+export const onboardingOpen = ref(false);
+
+/** In a dev build, the setup guide also starts in fresh setup (see `freshSetup.ts`). */
+export function openOnboarding() {
+  onboardingOpen.value = true;
+  enableFreshSetup(true);
+}
+
+export function closeOnboarding() {
+  onboardingOpen.value = false;
+  enableFreshSetup(false);
 }
 
 export function setupDismissed(): boolean {

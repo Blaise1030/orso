@@ -28,6 +28,9 @@ use crate::state::AppState;
 
 /// How long a probe (auth, version) stays fresh.
 const PROBE_TTL: Duration = Duration::from_secs(30);
+/// A signed-out answer expires fast: setup polls while the user runs the CLI's
+/// own login in Terminal, and should notice it within a few seconds.
+const SIGNED_OUT_PROBE_TTL: Duration = Duration::from_secs(3);
 /// End-to-end budget for `initialize` + `session/new`.
 const VERIFY_TIMEOUT: Duration = Duration::from_secs(25);
 
@@ -242,6 +245,21 @@ pub async fn dismiss() -> Result<Json<serde_json::Value>, ApiError> {
     Ok(Json(serde_json::json!({ "dismissed": true })))
 }
 
+#[derive(Deserialize)]
+struct TerminalBody {
+    command: String,
+}
+
+/// `POST /api/setup/terminal` `{ command }`: open Terminal running one of the setup
+/// guides' commands ([`crate::terminal::ALLOWED`]). 400 for any other command, 501
+/// off macOS.
+pub async fn run_in_terminal(body: Bytes) -> Result<Json<serde_json::Value>, ApiError> {
+    let TerminalBody { command } = serde_json::from_slice(&body)
+        .map_err(|e| ApiError::badreq(format!("expected JSON body {{ command }}: {e}")))?;
+    crate::terminal::run(&command).await?;
+    Ok(Json(serde_json::json!({ "opened": true })))
+}
+
 /// `GET /api/setup/runtimes` → `{ node, providers }`.
 pub async fn runtimes(State(state): State<AppState>) -> Result<Json<SetupSnapshot>, ApiError> {
     let search = search_path(&state).await;
@@ -433,11 +451,11 @@ async fn provider_status(
     } else if state.runtime_target.is_none() {
         Some("Assistants aren't available on this Mac.".into())
     } else if !runtime.is_ready() && !available {
-        Some(format!("Download {} to start chatting.", display(id)))
+        Some(format!("Install {} to start chatting.", display(id)))
     } else if !native_acp && !adapter_ready {
         super::chat::acp_unavailable_reason(state, id).or_else(|| {
             Some(format!(
-                "Chat with {} isn't ready yet. Download it again from setup.",
+                "Chat with {} isn't ready yet. Check its setup and try again.",
                 display(id)
             ))
         })
@@ -582,12 +600,17 @@ pub async fn sign_in_current(
     State(state): State<AppState>,
     AxumPath(provider): AxumPath<String>,
 ) -> Json<SignInReply> {
-    Json(state.logins.current(&provider).unwrap_or(SignInReply {
+    let reply = state.logins.current(&provider).unwrap_or(SignInReply {
         state: SignInState::Cancelled,
         url: None,
         needs_code: false,
         message: Some("No sign-in is in progress.".into()),
-    }))
+    });
+    // A cached "signed out" probe would otherwise outlive the finished login.
+    if reply.state == SignInState::Connected {
+        state.setup_probes.clear(&provider);
+    }
+    Json(reply)
 }
 
 /// `POST /api/setup/providers/{id}/sign-in/code` `{ code }`.
@@ -698,7 +721,12 @@ impl SetupProbes {
     pub fn get(&self, provider_id: &str) -> Option<Option<bool>> {
         let entries = self.lock();
         let entry = entries.get(provider_id)?;
-        (entry.at.elapsed() < PROBE_TTL).then_some(entry.signed_in)
+        let ttl = if entry.signed_in == Some(true) {
+            PROBE_TTL
+        } else {
+            SIGNED_OUT_PROBE_TTL
+        };
+        (entry.at.elapsed() < ttl).then_some(entry.signed_in)
     }
 
     pub fn put(&self, provider_id: &str, signed_in: Option<bool>) {

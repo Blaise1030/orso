@@ -17,6 +17,7 @@ pub mod projects;
 pub mod reviews;
 pub mod settings;
 pub mod setup;
+pub mod terminal;
 
 use std::path::PathBuf;
 
@@ -63,6 +64,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/github/repos", get(github::repos))
         .route("/api/setup/status", get(setup::status))
         .route("/api/setup/dismiss", post(setup::dismiss))
+        .route("/api/setup/terminal", post(setup::run_in_terminal))
         .route(
             "/api/setup/assistant-order",
             put(setup::save_assistant_order),
@@ -175,6 +177,7 @@ pub fn router(state: AppState) -> Router {
         .route("/api/ctl/refresh-preview", post(ctl::refresh_preview))
         .route("/api/ctl/refresh-content", post(ctl::refresh_content))
         .route("/ws/events", get(events::ws))
+        .route("/ws/terminal", get(terminal::ws))
         .route("/api/checkpoints", get(checkpoints::list))
         .route("/api/checkpoints/{sha}/diff", get(checkpoints::diff))
         .route("/api/checkpoints/{sha}/restore", post(checkpoints::restore))
@@ -212,6 +215,7 @@ pub fn router(state: AppState) -> Router {
             "/api/changes/conflicts/{id}/sync/{chat}/end",
             post(changes::end_sync),
         )
+        .route("/api/changes/{branch}", delete(changes::discard))
         .route("/api/changes/{branch}/switch", post(changes::switch))
         .route("/api/changes/{branch}/share", post(changes::share))
         .route("/api/changes/{branch}/status", get(changes::status))

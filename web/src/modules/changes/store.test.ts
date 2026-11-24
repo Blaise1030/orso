@@ -871,6 +871,53 @@ describe("changes store", () => {
   });
 });
 
+describe("changes store deleteChange", () => {
+  it("deleting the active change returns to main and drops it from the list", async () => {
+    const deleteChange = vi.fn(async () => ({ branch: "main", closedPr: 4 }));
+    const store = setup({
+      activeChange: vi.fn(async () => ({ branch: "content/lw", title: "LW" })),
+      changeStatus: vi.fn(async () => null),
+      deleteChange,
+      tree: vi.fn(async () => ({ entries: [] })),
+    });
+    await store.load("site");
+    store.items = [
+      { branch: "content/lw", title: "LW" },
+      { branch: "content/other", title: "Other" },
+    ];
+    const files = useFilesStore();
+    files.projectId = "site";
+    const refresh = vi.spyOn(files, "refresh").mockResolvedValue();
+
+    await expect(store.deleteChange("site", "content/lw")).resolves.toEqual({ closedPr: 4 });
+
+    expect(deleteChange).toHaveBeenCalledWith("site", "content/lw");
+    expect(store.active).toBeNull();
+    expect(store.status).toBeNull();
+    expect(store.items.map((c) => c.branch)).toEqual(["content/other"]);
+    expect(store.deleting).toBeNull();
+    expect(refresh).toHaveBeenCalled();
+  });
+
+  it("keeps the change and surfaces the error when GitHub refuses", async () => {
+    const store = setup({
+      activeChange: vi.fn(async () => ({ branch: "content/lw", title: "LW" })),
+      changeStatus: vi.fn(async () => null),
+      deleteChange: vi.fn(async () => {
+        throw new ApiError("SANDBOX", "You don't have permission to close this change's pull request", 403);
+      }),
+    });
+    await store.load("site");
+    store.items = [{ branch: "content/lw", title: "LW" }];
+    await expect(store.deleteChange("site", "content/lw")).rejects.toThrow();
+    expect(store.active?.branch).toBe("content/lw");
+    expect(store.items).toHaveLength(1);
+    expect(store.error).toContain("permission");
+    expect(store.deleting).toBeNull();
+    store.stopStatusPolling();
+  });
+});
+
 describe("changes store cleanup", () => {
   const merged = {
     number: 1,

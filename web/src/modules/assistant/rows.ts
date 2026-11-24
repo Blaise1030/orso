@@ -2,7 +2,12 @@
 // machine, ordering and copy are easy to test (and reusable by the setup UI).
 //
 // Copy rules: never show "agent", "CLI", "ACP", "SDK", "npx", "PATH" or
-// "runtime" to the user. Keep the product words: assistant, site, download.
+// "runtime" in prose. Keep the product words: assistant, site, install. The
+// install guide (`install.ts`) shows the vendors' Terminal commands as-is.
+//
+// orso does not download the assistants: a row the user has not installed
+// offers "Set up", which opens the install guide. Only the site builder (Node)
+// keeps the download states.
 
 import type { RuntimePhase, RuntimeSource, RuntimeStatus, SetupProvider } from "@/core/types";
 
@@ -33,6 +38,9 @@ export const PROVIDER_DESCRIPTIONS: Record<string, string> = {
 /** The exact user-facing labels, kept together so tests can assert on them. */
 export const LABELS = {
   download: "Download",
+  setUp: "Set up",
+  notInstalled: "Not installed",
+  notReady: "Not ready",
   downloading: "Downloading",
   cancel: "Cancel",
   settingUp: "Setting up…",
@@ -50,6 +58,8 @@ export type RowTone = "success" | "warning" | "destructive" | "muted";
 
 /** The one action a row offers; `none` while there is nothing to press. */
 export type RowAction =
+  /** Open the install guide (an assistant that is not installed yet). */
+  | "setup"
   | "download"
   | "cancel"
   | "retry"
@@ -148,7 +158,7 @@ export function deriveRow(provider: SetupProvider): AssistantRow {
   const chatReady = provider.chatReady ?? (phase === "ready" || phase === "updateAvailable");
   const signInRequired = phase === "ready" && signedIn === false && !freeModels;
 
-  const base: Omit<AssistantRow, "status" | "action" | "actionLabel" | "tone"> = {
+  const base: RowBase = {
     id: provider.id,
     name: provider.name || PROVIDER_NAMES[provider.id] || provider.id,
     description: PROVIDER_DESCRIPTIONS[provider.id] ?? "",
@@ -163,6 +173,16 @@ export function deriveRow(provider: SetupProvider): AssistantRow {
     freeModels,
     provider,
   };
+
+  if (provider.id !== "node") {
+    // The user installs assistants themselves; a leftover managed download state
+    // (an older orso) reads as "not installed" until the CLI is found.
+    if (phase !== "ready" && phase !== "updateAvailable") {
+      return { ...base, status: "", action: "setup", actionLabel: LABELS.setUp, tone: "muted" };
+    }
+    // No in-app updates: an update-available copy is used as it is.
+    return readyRow(provider, { ...base, phase: "ready" }, signInRequired, chatReady, freeModels, signedIn);
+  }
 
   switch (phase) {
     case "notDownloaded":
@@ -198,27 +218,38 @@ export function deriveRow(provider: SetupProvider): AssistantRow {
       if (provider.id === "node") {
         return { ...base, status: LABELS.connected, action: "none", actionLabel: "", tone: "success" };
       }
-      if (signInRequired || (!chatReady && signedIn !== true)) {
-        return {
-          ...base,
-          status: LABELS.signInRequired,
-          action: "signIn",
-          actionLabel: LABELS.signIn,
-          tone: "warning",
-        };
-      }
-      // OpenCode works signed out; signing in is only for extra models.
-      if (freeModels && signedIn !== true) {
-        return {
-          ...base,
-          status: LABELS.connected,
-          action: "signIn",
-          actionLabel: LABELS.signIn,
-          tone: "success",
-        };
-      }
-      return { ...base, status: LABELS.connected, action: "connect", actionLabel: LABELS.connect, tone: "success" };
+      return readyRow(provider, base, signInRequired, chatReady, freeModels, signedIn);
   }
+}
+
+type RowBase = Omit<AssistantRow, "status" | "action" | "actionLabel" | "tone">;
+
+/**
+ * An installed assistant: signed out (the guide shows the CLI's sign-in command),
+ * ready to chat, or installed and signed in but still failing its chat check
+ * ("Not ready", never "Connected", so the badge and the action agree).
+ */
+function readyRow(
+  _provider: SetupProvider,
+  base: RowBase,
+  signInRequired: boolean,
+  chatReady: boolean,
+  freeModels: boolean,
+  signedIn: boolean | null,
+): AssistantRow {
+  if (signInRequired || (!chatReady && signedIn !== true && !freeModels)) {
+    return {
+      ...base,
+      status: LABELS.signInRequired,
+      action: "signIn",
+      actionLabel: LABELS.signIn,
+      tone: "warning",
+    };
+  }
+  if (chatReady) {
+    return { ...base, status: LABELS.connected, action: "connect", actionLabel: LABELS.connect, tone: "success" };
+  }
+  return { ...base, status: LABELS.notReady, action: "setup", actionLabel: LABELS.setUp, tone: "warning" };
 }
 
 /** The assistant rows, in the user's order (the default order until they reorder). */

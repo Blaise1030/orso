@@ -1004,9 +1004,90 @@ pub async fn cleanup(
     }
     // `-D`: a squash-merged tip is never an ancestor of `main`.
     run(dir, &["branch", "-D", branch]).await?;
+    // Best effort: delete the merged branch on GitHub too, but only while it is still where we
+    // last saw it (a lease), so someone's newer push is never thrown away. No push access, or a
+    // repository that already deletes merged branches, leaves it as it is.
+    if remote {
+        if let Ok(pushed) = rev_parse(dir, &format!("refs/remotes/origin/{branch}")).await {
+            let lease = format!("--force-with-lease=refs/heads/{branch}:{}", pushed.trim());
+            let refspec = format!(":refs/heads/{branch}");
+            let _ = run_env(dir, &["push", &lease, "origin", &refspec], env).await;
+        }
+    }
     Ok(Cleaned {
         main_updated: fetched || !remote,
     })
+}
+
+/// The cheap local checks of [`discard`]: a `content/*` branch that exists.
+pub async fn check_discard(dir: &Path, branch: &str) -> Result<(), ApiError> {
+    if !branch.starts_with("content/") {
+        return Err(ApiError::badreq("branch must be a content/* change"));
+    }
+    if !branch_exists(dir, branch).await? {
+        return Err(ApiError::enoent(format!("no such change: {branch}")));
+    }
+    Ok(())
+}
+
+/// Whether `branch` is the checked-out branch.
+pub async fn is_checked_out(dir: &Path, branch: &str) -> Result<bool, ApiError> {
+    Ok(run(dir, &["branch", "--show-current"]).await?.trim() == branch)
+}
+
+/// Whether `branch` was ever shared: `origin` has it as of the last fetch or push.
+pub async fn was_pushed(dir: &Path, branch: &str) -> bool {
+    rev_parse(dir, &format!("refs/remotes/origin/{branch}"))
+        .await
+        .is_ok()
+}
+
+/// Delete `branch` on `origin`. A branch that is already gone there counts as deleted.
+pub async fn delete_remote(
+    dir: &Path,
+    branch: &str,
+    env: &[(String, String)],
+) -> Result<(), ApiError> {
+    if !branch.starts_with("content/") {
+        return Err(ApiError::badreq("not a change branch"));
+    }
+    if !has_remote(dir, "origin").await? {
+        return Ok(());
+    }
+    let refname = format!("refs/heads/{branch}");
+    // `ls-remote` prints nothing for a ref the remote doesn't have.
+    let listed = run_env(dir, &["ls-remote", "origin", &refname], env).await?;
+    if !listed.trim().is_empty() {
+        run_env(dir, &["push", "origin", &format!(":{refname}")], env).await?;
+    }
+    // Forget the remote-tracking branch too (the push above drops it; a branch already gone
+    // on GitHub would otherwise linger until the next prune).
+    let _ = run(
+        dir,
+        &["update-ref", "-d", &format!("refs/remotes/origin/{branch}")],
+    )
+    .await;
+    Ok(())
+}
+
+/// Delete a change's local branch, unmerged work and all. When it is checked out, `main` is
+/// checked out first, which needs a clean tree (callers checkpoint leftover edits first).
+/// Returns whether the checkout moved to `main`.
+pub async fn discard(dir: &Path, branch: &str) -> Result<bool, ApiError> {
+    check_discard(dir, branch).await?;
+    let left = is_checked_out(dir, branch).await?;
+    if left {
+        ensure_clean(dir, "deleting this change").await?;
+        run_env(
+            dir,
+            &["checkout", "main"],
+            &[(crate::git_shim::ALLOW_ENV.to_string(), "1".to_string())],
+        )
+        .await?;
+    }
+    // `-D`: the work was never merged. Its `branch.<name>.*` config (title, description) goes too.
+    run(dir, &["branch", "-D", branch]).await?;
+    Ok(left)
 }
 
 /// Whether commits `a` and `b` hold the same files (identical trees).

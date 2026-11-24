@@ -1,4 +1,5 @@
-//! Clean up a merged change: fast-forward `main`, then delete only the local branch.
+//! Clean up a merged change: fast-forward `main`, then delete its branch (locally, and on the
+//! remote when it is still where it was pushed). Also: deleting an unpublished change.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -155,8 +156,12 @@ async fn cleanup_fast_forwards_main_and_deletes_only_the_local_branch() {
     assert!(!local_branch_exists(&work, &merged));
     assert!(local_branch_exists(&work, &other), "other changes stay");
     assert!(
-        local_branch_exists(&remote, &merged),
-        "the remote branch is left alone"
+        !local_branch_exists(&remote, &merged),
+        "the merged branch is deleted on the remote too"
+    );
+    assert!(
+        local_branch_exists(&remote, &other),
+        "other remote branches stay"
     );
     let open: Vec<String> = changes::list(&work)
         .await
@@ -353,8 +358,8 @@ async fn cleanup_ignores_a_merged_pr_from_an_earlier_change_with_the_same_name()
         .await
         .unwrap();
 
-    // GitHub deleted the merged head branch, so a fresh name check can't see it remotely.
-    git_cli(&work, &["branch", "-D", "-r", &format!("origin/{branch}")]);
+    // Cleanup deleted the merged head branch on the remote, so the name is free again.
+    assert!(!changes::was_pushed(&work, &branch).await);
     let again = changes::create(&work, "New post: Squashed").await.unwrap();
     assert_eq!(again.branch, branch, "name is free again");
     commit_file(&work, "new.md", "new work\n");
@@ -372,11 +377,9 @@ async fn create_avoids_names_still_on_origin() {
     let tmp = tempfile::tempdir().unwrap();
     let work = clone_with_origin(tmp.path());
     let branch = shared_change(&work, "New post: Launch", "launch.md").await;
-    let head = tip(&work, &branch);
-    merge_on_remote(tmp.path(), &branch, false);
-    changes::cleanup(&work, &branch, merged(&head), &[])
-        .await
-        .unwrap();
+    // Gone locally, but still on the remote (e.g. a merged branch the lease kept).
+    git_cli(&work, &["checkout", "main"]);
+    git_cli(&work, &["branch", "-D", &branch]);
 
     let again = changes::create(&work, "New post: Launch").await.unwrap();
     assert_eq!(again.branch, "content/launch-2");
@@ -471,6 +474,99 @@ async fn cleanup_without_reaching_origin() {
     assert!(!local_branch_exists(&work, &branch));
 }
 
+#[tokio::test]
+async fn cleanup_keeps_a_remote_branch_someone_pushed_to_since() {
+    let tmp = tempfile::tempdir().unwrap();
+    let work = clone_with_origin(tmp.path());
+    let remote = tmp.path().join("remote.git");
+    let branch = shared_change(&work, "New post: Merged", "merged.md").await;
+    merge_on_remote(tmp.path(), &branch, false);
+    // A teammate pushes more onto the branch after the merge.
+    let reviewer = tmp.path().join("reviewer");
+    git_cli(
+        &reviewer,
+        &["checkout", "-b", "late", &format!("origin/{branch}")],
+    );
+    commit_file(&reviewer, "late.md", "late\n");
+    git_cli(&reviewer, &["push", "origin", &format!("late:{branch}")]);
+
+    changes::cleanup(&work, &branch, PrMerge::NotMerged, &[])
+        .await
+        .unwrap();
+    assert!(!local_branch_exists(&work, &branch));
+    assert!(
+        local_branch_exists(&remote, &branch),
+        "the lease keeps a branch that moved since we last saw it"
+    );
+}
+
+#[tokio::test]
+async fn discard_deletes_an_unpublished_change_and_returns_to_main() {
+    let tmp = tempfile::tempdir().unwrap();
+    let work = clone_with_origin(tmp.path());
+    let remote = tmp.path().join("remote.git");
+    let branch = shared_change(&work, "New post: Abandoned", "abandoned.md").await;
+    git_cli(&work, &["checkout", "main"]);
+    let other = shared_change(&work, "New post: Other", "other.md").await;
+    git_cli(&work, &["checkout", &branch]);
+
+    changes::delete_remote(&work, &branch, &[]).await.unwrap();
+    assert!(!local_branch_exists(&remote, &branch));
+    assert!(!changes::was_pushed(&work, &branch).await);
+    // Already gone on the remote: still fine.
+    changes::delete_remote(&work, &branch, &[]).await.unwrap();
+
+    let left = changes::discard(&work, &branch).await.unwrap();
+    assert!(left);
+    assert_eq!(git_cli(&work, &["branch", "--show-current"]), "main");
+    assert!(!local_branch_exists(&work, &branch));
+    assert!(!work.join("abandoned.md").exists());
+    assert!(local_branch_exists(&work, &other));
+    assert!(local_branch_exists(&remote, &other));
+}
+
+#[tokio::test]
+async fn discard_another_change_stays_put() {
+    let tmp = tempfile::tempdir().unwrap();
+    let work = clone_with_origin(tmp.path());
+    let doomed = changes::create(&work, "New post: Doomed")
+        .await
+        .unwrap()
+        .branch;
+    commit_file(&work, "doomed.md", "x\n");
+    git_cli(&work, &["checkout", "main"]);
+    let kept = changes::create(&work, "New post: Kept")
+        .await
+        .unwrap()
+        .branch;
+    // Unsaved edits on the checked-out change don't block deleting a different one.
+    std::fs::write(work.join("README.md"), "edited\n").unwrap();
+
+    let left = changes::discard(&work, &doomed).await.unwrap();
+    assert!(!left);
+    assert_eq!(git_cli(&work, &["branch", "--show-current"]), kept);
+    assert!(!local_branch_exists(&work, &doomed));
+}
+
+#[tokio::test]
+async fn discard_refuses_non_changes_and_a_dirty_checked_out_change() {
+    let tmp = tempfile::tempdir().unwrap();
+    let work = clone_with_origin(tmp.path());
+    let err = changes::discard(&work, "main").await.unwrap_err();
+    assert_eq!(err.code, ErrorCode::Badreq);
+    let err = changes::discard(&work, "content/nope").await.unwrap_err();
+    assert_eq!(err.code, ErrorCode::Enoent);
+
+    let branch = changes::create(&work, "New post: Dirty")
+        .await
+        .unwrap()
+        .branch;
+    std::fs::write(work.join("README.md"), "edited\n").unwrap();
+    let err = changes::discard(&work, &branch).await.unwrap_err();
+    assert_eq!(err.code, ErrorCode::Conflict);
+    assert!(local_branch_exists(&work, &branch));
+}
+
 fn config(dir: &Path) -> Config {
     Config {
         port: 0,
@@ -548,6 +644,10 @@ struct FakeGithub {
     base: String,
     pulls: std::sync::Arc<std::sync::Mutex<Pulls>>,
     hits: std::sync::Arc<std::sync::atomic::AtomicUsize>,
+    /// Bodies of `PATCH /repos/acme/site/pulls/{n}` requests, as `(n, body)`.
+    patches: std::sync::Arc<std::sync::Mutex<Vec<(u64, Value)>>>,
+    /// Status the fake answers those PATCHes with.
+    patch_status: std::sync::Arc<std::sync::Mutex<StatusCode>>,
 }
 
 impl FakeGithub {
@@ -567,7 +667,23 @@ async fn fake_github() -> FakeGithub {
     let pulls = std::sync::Arc::new(std::sync::Mutex::new(Pulls::Fail));
     let hits = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
     let (p, h) = (pulls.clone(), hits.clone());
+    let patches = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+    let patch_status = std::sync::Arc::new(std::sync::Mutex::new(StatusCode::OK));
+    let (pa, ps) = (patches.clone(), patch_status.clone());
     let app = axum::Router::new().route(
+        "/repos/acme/site/pulls/{n}",
+        axum::routing::patch(
+            move |axum::extract::Path(n): axum::extract::Path<u64>,
+                  axum::Json(body): axum::Json<Value>| {
+                let (pa, ps) = (pa.clone(), ps.clone());
+                async move {
+                    pa.lock().unwrap().push((n, body));
+                    (*ps.lock().unwrap(), axum::Json(json!({ "number": n })))
+                }
+            },
+        ),
+    );
+    let app = app.route(
         "/repos/acme/site/pulls",
         get(move |Query(q): Query<HashMap<String, String>>| {
             let (p, h) = (p.clone(), h.clone());
@@ -610,6 +726,8 @@ async fn fake_github() -> FakeGithub {
         base: format!("http://{addr}"),
         pulls,
         hits,
+        patches,
+        patch_status,
     }
 }
 
@@ -870,4 +988,70 @@ async fn http_cleanup_asks_github_through_the_cli_after_a_squash_merge() {
     assert_eq!(s, StatusCode::OK, "{v}");
     assert!(!local_branch_exists(&dir, "content/launch"));
     assert!(dir.join("launch.md").exists(), "main has the squashed work");
+}
+
+async fn delete_req(app: &axum::Router, uri: &str) -> (StatusCode, Value) {
+    let r = Request::builder()
+        .method("DELETE")
+        .uri(uri)
+        .header(header::HOST, "localhost")
+        .body(Body::empty())
+        .unwrap();
+    let res = app.clone().oneshot(r).await.unwrap();
+    let status = res.status();
+    let bytes = res.into_body().collect().await.unwrap().to_bytes();
+    (
+        status,
+        serde_json::from_slice(&bytes).unwrap_or(Value::Null),
+    )
+}
+
+fn on_origin(dir: &Path, branch: &str) -> bool {
+    !git_cli(
+        dir,
+        &["ls-remote", "origin", &format!("refs/heads/{branch}")],
+    )
+    .is_empty()
+}
+
+#[tokio::test]
+async fn http_delete_closes_the_pr_and_deletes_both_branches() {
+    let p = github_project().await;
+    let head = tip(&p.dir, "content/launch");
+    p.gh.set(Pulls::Pr {
+        merged: false,
+        head_sha: head,
+    });
+    let uri = format!("/api/changes/content%2Flaunch?project={}", p.id);
+
+    let (s, body) = delete_req(&p.app, &uri).await;
+    assert_eq!(s, StatusCode::OK, "{body}");
+    assert_eq!(body, json!({ "branch": "main", "closedPr": 7 }));
+    assert_eq!(
+        p.gh.patches.lock().unwrap().clone(),
+        vec![(7, json!({ "state": "closed" }))]
+    );
+    assert_eq!(git_cli(&p.dir, &["branch", "--show-current"]), "main");
+    assert!(!local_branch_exists(&p.dir, "content/launch"));
+    assert!(!on_origin(&p.dir, "content/launch"));
+
+    let (s, _) = delete_req(&p.app, &uri).await;
+    assert_eq!(s, StatusCode::NOT_FOUND, "already gone");
+}
+
+#[tokio::test]
+async fn http_delete_keeps_the_change_when_github_refuses_to_close_the_pr() {
+    let p = github_project().await;
+    let head = tip(&p.dir, "content/launch");
+    p.gh.set(Pulls::Pr {
+        merged: false,
+        head_sha: head,
+    });
+    *p.gh.patch_status.lock().unwrap() = StatusCode::FORBIDDEN;
+    let uri = format!("/api/changes/content%2Flaunch?project={}", p.id);
+
+    let (s, body) = delete_req(&p.app, &uri).await;
+    assert!(!s.is_success(), "{body}");
+    assert!(local_branch_exists(&p.dir, "content/launch"));
+    assert!(on_origin(&p.dir, "content/launch"));
 }

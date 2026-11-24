@@ -15,7 +15,7 @@ const props = defineProps<{
   <span
     :class="
       cn(
-        'relative block aspect-[4/3] w-20 overflow-hidden rounded-md border border-zinc-300/80 shadow-sm',
+        'relative block aspect-[4/3] w-20 overflow-hidden rounded-md border border-default shadow-sm',
         props.class,
       )
     "

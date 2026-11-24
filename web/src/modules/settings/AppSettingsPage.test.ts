@@ -4,7 +4,7 @@ import { enableAutoUnmount, flushPromises, mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { createMemoryHistory, createRouter, type Router } from "vue-router";
 import { createFakeDaemon, type FakeDaemon } from "@/test/fakeDaemon";
-import type { ProviderSignInState, RuntimeStatus, SetupProvider, SetupStatus } from "@/core/types";
+import type { RuntimeStatus, SetupProvider, SetupStatus } from "@/core/types";
 
 const h = vi.hoisted(() => ({ daemon: null as unknown as FakeDaemon }));
 vi.mock("@/core/daemon", () => ({ useDaemon: () => h.daemon }));
@@ -12,6 +12,7 @@ vi.mock("@/core/daemon", () => ({ useDaemon: () => h.daemon }));
 import { SelectRoot } from "reka-ui";
 import { useTypingSound } from "@/lib/typingSound";
 import AppSettingsPage from "./AppSettingsPage.vue";
+import { closeOnboarding, onboardingOpen } from "@/app/setup";
 import { queryPlugin } from "@/test/queryClient";
 
 const runtime = (over: Partial<RuntimeStatus> = {}): RuntimeStatus => ({
@@ -279,24 +280,23 @@ describe("Project rail", () => {
 });
 
 describe("Assistant settings", () => {
-  it("renders the Assistants section and handles the row actions", async () => {
+  it("renders the Assistants section and opens an install guide instead of downloading", async () => {
     const download = vi.fn(async () => runtime());
     const { w } = await mountPage("/settings", { downloadRuntime: download });
     expect(w.get("[data-testid='assistant-settings']").text()).toContain("Assistants");
     expect(w.find("[data-testid='assistant-row-opencode']").exists()).toBe(true);
-    expect(w.get("[data-testid='assistant-row-codex']").attributes("data-action")).toBe(
-      "download",
-    );
+    expect(w.get("[data-testid='assistant-row-codex']").attributes("data-action")).toBe("setup");
 
     await w.get("[data-testid='assistant-action-codex']").trigger("click");
     await flushPromises();
-    expect(download).toHaveBeenCalledWith("codex");
+    expect(download).not.toHaveBeenCalled();
+    const guide = w.get("[data-testid='assistant-guide-codex']");
+    expect(guide.text()).toContain("curl -fsSL https://chatgpt.com/codex/install.sh | sh");
+    expect(guide.text()).toContain("codex login");
   });
 
-  it("shows the sign-in panel under a row that needs a code", async () => {
-    const signIn = vi.fn(
-      async (): Promise<ProviderSignInState> => ({ state: "code", message: "Enter the code" }),
-    );
+  it("shows the sign-in command under a signed-out row", async () => {
+    const signIn = vi.fn();
     const { w } = await mountPage("/settings", {
       signInProvider: signIn,
       setupStatus: vi.fn(async (): Promise<SetupStatus> => ({
@@ -316,8 +316,11 @@ describe("Assistant settings", () => {
     });
     await w.get("[data-testid='assistant-action-claude']").trigger("click");
     await flushPromises();
-    expect(signIn).toHaveBeenCalledWith("claude");
-    expect(w.get("[data-testid='assistant-sign-in']").attributes("data-state")).toBe("code");
+    // orso no longer runs the sign-in itself.
+    expect(signIn).not.toHaveBeenCalled();
+    const guide = w.get("[data-testid='assistant-guide-claude']");
+    expect(guide.get("[data-testid='assistant-guide-install-claude']").attributes("data-done")).toBe("true");
+    expect(guide.get("[data-testid='assistant-guide-sign-in-claude']").text()).toContain("claude auth login");
   });
 });
 
@@ -423,6 +426,17 @@ describe("Site builder settings", () => {
   });
 });
 
+describe("Setup guide", () => {
+  afterEach(() => closeOnboarding());
+
+  it("opens the onboarding screen from the settings header", async () => {
+    const { w } = await mountPage("/settings");
+    expect(onboardingOpen.value).toBe(false);
+    await w.get("[data-testid='app-settings-open-onboarding']").trigger("click");
+    expect(onboardingOpen.value).toBe(true);
+  });
+});
+
 describe("GitHub settings", () => {
   it("lists Git, the GitHub tools and the account in one Account card", async () => {
     const start = vi.fn(async () => ({
@@ -443,9 +457,10 @@ describe("GitHub settings", () => {
     expect(account.text()).toContain("GitHub account");
     expect(account.text()).toContain("Optional");
 
-    await w.get("[data-testid='github-settings-sign-in']").trigger("click");
-    await flushPromises();
-    expect(start).toHaveBeenCalled();
+    // Signed out: the guide shows gh's sign-in command; orso starts no sign-in of its own.
+    expect(w.find("[data-testid='github-settings-sign-in']").exists()).toBe(false);
+    expect(w.get("[data-testid='github-guide-sign-in']").text()).toContain("gh auth login --web");
+    expect(start).not.toHaveBeenCalled();
   });
 
   it("keeps the cached setup status when revisiting the GitHub tab", async () => {

@@ -144,6 +144,15 @@ importers:
       '@vueuse/core':
         specifier: ^15.0.0
         version: 15.0.0(vue@3.5.43(typescript@6.0.3))
+      '@wterm/dom':
+        specifier: 0.6.0
+        version: 0.6.0
+      '@wterm/ghostty':
+        specifier: 0.6.0
+        version: 0.6.0
+      '@wterm/vue':
+        specifier: 0.6.0
+        version: 0.6.0(@wterm/dom@0.6.0)(vue@3.5.43(typescript@6.0.3))
       ai:
         specifier: 7.0.143
         version: 7.0.143(zod@3.25.76)
@@ -2597,6 +2606,21 @@ packages:
 
   '@workflow/serde@4.1.0':
     resolution: {integrity: sha512-pav4F2BoirECWR7Nf1TKt+2eETcBj7jj4cBefQ8VXQCA6NPkaKeLfj/zMgi+3zYV5ZIBT4GuUiphsj0/b9hPQQ==}
+
+  '@wterm/core@0.6.0':
+    resolution: {integrity: sha512-5sKuBbMAILn1PyC5AJvTfVo+80nEAoPY+YyN0SYg3KkCV/DyUqdDzFIZQYuJN1ijTWZ/XQLh7hsmZRQtb59IYw==}
+
+  '@wterm/dom@0.6.0':
+    resolution: {integrity: sha512-c638pHIx3nN0fXP8B/nERAEjBc3GsSbJmW1TN+/WaDLOU97Y/IYw35bargP6e8y8Paq0sF1AnWB9HgKIZR4QBw==}
+
+  '@wterm/ghostty@0.6.0':
+    resolution: {integrity: sha512-BmRMvea3/qYJY5C+CsjrGtd0dOYy3gyT26Bajiy/xOqyv6WILTKxPSEniLWz/mPBPoMWZpmzOS0QIQK15zHhUA==}
+
+  '@wterm/vue@0.6.0':
+    resolution: {integrity: sha512-6fhAJCXPx+qylqwTLZxIY7Rz/Jz5QsUd4F2S6QqUtBLFj+NAG0yPg41p9zZAMS08EC4fKc8kJGnMGidflxtDmQ==}
+    peerDependencies:
+      '@wterm/dom': 0.6.0
+      vue: ^3.4.0
 
   abbrev@5.0.0:
     resolution: {integrity: sha512-/XrFJgzQQQHpti1raDJC6m4ws6aNktmjBlhk8Fdlk7LwCEuDoieEJJY9OFHjfiFJFFRM2tK+Ky/IsfbbmlMu1w==}
@@ -7951,6 +7975,21 @@ snapshots:
       vue: 3.5.43(typescript@6.0.3)
 
   '@workflow/serde@4.1.0': {}
+
+  '@wterm/core@0.6.0': {}
+
+  '@wterm/dom@0.6.0':
+    dependencies:
+      '@wterm/core': 0.6.0
+
+  '@wterm/ghostty@0.6.0':
+    dependencies:
+      '@wterm/core': 0.6.0
+
+  '@wterm/vue@0.6.0(@wterm/dom@0.6.0)(vue@3.5.43(typescript@6.0.3))':
+    dependencies:
+      '@wterm/dom': 0.6.0
+      vue: 3.5.43(typescript@6.0.3)
 
   abbrev@5.0.0: {}
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { toast } from "@/lib/toast";
 import UAvatar from "@nuxt/ui/components/Avatar.vue";
 import UButton from "@nuxt/ui/components/Button.vue";
@@ -7,24 +7,34 @@ import UDropdownMenu from "@nuxt/ui/components/DropdownMenu.vue";
 import type { DropdownMenuItem } from "@nuxt/ui";
 import { useDaemon } from "@/core/daemon";
 import { errorMessage } from "@orso/utils";
-import DeviceCodeDialog from "./DeviceCodeDialog.vue";
 import { useGithubStore } from "./store";
 
-/** `rail`: a larger avatar, an icon-only sign-in, and a menu opening to the right, for the project sidebar. */
+/**
+ * `rail`: a larger avatar, an icon-only button, and a menu opening to the right, for the project sidebar.
+ * Signed out, the button opens Settings → GitHub, whose guide walks through installing the GitHub
+ * CLI and running `gh auth login` in Terminal (orso has no GitHub sign-in of its own).
+ */
 const props = defineProps<{ rail?: boolean }>();
+
+/** Settings → GitHub, where the GitHub guide lives. */
+const CONNECT_TO = { path: "/settings", query: { tab: "github" } };
 
 const gh = useGithubStore();
 
 const daemon = useDaemon();
+/** The daemon answered `/api/github/status`; older daemons without it keep the control hidden. */
+const loaded = ref(false);
 
 // Load once the daemon is reachable (and again after a reconnect).
 watch(
   daemon.status,
   (s) => {
     if (s !== "open") return;
-    gh.load().catch(() => {
-      // Older daemons have no /api/github: keep the control hidden.
-    });
+    gh.load()
+      .then(() => (loaded.value = true))
+      .catch(() => {
+        // Older daemons have no /api/github: keep the control hidden.
+      });
   },
   { immediate: true },
 );
@@ -48,14 +58,6 @@ const menuItems = computed<DropdownMenuItem[]>(() => {
   const items: DropdownMenuItem[] = [];
   if (gh.source === "cli") {
     items.push({ label: "Signed in with GitHub CLI (gh)", disabled: true });
-    if (gh.deviceFlow) {
-      items.push({
-        label: "Sign in with GitHub to share changes",
-        icon: "i-hugeicons-login-03",
-        "data-testid": "github-sign-in",
-        onSelect: () => void gh.signIn(),
-      });
-    }
   } else {
     items.push({ label: "Sign out", icon: "i-hugeicons-logout-03", onSelect: () => void signOut() });
   }
@@ -75,7 +77,7 @@ const menuContent = computed(() => ({
 </script>
 
 <template>
-  <template v-if="gh.configured || gh.user">
+  <template v-if="loaded || gh.user">
     <UDropdownMenu v-if="gh.user" :items="menuItems" :content="menuContent">
       <UButton
         color="neutral"
@@ -91,27 +93,26 @@ const menuContent = computed(() => ({
       </UButton>
     </UDropdownMenu>
     <UButton
-      v-else-if="gh.deviceFlow && rail"
+      v-else-if="rail"
       color="neutral"
       variant="ghost"
       square
       class="size-9 justify-center"
       icon="i-hugeicons-login-03"
-      title="Sign in with GitHub"
-      aria-label="Sign in with GitHub"
+      title="Connect GitHub"
+      aria-label="Connect GitHub"
       data-testid="github-sign-in"
-      @click="gh.signIn()"
+      :to="CONNECT_TO"
     />
     <UButton
-      v-else-if="gh.deviceFlow"
+      v-else
       color="neutral"
       variant="outline"
       size="sm"
       icon="i-hugeicons-login-03"
-      label="Sign in with GitHub"
+      label="Connect GitHub"
       data-testid="github-sign-in"
-      @click="gh.signIn()"
+      :to="CONNECT_TO"
     />
-    <DeviceCodeDialog />
   </template>
 </template>

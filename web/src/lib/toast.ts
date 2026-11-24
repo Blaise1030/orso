@@ -15,6 +15,8 @@ export interface ToastOptions {
   description?: string;
   /** Milliseconds; `0` keeps the toast until it is replaced or closed. */
   duration?: number;
+  /** Buttons in the toast, e.g. a "Try again" that re-runs what failed. */
+  actions?: { label: string; onClick: () => void }[];
 }
 
 let api: ToastApi | null = null;
@@ -51,4 +53,8 @@ export const toast = {
   /** A spinner toast that stays until it is replaced by another toast with the same id. */
   loading: (title: string, options?: ToastOptions) =>
     show("neutral", title, { duration: 0, ...options }, { ui: { icon: "animate-spin" } }),
+  /** Close a toast by id, e.g. a sticky error once the thing it reports is fixed. */
+  dismiss: (id: string | number) => {
+    if (api?.toasts.value.some((t) => t.id === id)) api.remove(id);
+  },
 };

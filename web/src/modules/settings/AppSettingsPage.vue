@@ -11,6 +11,7 @@ import UKbd from "@nuxt/ui/components/Kbd.vue";
 import GithubAccount from "@/modules/github/GithubAccount.vue";
 import ProjectRail from "@/app/ProjectRail.vue";
 import { isMacDesktop } from "@/lib/desktop";
+import { openOnboarding } from "@/app/setup";
 import { APP_SETTINGS_TABS, type AppSettingsTab } from "@/router";
 import AboutSettings from "./AboutSettings.vue";
 import AppearanceSettings from "./AppearanceSettings.vue";
@@ -255,6 +256,7 @@ function goBack() {
             :key="section.id"
             color="neutral"
             variant="ghost"
+            active-color="primary"
             active-variant="soft"
             size="sm"
             block
@@ -277,6 +279,7 @@ function goBack() {
           <UButton
             color="neutral"
             variant="ghost"
+            active-color="primary"
             active-variant="soft"
             size="sm"
             block
@@ -302,7 +305,17 @@ function goBack() {
       <div class="mx-auto flex w-full max-w-3xl flex-col gap-12 px-6 py-8 sm:px-8">
         <div class="flex items-center justify-between gap-3">
           <h1 class="text-highlighted text-2xl font-semibold tracking-tight">Settings</h1>
-          <div class="shrink-0" data-testid="app-settings-account">
+          <div class="flex shrink-0 items-center gap-2" data-testid="app-settings-account">
+            <!-- Opens the onboarding screen; its Skip setup / Start building comes back here. -->
+            <UButton
+              color="neutral"
+              variant="outline"
+              size="sm"
+              icon="i-hugeicons-rocket-01"
+              label="Setup guide"
+              data-testid="app-settings-open-onboarding"
+              @click="openOnboarding"
+            />
             <GithubAccount />
           </div>
         </div>

@@ -1,16 +1,13 @@
 <script setup lang="ts">
-// Assistant setup: the list of assistants, the separate site-builder download,
-// and the sign-in steps. It works embedded (SetupCheck) and inside a dialog:
+// Assistant setup: the list of assistants (each with an install guide: the
+// vendor's Terminal commands, polled until done) and the site-builder download. It works embedded (SetupCheck) and inside a dialog:
 // the data comes from the assistant store, `initial` is a read-only fallback
 // for previews and tests, and the caller owns Continue / dismissal.
-import { computed, onMounted, ref } from "vue";
-import UAlert from "@nuxt/ui/components/Alert.vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import UButton from "@nuxt/ui/components/Button.vue";
-import UCollapsible from "@nuxt/ui/components/Collapsible.vue";
 import UIcon from "@nuxt/ui/components/Icon.vue";
-import type { ProviderSignInState } from "@/core/types";
 import ProviderRow from "./ProviderRow.vue";
-import SignInPanel from "./SignInPanel.vue";
+import CliGuide from "./CliGuide.vue";
 import { buildRows, siteBuilderRow, type AssistantRow, type RowAction } from "./rows";
 import { useAssistantStore, type AssistantSnapshot } from "./store";
 
@@ -45,7 +42,6 @@ const siteBuilder = computed<AssistantRow>(() =>
 );
 const showSiteBuilder = computed(() => snapshot.value?.node != null);
 const loading = computed(() => !ready.value && !store.error);
-const error = computed(() => (ready.value ? null : store.error));
 
 onMounted(() => {
   if (!props.autoload || props.initial || store.snapshot) return;
@@ -63,22 +59,24 @@ async function recheck() {
   }
 }
 
-/** The sign-in step to show under a row, if one is waiting on the user. */
-function panelFor(id: string): ProviderSignInState | null {
-  const state = store.signInFor(id);
-  if (!state) return null;
-  return state.state === "browser" || state.state === "code" || state.state === "failed"
-    ? state
-    : null;
+/** An assistant's install guide shows under its row until it can chat. */
+function showGuide(row: AssistantRow): boolean {
+  return !row.chatReady && store.guideOpen(row.id);
 }
 
-/** Never rendered: `v-if` above the panel guards it, this only keeps the prop non-null. */
-const NO_SIGN_IN: ProviderSignInState = { state: "cancelled" };
+function toggleGuide(id: string) {
+  if (store.guideOpen(id)) store.closeGuide(id);
+  else store.openGuide(id);
+}
 
 function onAction(row: AssistantRow, action: RowAction) {
   switch (action) {
+    case "setup":
+    case "signIn":
+      toggleGuide(row.id);
+      break;
+    // Only the site builder downloads.
     case "download":
-      // An update uses the same download route until updates get their own.
     case "update":
       void store.download(row.id);
       break;
@@ -88,9 +86,6 @@ function onAction(row: AssistantRow, action: RowAction) {
     case "cancel":
       void store.cancel(row.id);
       break;
-    case "signIn":
-      void store.signIn(row.id);
-      break;
     case "connect":
       emit("connect", row.id);
       break;
@@ -99,21 +94,10 @@ function onAction(row: AssistantRow, action: RowAction) {
   }
 }
 
-function onSubmitCode(id: string, code: string) {
-  void store.submitCode(id, code);
-}
-
-function onCancelSignIn(id: string) {
-  void store.cancelSignIn(id);
-}
-
-function onRetrySignIn(id: string) {
-  void store.signIn(id);
-}
-
-function onDismissSignIn(id: string) {
-  store.clearSignIn(id);
-}
+// Leaving setup stops the guides' polling.
+onBeforeUnmount(() => {
+  for (const id of [...store.guides]) store.closeGuide(id);
+});
 </script>
 
 <template>
@@ -127,29 +111,6 @@ function onDismissSignIn(id: string) {
       Checking your setup…
     </p>
 
-    <UAlert
-      v-else-if="error"
-      color="error"
-      variant="subtle"
-      icon="i-hugeicons-alert-circle"
-      description="We couldn't check your setup just now. Make sure orso is still running, then check again."
-      data-testid="assistant-load-error"
-    >
-      <template #actions>
-        <UButton
-          color="neutral"
-          variant="outline"
-          size="sm"
-          icon="i-hugeicons-refresh"
-          loading-icon="i-hugeicons-refresh"
-          label="Check again"
-          :loading="rechecking"
-          :disabled="rechecking"
-          data-testid="assistant-load-retry"
-          @click="recheck"
-        />
-      </template>
-    </UAlert>
 
     <template v-else>
       <section class="flex flex-col gap-2" data-testid="assistant-assistants">
@@ -160,57 +121,30 @@ function onDismissSignIn(id: string) {
           </p>
         </div>
 
-        <p v-if="!rows.length" class="text-muted text-sm">
-          No assistants were found. Select Check again below.
-        </p>
+        <div v-if="!rows.length" class="text-muted flex flex-wrap items-center gap-2 text-sm">
+          <p>No assistants were found.</p>
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="xs"
+            icon="i-hugeicons-refresh"
+            label="Check again"
+            :loading="rechecking"
+            :disabled="rechecking"
+            data-testid="assistant-recheck"
+            @click="recheck"
+          />
+        </div>
 
         <ul v-else class="flex flex-col divide-y divide-default" data-testid="assistant-rows">
           <template v-for="row in rows" :key="row.id">
             <ProviderRow :row="row" @action="onAction(row, $event)" />
-            <li v-if="panelFor(row.id)" class="pb-3">
-              <SignInPanel
-                :provider-name="row.name"
-                :state="panelFor(row.id) ?? NO_SIGN_IN"
-                @submit-code="onSubmitCode(row.id, $event)"
-                @cancel="onCancelSignIn(row.id)"
-                @retry="onRetrySignIn(row.id)"
-                @dismiss="onDismissSignIn(row.id)"
-              />
+            <li v-if="showGuide(row)" class="pb-3">
+              <CliGuide :row="row" :checking="rechecking" @recheck="recheck" />
             </li>
           </template>
         </ul>
 
-        <UCollapsible :unmount-on-hide="false" data-testid="assistant-installed">
-          <template #default="{ open }">
-            <UButton
-              color="neutral"
-              variant="link"
-              size="sm"
-              class="px-0"
-              icon="i-hugeicons-arrow-down-01"
-              :ui="{ leadingIcon: ['transition-transform', open ? 'rotate-180' : ''] }"
-              label="I already installed an assistant"
-              data-testid="assistant-installed-toggle"
-            />
-          </template>
-          <template #content>
-            <div class="text-muted mt-2 flex flex-col items-start gap-2 text-sm">
-              <p>orso can use an assistant you installed yourself. Select Check again once it's ready.</p>
-              <UButton
-                color="neutral"
-                variant="outline"
-                size="sm"
-                icon="i-hugeicons-refresh"
-                loading-icon="i-hugeicons-refresh"
-                label="Check again"
-                :loading="rechecking"
-                :disabled="rechecking"
-                data-testid="assistant-recheck"
-                @click="recheck"
-              />
-            </div>
-          </template>
-        </UCollapsible>
       </section>
 
       <section

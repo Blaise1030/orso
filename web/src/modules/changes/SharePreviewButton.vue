@@ -9,11 +9,9 @@ import PrMenu from "@/modules/changes/PrMenu.vue";
 import ProtectionHint from "@/modules/changes/ProtectionHint.vue";
 import PublishButton from "@/modules/changes/PublishButton.vue";
 import { useChangesStore } from "@/modules/changes/store";
-import { useGithubStore } from "@/modules/github/store";
 
 const props = defineProps<{ projectId: string; repo?: string | null }>();
 const changes = useChangesStore();
-const github = useGithubStore();
 
 /** Once the PR exists, sharing again only pushes new commits to it. */
 const variant = computed(() => (changes.prUrl ? "secondary" : "default"));
@@ -138,9 +136,9 @@ async function onShare() {
       variant="outline"
       size="sm"
       icon="i-hugeicons-login-03"
-      label="Sign in with GitHub"
+      label="Connect GitHub"
       data-testid="share-sign-in"
-      @click="github.signIn()"
+      :to="{ path: '/settings', query: { tab: 'github' } }"
     />
 
     <ProtectionHint :project-id="projectId" />

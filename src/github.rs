@@ -1676,6 +1676,32 @@ impl GithubAuth {
         Ok(pulls.into_iter().next().map(PullRequest::from))
     }
 
+    /// Close `head_branch`'s open pull request without merging it. Returns its number, or
+    /// `None` when it has no open one.
+    pub async fn close_pr(&self, repo: &str, head_branch: &str) -> Result<Option<u64>, ApiError> {
+        let Some(pull) = self.find_pr(repo, head_branch).await? else {
+            return Ok(None);
+        };
+        let (status, _) = self
+            .api_raw(
+                reqwest::Method::PATCH,
+                &format!("/repos/{repo}/pulls/{}", pull.number),
+                Some(&serde_json::json!({ "state": "closed" })),
+            )
+            .await?;
+        if status == reqwest::StatusCode::FORBIDDEN || status == reqwest::StatusCode::NOT_FOUND {
+            return Err(ApiError::sandbox(
+                "You don't have permission to close this change's pull request",
+            ));
+        }
+        if !status.is_success() {
+            return Err(ApiError::github(format!(
+                "GitHub couldn't close the pull request ({status})"
+            )));
+        }
+        Ok(Some(pull.number))
+    }
+
     /// Create a draft pull request from `head_branch` into `main`, tagged with `labels`.
     pub async fn create_draft_pr(
         &self,

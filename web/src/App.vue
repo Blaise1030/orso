@@ -6,7 +6,14 @@ import CommandPalette from "@/app/CommandPalette.vue";
 import DaemonUnreachable from "@/app/DaemonUnreachable.vue";
 import SetupCheck from "@/app/SetupCheck.vue";
 import UpdateNotice from "@/app/UpdateNotice.vue";
-import { SETUP_WAIT_MS, dismissSetup, setupDismissed, setupIncomplete } from "@/app/setup";
+import {
+  SETUP_WAIT_MS,
+  closeOnboarding,
+  dismissSetup,
+  onboardingOpen,
+  setupDismissed,
+  setupIncomplete,
+} from "@/app/setup";
 import UIcon from "@nuxt/ui/components/Icon.vue";
 import { useToast } from "@nuxt/ui/composables/useToast";
 import { useDaemon } from "@/core/daemon";
@@ -40,7 +47,11 @@ watch(daemon.status, (s) => {
 const setup = ref<SetupStatus | null>(null);
 const setupSkipped = ref(setupDismissed());
 const setupPending = ref(!setupSkipped.value);
-const showSetup = computed(() => !setupSkipped.value && !!setup.value && setupIncomplete(setup.value));
+const showSetup = computed(
+  () =>
+    // Opened from Settings → "Setup guide": shown whatever the status says.
+    onboardingOpen.value || (!setupSkipped.value && !!setup.value && setupIncomplete(setup.value)),
+);
 
 const setupTimer = setupPending.value ? setTimeout(() => (setupPending.value = false), SETUP_WAIT_MS) : undefined;
 let setupRequested = false;
@@ -69,6 +80,7 @@ watch(
 );
 
 function continueFromSetup() {
+  closeOnboarding();
   dismissSetup();
   setupSkipped.value = true;
   void daemon.api.dismissSetup().catch(() => {

@@ -210,22 +210,19 @@ describe("RepoBrowser", () => {
     expect(githubRepos).not.toHaveBeenCalled();
   });
 
-  it("offers sign-in instead of repositories when signed out", async () => {
+  it("shows the GitHub guide instead of repositories when signed out", async () => {
     mountBrowser({
       signedIn: false,
       api: { githubStatus: vi.fn(async () => ({ ...signedOutStatus, configured: true, deviceFlow: true })) },
     });
-    const gh = useGithubStore();
     await flushPromises();
-    expect(document.body.querySelector("[data-testid='repo-sign-in']")).not.toBeNull();
-
-    gh.deviceFlow = false;
-    await flushPromises();
-    expect(document.body.querySelector("[data-testid='repo-sign-in']")).toBeNull();
-    expect(document.body.textContent).toContain("gh auth login");
+    expect(document.body.querySelector("[data-testid='repo-sign-in']")?.textContent).toContain(
+      "Connect GitHub to see your repositories.",
+    );
+    expect(document.body.querySelector("[data-testid='github-guide']")?.textContent).toContain("gh auth login --web");
   });
 
-  it("starts sign-in when the signed-out prompt is clicked", async () => {
+  it("never starts orso's own sign-in from the signed-out prompt", async () => {
     mountBrowser({
       signedIn: false,
       api: { githubStatus: vi.fn(async () => ({ ...signedOutStatus, configured: true, deviceFlow: true })) },
@@ -235,7 +232,7 @@ describe("RepoBrowser", () => {
     const signIn = vi.spyOn(gh, "signIn").mockResolvedValue();
 
     document.body.querySelector<HTMLElement>("[data-testid='repo-sign-in']")!.click();
-    expect(signIn).toHaveBeenCalledOnce();
+    expect(signIn).not.toHaveBeenCalled();
   });
 
   it("says there are no repositories when the account has none", async () => {

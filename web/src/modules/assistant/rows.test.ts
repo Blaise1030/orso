@@ -105,36 +105,43 @@ describe("the user's order", () => {
 describe("row state", () => {
   it.each([
     [
-      "not downloaded",
+      "not installed",
       provider("opencode", {
         runtime: runtime({ phase: "notDownloaded", version: null, source: null }),
         installed: false,
         chatReady: false,
       }),
-      { status: "", action: "download", actionLabel: LABELS.download, tone: "muted" },
+      { status: "", action: "setup", actionLabel: LABELS.setUp, tone: "muted" },
     ],
+    // Leftover managed download states from an older orso read as "not installed".
     [
-      "downloading",
+      "a leftover download in progress",
       provider("opencode", { runtime: runtime({ phase: "downloading", progress: 42 }), chatReady: false }),
-      { status: "42%", action: "cancel", actionLabel: LABELS.cancel, tone: "muted" },
+      { status: "", action: "setup", actionLabel: LABELS.setUp, tone: "muted" },
     ],
     [
-      "finishing",
+      "a leftover finishing download",
       provider("opencode", { runtime: runtime({ phase: "finishing" }), chatReady: false }),
-      { status: LABELS.settingUp, action: "none", actionLabel: "", tone: "muted" },
+      { status: "", action: "setup", actionLabel: LABELS.setUp, tone: "muted" },
     ],
     [
-      "download failed",
+      "a leftover failed download",
       provider("opencode", {
         runtime: runtime({ phase: "downloadError", message: "offline" }),
         chatReady: false,
       }),
-      { status: LABELS.downloadFailed, action: "retry", actionLabel: LABELS.retry, tone: "destructive" },
+      { status: "", action: "setup", actionLabel: LABELS.setUp, tone: "muted" },
     ],
     [
-      "update available",
+      "update available, used as it is",
       provider("claude", { runtime: runtime({ phase: "updateAvailable" }) }),
-      { status: LABELS.updateAvailable, action: "update", actionLabel: LABELS.update, tone: "warning" },
+      {
+        phase: "ready",
+        status: LABELS.connected,
+        action: "connect",
+        actionLabel: LABELS.connect,
+        tone: "success",
+      },
     ],
     [
       "ready and signed in",
@@ -154,7 +161,7 @@ describe("row state", () => {
     [
       "OpenCode with free models and no sign-in",
       provider("opencode", { signedIn: null, chatReady: true, freeModels: true }),
-      { status: LABELS.connected, action: "signIn", actionLabel: LABELS.signIn, tone: "success" },
+      { status: LABELS.connected, action: "connect", actionLabel: LABELS.connect, tone: "success" },
     ],
     [
       "OpenCode signed in",
@@ -166,16 +173,18 @@ describe("row state", () => {
       provider("codex", { signedIn: null, chatReady: false }),
       { status: LABELS.signInRequired, action: "signIn", actionLabel: LABELS.signIn, tone: "warning" },
     ],
+    [
+      "signed in but the chat check fails",
+      provider("claude", { signedIn: true, chatReady: false, reason: "The adapter exited." }),
+      { status: LABELS.notReady, action: "setup", actionLabel: LABELS.setUp, tone: "warning" },
+    ],
+    [
+      "OpenCode installed on free models but the chat check fails",
+      provider("opencode", { signedIn: null, chatReady: false, freeModels: true }),
+      { status: LABELS.notReady, action: "setup", actionLabel: LABELS.setUp, tone: "warning" },
+    ],
   ])("derives %s", (_name, p, expected) => {
     expect(deriveRow(p)).toMatchObject(expected);
-  });
-
-  it("shows progress without a daemon percentage as Downloading", () => {
-    const row = deriveRow(
-      provider("opencode", { runtime: runtime({ phase: "downloading", progress: null }) }),
-    );
-    expect(row.status).toBe(LABELS.downloading);
-    expect(row.action).toBe("cancel");
   });
 
   it("clamps progress into 0–100", () => {

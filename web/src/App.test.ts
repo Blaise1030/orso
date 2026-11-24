@@ -10,7 +10,7 @@ const h = vi.hoisted(() => ({ daemon: null as unknown }));
 vi.mock("@/core/daemon", () => ({ useDaemon: () => h.daemon }));
 
 import App from "./App.vue";
-import { SETUP_WAIT_MS, dismissSetup } from "./app/setup";
+import { SETUP_WAIT_MS, closeOnboarding, dismissSetup, openOnboarding } from "./app/setup";
 
 const complete: SetupStatus = {
   git: true,
@@ -40,9 +40,27 @@ function mountWith(status: SetupStatus | (() => Promise<SetupStatus>)) {
 }
 
 enableAutoUnmount(afterEach);
-afterEach(() => localStorage.clear());
+afterEach(() => {
+  localStorage.clear();
+  closeOnboarding();
+});
 
 describe("App setup gate", () => {
+  it("shows onboarding on demand from settings, even when setup is complete, and leaves it on Skip", async () => {
+    const { w } = mountWith(complete);
+    await flushPromises();
+    expect(w.find("[data-testid='shell']").exists()).toBe(true);
+
+    openOnboarding();
+    await flushPromises();
+    expect(w.find("[data-testid='setup-check']").exists()).toBe(true);
+
+    await w.get("[data-testid='onboarding-skip']").trigger("click");
+    await flushPromises();
+    expect(w.find("[data-testid='setup-check']").exists()).toBe(false);
+    expect(w.find("[data-testid='shell']").exists()).toBe(true);
+  });
+
   it("shows the setup check when something required is missing", async () => {
     const { w } = mountWith({
       ...complete,

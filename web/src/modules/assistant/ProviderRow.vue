@@ -4,10 +4,8 @@
 // the one action the user picked. It never talks to the daemon itself, so the
 // same row works inside SetupCheck and inside a dialog.
 import { computed } from "vue";
-import UAlert from "@nuxt/ui/components/Alert.vue";
 import UBadge from "@nuxt/ui/components/Badge.vue";
 import UButton from "@nuxt/ui/components/Button.vue";
-import UCollapsible from "@nuxt/ui/components/Collapsible.vue";
 import UIcon from "@nuxt/ui/components/Icon.vue";
 import UProgress from "@nuxt/ui/components/Progress.vue";
 import { LABELS, type AssistantRow, type RowAction } from "./rows";
@@ -28,13 +26,18 @@ const emit = defineEmits<{
   action: [action: RowAction];
 }>();
 
-const downloading = computed(() => props.row.phase === "downloading");
+/** Only the site builder downloads; an assistant row never shows download states. */
+const isSiteBuilder = computed(() => props.row.id === "node");
+const downloading = computed(() => isSiteBuilder.value && props.row.phase === "downloading");
+const finishing = computed(() => isSiteBuilder.value && props.row.phase === "finishing");
 /** A ready copy shows its version and where it came from; an update does too. */
 const showVersion = computed(
   () => props.row.phase === "ready" || props.row.phase === "updateAvailable",
 );
 const size = computed(() =>
-  props.row.phase === "ready" ? null : formatDownloadSize(props.row.provider.runtime?.downloadBytes),
+  !isSiteBuilder.value || props.row.phase === "ready"
+    ? null
+    : formatDownloadSize(props.row.provider.runtime?.downloadBytes),
 );
 const source = computed(() => (showVersion.value ? sourceLabel(props.row.source) : null));
 const percent = computed(() => props.row.progress ?? 0);
@@ -42,7 +45,7 @@ const percent = computed(() => props.row.progress ?? 0);
 type BadgeLook = { color: "success" | "warning" | "error"; variant: "subtle" | "outline" };
 
 const statusBadge = computed<BadgeLook | null>(() => {
-  if (!props.row.status || downloading.value || props.row.phase === "finishing") return null;
+  if (!props.row.status || downloading.value || finishing.value) return null;
   switch (props.row.tone) {
     case "success":
       return { color: "success", variant: "subtle" };
@@ -76,6 +79,8 @@ const actionSecondary = computed(
 
 const actionIcon = computed(() => {
   switch (props.row.action) {
+    case "setup":
+      return "i-hugeicons-computer-terminal-01";
     case "download":
       return "i-hugeicons-download-01";
     case "update":
@@ -94,6 +99,8 @@ const actionIcon = computed(() => {
 
 const actionAria = computed(() => {
   switch (props.row.action) {
+    case "setup":
+      return `Set up ${props.row.name}`;
     case "download":
       return `Download ${props.row.name}`;
     case "cancel":
@@ -165,7 +172,7 @@ const actionAria = computed(() => {
           :data-testid="`assistant-status-${row.id}`"
         />
         <span
-          v-else-if="row.phase === 'finishing'"
+          v-else-if="finishing"
           class="text-muted inline-flex items-center gap-1.5 text-sm"
           :data-testid="`assistant-status-${row.id}`"
         >
@@ -203,29 +210,5 @@ const actionAria = computed(() => {
       <span class="text-muted text-xs tabular-nums">{{ row.status }}</span>
     </div>
 
-    <UAlert
-      v-if="row.phase === 'downloadError'"
-      color="error"
-      variant="subtle"
-      icon="i-hugeicons-alert-circle"
-      :data-testid="`assistant-error-${row.id}`"
-    >
-      <template #description>
-        <p>We couldn't download {{ row.name }}. Check your connection and try again.</p>
-        <UCollapsible v-if="row.message" :unmount-on-hide="false" class="mt-1">
-            <UButton
-              variant="link"
-              color="neutral"
-              size="xs"
-              class="px-0 underline"
-              label="Details"
-              data-testid="assistant-details-toggle"
-            />
-            <template #content>
-              <p class="mt-1 text-xs break-words" data-testid="assistant-details">{{ row.message }}</p>
-            </template>
-          </UCollapsible>
-      </template>
-    </UAlert>
   </li>
 </template>

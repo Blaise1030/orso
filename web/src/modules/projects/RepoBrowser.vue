@@ -11,6 +11,7 @@ import { projectPath } from "@/router";
 import { relativeTime } from "@/lib/relativeTime";
 import { openErrorMessage } from "./invite";
 import { useProjectsStore } from "./store";
+import GhGuide from "@/modules/github/GhGuide.vue";
 
 const gh = useGithubStore();
 const projects = useProjectsStore();
@@ -94,19 +95,10 @@ watch(
       <UIcon name="i-hugeicons-loading-03" class="size-4 animate-spin" />
       Checking GitHub sign-in…
     </p>
-    <div v-else-if="!gh.user" class="flex flex-col items-start gap-2">
-      <template v-if="gh.deviceFlow">
-        <UButton
-          size="sm"
-          icon="i-hugeicons-login-03"
-          label="Sign in with GitHub"
-          data-testid="repo-sign-in"
-          @click="gh.signIn()"
-        />
-      </template>
-      <p v-else class="text-default text-sm">
-        Run <code class="bg-muted rounded px-1">gh auth login</code> in a terminal to see your repositories.
-      </p>
+    <!-- Signed out: the GitHub guide (install gh, `gh auth login`); it re-checks until signed in. -->
+    <div v-else-if="!gh.user" class="flex flex-col gap-2" data-testid="repo-sign-in">
+      <p class="text-default text-sm">Connect GitHub to see your repositories.</p>
+      <GhGuide />
     </div>
     <template v-else>
       <UInput

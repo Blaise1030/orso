@@ -563,13 +563,23 @@ fn absorb_line(
         state.message = Some("Paste the code from the sign-in page.".into());
     }
     if let Some(url) = find_url(trimmed) {
-        if !lock(&pending.opened).iter().any(|seen| seen == &url) {
+        // Claude opens its own browser tab (with a localhost callback) and prints
+        // a different, manual URL as a fallback. Opening that one too gives the
+        // user two tabs, one of which ends on a code to paste.
+        let cli_opens_browser = provider_id == "claude";
+        if !cli_opens_browser && !lock(&pending.opened).iter().any(|seen| seen == &url) {
             lock(&pending.opened).push(url.clone());
             opener(&url);
         }
         state.url = Some(url);
         if state.state != SignInState::Code {
             state.state = SignInState::Browser;
+        }
+        // Claude then waits on `Paste code here if prompted > ` with no newline,
+        // so that prompt never arrives as a line: offer the code box up front for
+        // anyone who finishes on the fallback page.
+        if cli_opens_browser {
+            state.needs_code = true;
         }
         state.message = Some("Finish signing in in your browser.".into());
     }
@@ -938,14 +948,20 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let script = "#!/bin/sh\n\
              if [ \"$1\" = \"auth\" ] && [ \"$2\" = \"status\" ]; then echo '{\"loggedIn\":true}'; exit 0; fi\n\
-             if [ \"$1\" = \"auth\" ] && [ \"$2\" = \"login\" ]; then echo \"Visit https://claude.test/login\"; exit 0; fi\n\
+             if [ \"$1\" = \"auth\" ] && [ \"$2\" = \"login\" ]; then echo \"If the browser didn't open, visit:\"; echo \"https://claude.test/login\"; printf 'Paste code here if prompted > '; sleep 1; exit 0; fi\n\
              exit 1\n";
-        let logins = manager(dir.path(), "claude", script);
+        let opened = Arc::new(Mutex::new(Vec::<String>::new()));
+        let seen = opened.clone();
+        let logins = manager(dir.path(), "claude", script)
+            .with_opener(move |url: &str| seen.lock().unwrap().push(url.to_string()));
         let reply = logins.start("claude").await;
         assert_eq!(reply.state, SignInState::Browser);
         assert_eq!(reply.url.as_deref(), Some("https://claude.test/login"));
-        assert!(!reply.needs_code);
+        // The un-terminated paste prompt never arrives as a line; the box is offered anyway.
+        assert!(reply.needs_code);
         wait_for(&logins, "claude", SignInState::Connected).await;
+        // Claude opened its own tab; orso must not open the fallback URL as a second one.
+        assert!(opened.lock().unwrap().is_empty());
     }
 
     #[tokio::test]
@@ -990,8 +1006,10 @@ mod tests {
                sleep 30\n\
              fi\n\
              exit 1\n";
+        // Long enough that the URL is read first even on a loaded machine (300ms raced
+        // the fake CLI's first line under `cargo test`), short of `wait_for`'s 6s.
         let logins =
-            manager(dir.path(), "opencode", script).with_flow_timeout(Duration::from_millis(300));
+            manager(dir.path(), "opencode", script).with_flow_timeout(Duration::from_millis(1500));
         let reply = logins.start("opencode").await;
         assert_eq!(reply.state, SignInState::Browser);
         let reply = wait_for(&logins, "opencode", SignInState::Failed).await;

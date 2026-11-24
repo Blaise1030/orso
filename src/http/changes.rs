@@ -1,7 +1,7 @@
 //! `POST /api/changes`, `GET /api/changes`, `GET /api/changes/active`,
 //! `POST /api/changes/{branch}/switch`, `POST /api/changes/{branch}/share`,
 //! `GET /api/changes/{branch}/status`, `GET /api/changes/live`, `GET /api/docs/branch-protection`,
-//! `POST /api/changes/update`, `POST /api/changes/{branch}/cleanup`,
+//! `POST /api/changes/update`, `POST /api/changes/{branch}/cleanup`, `DELETE /api/changes/{branch}`,
 //! `POST /api/changes/{branch}/ready`, `POST /api/changes/{branch}/publish`.
 
 use axum::body::Bytes;
@@ -709,6 +709,62 @@ pub async fn cleanup(
     Ok(Json(
         json!({ "branch": "main", "mainUpdated": done.main_updated }),
     ))
+}
+
+/// `DELETE /api/changes/{branch}?project=` → `{ branch, closedPr }`: give up on a change.
+/// Closes its open pull request and deletes its branch on GitHub, then deletes the local
+/// branch (moving to `main` first when it is checked out). `branch` is the checked-out branch
+/// afterwards; `closedPr` the number of the pull request closed, if any.
+///
+/// GitHub goes first so a refusal there (no permission, signed out) leaves the change intact
+/// rather than half deleted. A change that was never pushed needs no GitHub at all.
+pub async fn discard(
+    State(state): State<AppState>,
+    Path(branch): Path<String>,
+    q: Result<Query<ProjectQuery>, QueryRejection>,
+) -> Result<Json<Value>, ApiError> {
+    let q = query_or_badreq(q)?;
+    let project = state
+        .projects
+        .get(&q.project)
+        .await
+        .ok_or_else(|| ApiError::enoent(format!("no such project: {}", q.project)))?;
+    changes::check_discard(&project.dir, &branch).await?;
+    let checked_out = changes::is_checked_out(&project.dir, &branch).await?;
+    if checked_out && state.chats.any_running(&q.project) {
+        return Err(ApiError::conflict(
+            "The assistant is working on this change — stop it before deleting the change",
+        ));
+    }
+
+    let mut closed_pr = None;
+    if let Some(repo) = project.repo.as_deref() {
+        let signed_in = state.github.status().await.user.is_some();
+        if signed_in {
+            closed_pr = state.github.close_pr(repo, &branch).await?;
+        }
+        if signed_in || changes::was_pushed(&project.dir, &branch).await {
+            let env = state.github.git_env().await.unwrap_or_default();
+            changes::delete_remote(&project.dir, &branch, &env).await?;
+        }
+    }
+
+    if checked_out {
+        // Leftover edits go down with the change rather than blocking the move to `main`.
+        save_edits(&state, &q.project, &project.dir, false).await?;
+    }
+    let left = changes::discard(&project.dir, &branch).await?;
+    if left {
+        let _ = state.devservers.start(&q.project).await;
+    }
+    let now = if left {
+        "main".to_string()
+    } else {
+        changes::active(&project.dir)
+            .await?
+            .map_or_else(|| "main".to_string(), |c| c.branch)
+    };
+    Ok(Json(json!({ "branch": now, "closedPr": closed_pr })))
 }
 
 /// `GET /api/changes/{branch}/edits?project=` → `{ hasEdits }`: whether the change differs

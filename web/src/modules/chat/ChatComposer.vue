@@ -125,7 +125,8 @@ const pickerItems = computed<MenuItem[][]>(() => [
     filter: { placeholder: "Search models…", "data-testid": "chat-model-search" },
     filterFields: ["search"],
     open: forceSubMount || undefined,
-    ui: { content: "w-72" },
+    // The tick and chevron centre on the row too, not on its top edge.
+    ui: { content: "w-72", itemTrailing: "self-center" },
     content: { onCloseAutoFocus: (e: Event) => e.preventDefault() },
   })),
   [
@@ -406,7 +407,8 @@ defineExpose({ focus: () => textarea.value?.textareaRef?.focus() });
                 <span class="min-w-0 truncate">{{ pickerLabel }}</span>
               </UButton>
               <template #provider-leading="{ item }">
-                <ProviderIcon :provider="row(item).provider" class="size-3.5 text-current" />
+                <!-- Menu rows align to the top (items-start); centre the 14px mark on the 20px label line. -->
+                <ProviderIcon :provider="row(item).provider" class="size-3.5 self-center text-current" />
               </template>
               <template #provider-label="{ item }">
                 <!-- Sub triggers take no attrs; the label carries the flyout's testid (hovering it opens the flyout). -->

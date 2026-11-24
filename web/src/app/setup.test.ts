@@ -1,7 +1,25 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from "vitest";
 import type { SetupStatus } from "@/core/types";
-import { dismissSetup, onboardingStartStep, setupDismissed, setupIncomplete } from "./setup";
+import {
+  closeOnboarding,
+  dismissSetup,
+  onboardingOpen,
+  onboardingStartStep,
+  openOnboarding,
+  setupDismissed,
+  setupIncomplete,
+} from "./setup";
+
+describe("onboarding toggle", () => {
+  it("opens from settings and closes when the user leaves onboarding", () => {
+    expect(onboardingOpen.value).toBe(false);
+    openOnboarding();
+    expect(onboardingOpen.value).toBe(true);
+    closeOnboarding();
+    expect(onboardingOpen.value).toBe(false);
+  });
+});
 
 const complete: SetupStatus = {
   git: true,

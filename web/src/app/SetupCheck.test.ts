@@ -9,8 +9,18 @@ import type { RuntimeStatus, SetupProvider, SetupStatus } from "@/core/types";
 
 const h = vi.hoisted(() => ({ daemon: null as unknown as FakeDaemon }));
 vi.mock("@/core/daemon", () => ({ useDaemon: () => h.daemon }));
+const toastMock = vi.hoisted(() => ({
+  error: vi.fn(),
+  warning: vi.fn(),
+  success: vi.fn(),
+  info: vi.fn(),
+  loading: vi.fn(),
+  dismiss: vi.fn(),
+}));
+vi.mock("@/lib/toast", () => ({ toast: toastMock }));
 
 import SetupCheck from "./SetupCheck.vue";
+import { useAssistantStore } from "@/modules/assistant/store";
 import { PROVIDER_NAMES } from "@/modules/assistant/rows";
 
 const runtime = (over: Partial<RuntimeStatus> = {}): RuntimeStatus => ({
@@ -93,7 +103,8 @@ async function toSite(w: ReturnType<typeof mount>) {
     await flushPromises();
     return;
   }
-  await testId(w, "onboarding-setup-opencode").trigger("click");
+  // A ready assistant's step 1 continues with the bottom Continue button.
+  await testId(w, "onboarding-next").trigger("click");
   await flushPromises();
 }
 
@@ -107,6 +118,7 @@ async function toGithub(w: ReturnType<typeof mount>) {
 }
 
 enableAutoUnmount(afterEach);
+afterEach(() => vi.clearAllMocks());
 
 /** The radio-card option (Nuxt UI `URadioGroup` item) that holds the element with this testid. */
 function option(w: ReturnType<typeof mountCheck>, id: string) {
@@ -120,7 +132,7 @@ function radio(w: ReturnType<typeof mountCheck>, id: string) {
 }
 
 describe("onboarding step 1: assistant", () => {
-  it("renders the assistant step with four cards and OpenCode selected", async () => {
+  it("renders four cards, OpenCode selected, with its install guide and no download button", async () => {
     const w = mountCheck({}, fresh());
     await flushPromises();
 
@@ -128,159 +140,120 @@ describe("onboarding step 1: assistant", () => {
     expect(w.find("[data-testid='onboarding-step-site']").exists()).toBe(false);
     expect(w.text()).toContain("Set up your assistant.");
     expect(w.text()).toContain(
-      "Download an assistant to make changes to your site. OpenCode is free to start; use the account you already have for the others.",
+      "Pick the assistant that makes changes to your site, then set it up in Terminal. OpenCode is free to start; the others use the account you already have.",
     );
 
     const ids = ["opencode", "claude", "codex", "cursor"];
-    for (const id of ids) expect(w.find(`[data-testid='onboarding-provider-${id}']`).exists()).toBe(true);
+    for (const id of ids) {
+      expect(w.find(`[data-testid='onboarding-provider-${id}']`).exists()).toBe(true);
+      expect(testId(w, `onboarding-not-installed-${id}`).text()).toBe("Not installed");
+    }
 
     expect(radio(w, "onboarding-provider-opencode").attributes("aria-checked")).toBe("true");
     for (const id of ["claude", "codex", "cursor"]) {
       expect(radio(w, `onboarding-provider-${id}`).attributes("aria-checked")).toBe("false");
     }
-    expect(testId(w, "onboarding-setup-opencode").text()).toContain("Set up with OpenCode");
+
+    const guide = testId(w, "assistant-guide-opencode");
+    expect(guide.text()).toContain("Install OpenCode");
+    expect(guide.text()).toContain("curl -fsSL https://opencode.ai/v2/install | bash");
+    expect(guide.find("[data-testid='assistant-guide-copy-install-opencode']").exists()).toBe(true);
+    expect(guide.text()).toContain("No account needed");
+
+    expect(w.find("[data-testid^='onboarding-setup-']").exists()).toBe(false);
+    expect(w.find("[data-testid='onboarding-existing']").exists()).toBe(false);
+    expect(testId(w, "onboarding-next").attributes("disabled")).toBeDefined();
     expect(w.findAll("[data-testid^='onboarding-dot-']")).toHaveLength(3);
     expect(testId(w, "onboarding-dot-1").attributes("aria-current")).toBe("step");
     expect(w.find("[data-testid='onboarding-skip']").exists()).toBe(true);
   });
 
-  it("shows the advanced existing-assistant block without commands", async () => {
+  it("switches the guide with the selection, and polls only for the selected assistant", async () => {
     const w = mountCheck({}, fresh());
     await flushPromises();
+    const store = useAssistantStore();
+    expect(store.guides).toEqual(["opencode"]);
 
-    const advanced = w.get("[data-testid='onboarding-existing']");
-    expect(advanced.text()).toContain("Or use an assistant you already have.");
-    expect(advanced.text()).toContain("will appear here");
-    expect(advanced.text()).not.toMatch(/npx|--|open code|terminal/i);
-    expect(w.find("[data-testid='onboarding-existing-claude']").exists()).toBe(false);
+    await radio(w, "onboarding-provider-claude").trigger("click");
+    await flushPromises();
+
+    expect(radio(w, "onboarding-provider-claude").attributes("aria-checked")).toBe("true");
+    expect(w.findAll("[role='radio'][aria-checked='true']")).toHaveLength(1);
+    expect(w.find("[data-testid='assistant-guide-opencode']").exists()).toBe(false);
+    const guide = testId(w, "assistant-guide-claude");
+    expect(guide.text()).toContain("curl -fsSL https://claude.ai/install.sh | bash");
+    expect(guide.text()).toContain("claude auth login");
+    expect(store.guides).toEqual(["claude"]);
   });
 
-  it("lists system assistants that are ready and selects one", async () => {
+  it("ticks off install for an installed, signed-out assistant and shows its sign-in command", async () => {
+    const w = mountCheck(
+      {},
+      status({
+        providers: [
+          freshProvider("opencode"),
+          provider("claude", { runtime: runtime({ source: "system" }), signedIn: false, chatReady: false }),
+        ],
+      }),
+    );
+    await flushPromises();
+
+    await radio(w, "onboarding-provider-claude").trigger("click");
+    await flushPromises();
+
+    expect(testId(w, "onboarding-status-claude").text()).toContain("Sign-in required");
+    expect(w.find("[data-testid='onboarding-not-installed-claude']").exists()).toBe(false);
+    expect(testId(w, "assistant-guide-install-claude").attributes("data-done")).toBe("true");
+    const signIn = testId(w, "assistant-guide-sign-in-claude");
+    expect(signIn.attributes("data-done")).toBeUndefined();
+    expect(signIn.text()).toContain("claude auth login");
+  });
+
+  it("moves on once the user finishes in Terminal and the check sees it", async () => {
+    let next = status({
+      providers: [freshProvider("opencode"), provider("claude", { signedIn: false, chatReady: false })],
+      node: notDownloaded(),
+    });
+    const setupStatus = vi.fn(async () => next);
+    const w = mountCheck({ setupStatus }, async () => next);
+    await flushPromises();
+    await radio(w, "onboarding-provider-claude").trigger("click");
+    await flushPromises();
+    expect(w.find("[data-testid='onboarding-step-assistant']").exists()).toBe(true);
+
+    next = status({
+      providers: [freshProvider("opencode"), provider("claude", { signedIn: true, chatReady: true })],
+      node: notDownloaded(),
+    });
+    await testId(w, "assistant-guide-recheck-claude").trigger("click");
+    await flushPromises();
+
+    expect(w.find("[data-testid='onboarding-step-site']").exists()).toBe(true);
+    expect(useAssistantStore().guides).toEqual([]);
+  });
+
+  it("lets the user go back and pick a ready assistant without a guide", async () => {
     const w = mountCheck(
       {},
       status({
         providers: [
           provider("opencode", { freeModels: true, signedIn: null }),
-          provider("claude", {
-            runtime: runtime({ source: "system" }),
-            signedIn: true,
-            chatReady: true,
-          }),
+          provider("claude", { runtime: runtime({ source: "system" }), signedIn: true, chatReady: true }),
         ],
       }),
     );
     await flushPromises();
 
-    // Already connected → wizard skips past the assistant step; jump back to pick another.
-    expect(w.find("[data-testid='onboarding-step-assistant']").exists()).toBe(false);
+    // Already connected → the form moves past the assistant step; jump back to pick another.
+    expect(testId(w, "onboarding-step-assistant").attributes("data-active")).toBeUndefined();
     await testId(w, "onboarding-dot-1").trigger("click");
     await flushPromises();
 
-    const existing = option(w, "onboarding-existing-claude");
-    expect(existing.text()).toContain("Claude");
-    expect(existing.text()).toContain("Already on your Mac");
-    await radio(w, "onboarding-existing-claude").trigger("click");
-
-    expect(radio(w, "onboarding-provider-claude").attributes("aria-checked")).toBe("true");
-    expect(testId(w, "onboarding-setup-claude").text()).toContain("Continue");
-  });
-
-  it("changes the CTA when the selection changes", async () => {
-    const w = mountCheck({}, fresh());
-    await flushPromises();
-
     await radio(w, "onboarding-provider-claude").trigger("click");
+    await flushPromises();
     expect(radio(w, "onboarding-provider-claude").attributes("aria-checked")).toBe("true");
-    expect(radio(w, "onboarding-provider-opencode").attributes("aria-checked")).toBe("false");
-    expect(testId(w, "onboarding-setup-claude").text()).toContain("Set up with Claude");
-    expect(w.findAll("[role='radio'][aria-checked='true']")).toHaveLength(1);
-  });
-
-  it("starts a download, shows progress and cancels it", async () => {
-    const downloadRuntime = vi.fn(async () => runtime({ phase: "downloading", progress: 0 }));
-    const cancelRuntime = vi.fn(async () => notDownloaded());
-    const w = mountCheck({ downloadRuntime, cancelRuntime }, fresh());
-    await flushPromises();
-
-    await testId(w, "onboarding-setup-opencode").trigger("click");
-    await flushPromises();
-
-    expect(downloadRuntime).toHaveBeenCalledWith("opencode");
-    expect(w.find("[data-testid='onboarding-progress-opencode']").exists()).toBe(true);
-    expect(testId(w, "onboarding-setup-opencode").text()).toContain("Downloading…");
-    expect(testId(w, "onboarding-cancel-opencode").text()).toContain("Cancel");
-
-    h.daemon.emit({
-      type: "setup.runtime",
-      runtime: "opencode",
-      phase: "downloading",
-      progress: 42,
-    });
-    await nextTick();
-    expect(testId(w, "onboarding-percent-opencode").text()).toContain("42%");
-
-    await testId(w, "onboarding-cancel-opencode").trigger("click");
-    await flushPromises();
-    expect(cancelRuntime).toHaveBeenCalledWith("opencode");
-    expect(w.find("[data-testid='onboarding-progress-opencode']").exists()).toBe(false);
-    expect(testId(w, "onboarding-setup-opencode").text()).toContain("Set up with OpenCode");
-  });
-
-  it("offers Retry after a failed download", async () => {
-    const retryRuntime = vi.fn(async () => runtime({ phase: "downloading", progress: 3 }));
-    const w = mountCheck(
-      { retryRuntime },
-      status({
-        providers: [
-          provider("opencode", {
-            runtime: runtime({ phase: "downloadError", version: null, message: "The connection dropped." }),
-            installed: false,
-            chatReady: false,
-            freeModels: true,
-            signedIn: null,
-          }),
-        ],
-      }),
-    );
-    await flushPromises();
-
-    expect(testId(w, "onboarding-setup-opencode").text()).toContain("Retry");
-    expect(testId(w, "onboarding-error-opencode").text()).toContain(
-      "We couldn't download OpenCode. Check your connection and try again.",
-    );
-
-    await testId(w, "onboarding-setup-opencode").trigger("click");
-    await flushPromises();
-    expect(retryRuntime).toHaveBeenCalledWith("opencode");
-    expect(testId(w, "onboarding-setup-opencode").text()).toContain("Downloading…");
-  });
-
-  it("asks a downloaded assistant to sign in", async () => {
-    const signInProvider = vi.fn(async () => ({
-      state: "browser" as const,
-      url: "https://example.test/login",
-    }));
-    const w = mountCheck(
-      { signInProvider },
-      status({
-        providers: [
-          freshProvider("opencode"),
-          provider("claude", { signedIn: false, chatReady: false }),
-        ],
-      }),
-    );
-    await flushPromises();
-
-    await testId(w, "onboarding-provider-claude").trigger("click");
-    expect(testId(w, "onboarding-setup-claude").text()).toContain("Sign in");
-    expect(w.find("[data-testid='assistant-sign-in']").exists()).toBe(false);
-
-    await testId(w, "onboarding-setup-claude").trigger("click");
-    await flushPromises();
-    expect(signInProvider).toHaveBeenCalledWith("claude");
-    const panel = w.get("[data-testid='assistant-sign-in']");
-    expect(panel.attributes("data-state")).toBe("browser");
-    expect(panel.text()).toContain("Finish signing in to Claude");
+    expect(w.find("[data-testid^='assistant-guide-']").exists()).toBe(false);
+    expect(testId(w, "onboarding-next").attributes("disabled")).toBeUndefined();
   });
 
   it("moves on when the assistant is already ready", async () => {
@@ -288,8 +261,9 @@ describe("onboarding step 1: assistant", () => {
     await flushPromises();
 
     // Assistant + site builder are already ready in the default fixture → GitHub step.
-    expect(w.find("[data-testid='onboarding-step-github']").exists()).toBe(true);
-    expect(w.find("[data-testid='onboarding-step-assistant']").exists()).toBe(false);
+    expect(testId(w, "onboarding-step-github").attributes("data-active")).toBe("true");
+    // Done steps stay above in the scroll, but aren't the active one.
+    expect(testId(w, "onboarding-step-assistant").attributes("data-active")).toBeUndefined();
   });
 
   it("skips the assistant step when OpenCode is already connected", async () => {
@@ -302,30 +276,40 @@ describe("onboarding step 1: assistant", () => {
     );
     await flushPromises();
 
-    expect(w.find("[data-testid='onboarding-step-site']").exists()).toBe(true);
-    expect(w.find("[data-testid='onboarding-step-assistant']").exists()).toBe(false);
+    expect(testId(w, "onboarding-step-site").attributes("data-active")).toBe("true");
+    expect(testId(w, "onboarding-step-assistant").attributes("data-active")).toBeUndefined();
     expect(w.text()).toContain("Add the site builder.");
   });
 
-  it("skips setup and rechecks", async () => {
+  it("rechecks from the guide and skips setup", async () => {
     let next = fresh();
     const setupStatus = vi.fn(async () => next);
     const setupRuntimes = vi.fn(async () => ({ providers: [] }));
     const w = mountCheck({ setupStatus, setupRuntimes }, async () => next);
     await flushPromises();
 
-    await testId(w, "setup-recheck").trigger("click");
+    await testId(w, "assistant-guide-recheck-opencode").trigger("click");
     await flushPromises();
     expect(setupStatus).toHaveBeenCalled();
     expect(setupRuntimes).toHaveBeenCalled();
 
     next = status();
-    await testId(w, "setup-recheck").trigger("click");
+    await testId(w, "assistant-guide-recheck-opencode").trigger("click");
     await flushPromises();
     expect(w.find("[data-testid='onboarding-step-github']").exists()).toBe(true);
 
     await testId(w, "onboarding-skip").trigger("click");
     expect(w.emitted("continue")).toHaveLength(1);
+  });
+
+  it("closes its guide when it unmounts, so polling stops", async () => {
+    const w = mountCheck({}, fresh());
+    await flushPromises();
+    const store = useAssistantStore();
+    expect(store.guides).toEqual(["opencode"]);
+
+    w.unmount();
+    expect(store.guides).toEqual([]);
   });
 });
 
@@ -392,8 +376,9 @@ describe("onboarding step 2: site builder", () => {
     await toSite(w);
 
     expect(testId(w, "onboarding-site-primary").text()).toContain("Retry");
-    expect(testId(w, "onboarding-site-error").text()).toContain(
-      "We couldn't download the site builder. Check your connection and try again.",
+    expect(toastMock.error).toHaveBeenCalledWith(
+      "We couldn't download the site builder",
+      expect.objectContaining({ description: "Check your connection and try again. (Network)" }),
     );
     await testId(w, "onboarding-site-primary").trigger("click");
     await flushPromises();
@@ -441,7 +426,7 @@ describe("onboarding step 3: GitHub", () => {
     expect(w.emitted("continue")).toHaveLength(1);
   });
 
-  it("offers the GitHub sign-in when the account is missing", async () => {
+  it("guides the GitHub sign-in in Terminal when the account is missing", async () => {
     const w = mountCheck({}, status({ githubSignedIn: false }));
     await flushPromises();
     await toGithub(w);
@@ -449,7 +434,17 @@ describe("onboarding step 3: GitHub", () => {
     expect(testId(w, "onboarding-github-account").text()).toContain(
       "Sign in so orso can open your sites and share your changes.",
     );
-    expect(w.find("[data-testid='setup-sign-in']").exists()).toBe(true);
+    // No in-app sign-in: the guide shows gh's own command instead.
+    expect(w.find("[data-testid='setup-sign-in']").exists()).toBe(false);
+    expect(testId(w, "github-guide-install").attributes("data-done")).toBe("true");
+    expect(testId(w, "github-guide-sign-in").text()).toContain("gh auth login --web");
+  });
+
+  it("hides the GitHub guide once Git, gh and the account are all ready", async () => {
+    const w = mountCheck({}, status());
+    await flushPromises();
+    await toGithub(w);
+    expect(w.find("[data-testid='github-guide']").exists()).toBe(false);
   });
 
   it("walks back through the steps", async () => {
@@ -501,7 +496,11 @@ describe("onboarding copy and failures", () => {
     });
     await flushPromises();
 
-    expect(w.find("[data-testid='setup-error']").exists()).toBe(true);
+    expect(toastMock.error).toHaveBeenCalledWith(
+      "We couldn't check your setup just now",
+      expect.objectContaining({ description: "Make sure orso is still running, then check again." }),
+    );
+    expect(JSON.stringify(toastMock.error.mock.calls)).not.toContain("127.0.0.1");
     expect(w.text()).not.toContain("cannot reach daemon");
     expect(w.text()).not.toContain("127.0.0.1");
   });
