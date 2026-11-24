@@ -61,7 +61,11 @@ pub fn script(command: &str) -> String {
         "#!/bin/sh".to_string(),
         r#"rm -f -- "$0""#.to_string(),
         "clear".to_string(),
-        format!(r"printf '%s\n\n  %s\n\n' {} {}", quote(INTRO), quote(command)),
+        format!(
+            r"printf '%s\n\n  %s\n\n' {} {}",
+            quote(INTRO),
+            quote(command)
+        ),
         format!(r#"exec "${{SHELL:-/bin/zsh}}" -lic {}"#, quote(&body)),
         String::new(),
     ]
@@ -74,8 +78,8 @@ fn scripts_dir() -> PathBuf {
 }
 
 fn write_script(dir: &Path, command: &str) -> std::io::Result<PathBuf> {
-    use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt, PermissionsExt};
     use std::io::Write;
+    use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt, PermissionsExt};
 
     std::fs::DirBuilder::new()
         .recursive(true)
@@ -139,7 +143,10 @@ mod tests {
     fn script_deletes_itself_and_runs_the_command_in_a_login_shell() {
         let s = script("curl -fsSL https://claude.ai/install.sh | bash");
         assert!(s.starts_with("#!/bin/sh\nrm -f -- \"$0\"\n"), "{s}");
-        assert!(s.contains("-lic 'if curl -fsSL https://claude.ai/install.sh | bash; then"), "{s}");
+        assert!(
+            s.contains("-lic 'if curl -fsSL https://claude.ai/install.sh | bash; then"),
+            "{s}"
+        );
         assert!(s.contains("All done."), "{s}");
     }
 
@@ -159,7 +166,10 @@ mod tests {
             .env("TERM", "dumb")
             .output()
             .unwrap();
-        (String::from_utf8_lossy(&out.stdout).into_owned(), path.exists())
+        (
+            String::from_utf8_lossy(&out.stdout).into_owned(),
+            path.exists(),
+        )
     }
 
     #[test]
