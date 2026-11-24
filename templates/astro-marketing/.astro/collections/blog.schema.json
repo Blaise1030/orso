@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "pubDate": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "editor": {
+        "type": "date",
+        "knownRefinement": true
+      }
+    },
+    "coverImage": {
+      "type": "string",
+      "editor": {
+        "type": "image"
+      }
+    },
+    "coverAlt": {
+      "type": "string"
+    },
+    "categories": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "editor": {
+          "type": "reference",
+          "collection": "blogCategories"
+        }
+      }
+    },
+    "tags": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relatedPosts": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "editor": {
+          "type": "reference",
+          "collection": "blog"
+        }
+      }
+    },
+    "$schema": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "description",
+    "pubDate"
+  ],
+  "editor": {
+    "knownRefinement": true
+  }
+}

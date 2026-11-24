@@ -144,7 +144,7 @@ describe("ProjectsGrid", () => {
   it("creates a project from the dialog", async () => {
     const w = mountGrid();
     await flushPromises();
-    await w.get("[data-testid='template-astro-marketing']").trigger("click");
+    await w.get("[data-testid='template-astro-starter']").trigger("click");
     await flushPromises();
     const input = document.body.querySelector<HTMLInputElement>("input[aria-label='Project name']")!;
     input.value = "Landing";

@@ -77,6 +77,7 @@ export const useChangesStore = defineStore("changes", () => {
   const creating = ref(false);
   const sharing = ref(false);
   const markingReady = ref(false);
+  const convertingToDraft = ref(false);
   const publishing = ref(false);
   const switching = ref(false);
   const updating = ref(false);
@@ -855,6 +856,33 @@ export const useChangesStore = defineStore("changes", () => {
   }
 
   /**
+   * Put a change waiting for a greenlight back to draft and show the status it returns. No
+   * immediate re-read: GitHub's REST view can lag the GraphQL write and still say open.
+   */
+  async function convertToDraft(id: string, branch: string): Promise<void> {
+    convertingToDraft.value = true;
+    needsSignIn.value = false;
+    try {
+      const pr = await daemon.api.convertChangeToDraft(id, branch);
+      if (projectId.value === id && active.value?.branch === branch) {
+        stopStatusPolling();
+        status.value = pr;
+        if (pr) {
+          prUrl.value = pr.url;
+          pollTimer = setTimeout(() => void refreshStatus(), STATUS_POLL_MS);
+        }
+      }
+    } catch (e) {
+      if (e instanceof ApiError && e.needsGithubSignIn) {
+        needsSignIn.value = true;
+      }
+      throw e;
+    } finally {
+      convertingToDraft.value = false;
+    }
+  }
+
+  /**
    * Publish the change: push it, share it (opening a pull request if it has none), mark it
    * ready, merge it on GitHub, then clean up onto updated `main`. Clean up stays available when
    * the merge happened outside orso, or when this post-publish cleanup fails.
@@ -905,6 +933,7 @@ export const useChangesStore = defineStore("changes", () => {
     creating,
     sharing,
     markingReady,
+    convertingToDraft,
     hasEdits,
     publishing,
     switching,
@@ -953,6 +982,7 @@ export const useChangesStore = defineStore("changes", () => {
     cleanup,
     deleteChange,
     markReady,
+    convertToDraft,
     publish,
     refreshStatus,
     stopStatusPolling,

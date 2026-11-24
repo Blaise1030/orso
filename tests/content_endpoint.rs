@@ -27,6 +27,7 @@ async fn fake_dev_server_patches_through_the_integration_endpoint() {
     let id = state.projects.create("Site").await.unwrap().id;
     let dir = state.projects.get(&id).await.unwrap().dir;
     common::write_content_manifest(&dir, "");
+    common::seed_fixture_content(&dir, "");
 
     common::start_fake(&state, &id).await;
     let endpoint = state.content_endpoint(&id).await.unwrap().unwrap();

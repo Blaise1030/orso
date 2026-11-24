@@ -5,7 +5,7 @@ import { expect, test as base, type Page } from "@playwright/test";
 import type { orsoEnv } from "./daemon";
 import { api, startorso } from "./daemon";
 
-/** A local-only project scaffolded from the bundled astro-marketing template. */
+/** A local-only project scaffolded from the bundled astro-starter template. */
 export type TemplateProject = { id: string; dir: string };
 
 export const test = base.extend<{ orso: orsoEnv; templateProject: TemplateProject }>({

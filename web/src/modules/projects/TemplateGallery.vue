@@ -13,8 +13,8 @@ const emit = defineEmits<{ create: [] }>();
         as="button"
         type="button"
         variant="outline"
-        title="Astro marketing"
-        description="Astro landing page with blog and help content"
+        title="Astro starter"
+        description="Get-started Astro site with a sample posts model"
         class="btn-depth-soft hover:bg-elevated/50 focus-visible:outline-primary text-left transition-colors focus-visible:outline-2"
         :ui="{
           container: 'gap-0 p-0 sm:p-0 lg:flex',
@@ -22,7 +22,7 @@ const emit = defineEmits<{ create: [] }>();
           title: 'text-sm font-medium',
           description: 'text-xs text-muted',
         }"
-        data-testid="template-astro-marketing"
+        data-testid="template-astro-starter"
         @click="emit('create')"
       >
         <!-- Layout sketch of the template, not real content. -->

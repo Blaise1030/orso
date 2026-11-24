@@ -5,6 +5,8 @@ import Image from "@tiptap/extension-image";
 import { OrderedList, TaskItem, TaskList } from "@tiptap/extension-list";
 import { renderTableToMarkdown, Table, TableKit } from "@tiptap/extension-table";
 import { Markdown, MarkdownManager } from "@tiptap/markdown";
+import { NamedBlock } from "./NamedBlock";
+import { parseNamedBlockHtml } from "./namedBlocks";
 
 /**
  * Tiptap writes every `&` in text as `&amp;`, so "Voice & Tone" saved as "Voice &amp; Tone" and
@@ -64,6 +66,7 @@ export const STARTER_KIT: Partial<StarterKitOptions> = {
 /** The extensions the rich editor adds on top of what `UEditor` builds in: lists, tables and images. */
 export function bodyExtensions(resolveImage?: (src: string) => string): AnyExtension[] {
   return [
+    NamedBlock,
     NumericOrderedList,
     TaskList,
     TaskItem.configure({ nested: true }),
@@ -174,21 +177,44 @@ const SUPPORTED_TOKENS = new Set([
 ]);
 
 type Cell = { tokens: Token[] };
-interface Token { type: string; raw?: string; text?: string; task?: boolean; tokens?: Token[]; items?: Token[]; header?: Cell[]; rows?: Cell[][] }
+interface Token {
+  type: string;
+  block?: boolean;
+  raw?: string;
+  text?: string;
+  task?: boolean;
+  tokens?: Token[];
+  items?: Token[];
+  header?: Cell[];
+  rows?: Cell[][];
+}
 
 let manager: MarkdownManager | null = null;
+let managerEditor: Editor | null = null;
 /** A detached editor gives the same flattened extension set and Markdown manager the rich editor uses. */
 function markdownManager(): MarkdownManager {
   if (!manager) {
-    const editor = new Editor({ extensions: markdownExtensions() });
-    manager = editor.markdown!;
+    managerEditor = new Editor({ extensions: markdownExtensions() });
+    manager = managerEditor.markdown!;
   }
   return manager;
+}
+
+/** Drop the cached manager so tests that change the registry rebuild parse state cleanly. */
+export function resetMarkdownManager(): void {
+  managerEditor?.destroy();
+  managerEditor = null;
+  manager = null;
 }
 
 /** Only checks Markdown structure: any token outside the supported set, or MDX-looking text, fails. */
 function supportedTokens(tokens: Token[] | undefined): boolean {
   for (const token of tokens ?? []) {
+    // Registered named blocks only; arbitrary / inline HTML stays unsupported.
+    if (token.type === "html") {
+      if (!token.block || !parseNamedBlockHtml(token.text ?? token.raw ?? "")) return false;
+      continue;
+    }
     if (!SUPPORTED_TOKENS.has(token.type)) return false;
     // MDX module syntax and expressions, and stray angle brackets, are not plain Markdown text.
     if (token.type === "paragraph" && /^\s*(import|export)\s/.test(token.raw ?? "")) return false;

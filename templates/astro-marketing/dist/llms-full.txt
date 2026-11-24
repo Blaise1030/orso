@@ -1,0 +1,222 @@
+# Acme
+
+> Acme keeps projects, milestones and the reasons behind each decision in one shared plan, so a small team always knows what ships next.
+
+## Getting started
+
+Source: https://example.com/help/getting-started/
+
+Learn the basics and make your first changes.
+
+## First steps
+
+Explore the site, read our guides, and start shaping your product story.
+
+1. Review your site settings.
+2. Update your home page sections.
+3. Share your work with your team.
+
+## Where to go next
+
+- **Create your account** if you have not signed up yet.
+- **Invite your team** once you are ready to work together.
+
+## Create your account
+
+Source: https://example.com/help/create-your-account/
+
+Sign up with your work email and set up your workspace.
+
+## Sign up
+
+Choose **Get started** on the home page and enter your work email. We send a link to confirm the address.
+
+## Name your workspace
+
+A workspace holds your projects and your team. Most teams use the company name. You can rename it later in **Settings**.
+
+## Invite your team
+
+Source: https://example.com/help/invite-your-team/
+
+Add teammates to your workspace and choose what each person can do.
+
+## Send invitations
+
+Open **Settings → Members** and choose **Invite**. Enter one or more email addresses, separated by commas.
+
+## Choose a role
+
+- **Admin** — manages billing, members and every project.
+- **Member** — creates and edits projects.
+- **Guest** — sees only the projects shared with them.
+
+You can change a role at any time.
+
+## Create a project
+
+Source: https://example.com/help/create-a-project/
+
+Start a project from scratch or from a template.
+
+## Start a project
+
+Choose **New project**, give it a name, and pick who can see it. Projects are private to their members until you share them.
+
+## Use a template
+
+Templates come with tasks and milestones already in place. Pick one that matches your work and adjust it as you go.
+
+## Organise work with milestones
+
+Source: https://example.com/help/organise-work-with-milestones/
+
+Group tasks under a shared goal and date to track progress.
+
+## Add a milestone
+
+In a project, choose **New milestone**, then set a name and a target date.
+
+## Track progress
+
+Each milestone shows how many of its tasks are done. It turns amber when the date is near and work is still open.
+
+## Share a project
+
+Source: https://example.com/help/share-a-project/
+
+Give clients or teammates outside the project a link to follow along.
+
+## Share with a link
+
+Open the project, choose **Share**, and turn on **Anyone with the link can view**. Copy the link and send it.
+
+## Stop sharing
+
+Turn the link off at any time. Anyone who had it loses access straight away.
+
+## Choose a plan
+
+Source: https://example.com/help/choose-a-plan/
+
+Compare plans and change yours whenever your team grows.
+
+## Compare plans
+
+Every plan includes unlimited projects. Paid plans add more members, guests, and priority support. See the **pricing section** on the home page.
+
+## Change your plan
+
+Admins can upgrade or downgrade in **Settings → Billing**. Changes take effect immediately and are prorated.
+
+## Reset your password
+
+Source: https://example.com/help/reset-your-password/
+
+Get back into your account when you cannot sign in.
+
+## Request a reset link
+
+On the sign-in page, choose **Forgot password** and enter your email. The link is valid for one hour.
+
+## Still locked out?
+
+Check your spam folder, then contact support from the address you signed up with.
+
+## How we run design reviews
+
+Source: https://example.com/blog/how-we-run-design-reviews/
+
+Thirty minutes, one decision, and written feedback before anyone joins the call.
+
+## Feedback comes first, in writing
+
+The designer shares the work a day ahead. Reviewers leave written comments before the meeting, so the call is for decisions, not first impressions.
+
+## One decision per review
+
+Every review ends with a single outcome: ship it, change it, or try another direction. If we cannot decide, we name who will and by when.
+
+## Keep it short
+
+Thirty minutes is enough. Long reviews tend to drift into redesigning the whole product.
+
+## Release notes people actually read
+
+Source: https://example.com/blog/release-notes-people-read/
+
+Lead with the change a customer will notice, keep it short, and show a picture.
+
+## Start with the outcome
+
+"You can now export reports as PDF" beats "We added a new export pipeline". Readers want to know what they can do, not how you built it.
+
+## One change per paragraph
+
+Short paragraphs are easy to skim. If a change needs more than three sentences, link to a help article instead.
+
+## Show it
+
+A single screenshot or short clip answers most questions before they are asked.
+
+## How to plan a launch in one week
+
+Source: https://example.com/blog/plan-a-launch-in-a-week/
+
+A day-by-day plan for small teams that need to ship something real by Friday.
+
+## Monday: decide what "done" means
+
+Write one sentence that describes the launch from the customer's side. Everything that does not serve that sentence moves to next week.
+
+## Tuesday and Wednesday: build the smallest version
+
+Split the work into tasks no bigger than half a day. If a task feels bigger, it is two tasks.
+
+## Thursday: rehearse
+
+Walk through the launch as a customer would: the page, the sign-up, the first email. Fix what trips you up.
+
+## Friday: ship and tell people
+
+Publish, then write a short note about what changed and why. A launch nobody hears about is only a deploy.
+
+## Introducing milestones
+
+Source: https://example.com/blog/introducing-milestones/
+
+Group related tasks under one goal, see progress at a glance, and know what ships next.
+
+## Why milestones
+
+Projects rarely fail on a single task. They slip when nobody can see how the pieces add up. Milestones give a set of tasks one shared goal and one date, so the whole team can see how close you are.
+
+## How they work
+
+1. Open a project and choose **New milestone**.
+2. Give it a name and a target date.
+3. Drag tasks onto it, or pick the milestone when you create a task.
+
+Each milestone shows a progress bar based on completed tasks, and turns amber when the date is close and work is still open.
+
+## Available today
+
+Milestones are available on every plan. Read **Organise work with milestones** in the help center for the details.
+
+## Welcome to the blog
+
+Source: https://example.com/blog/welcome/
+
+News, ideas, and updates from the Acme team.
+
+## Welcome
+
+We're glad you're here. Follow along for product updates, practical tips, and stories from our team.
+
+## What to expect
+
+We post a few times a month, in three categories:
+
+- **Product** — new features and the thinking behind them.
+- **Guides** — step-by-step advice you can use today.
+- **Company** — how we work and who we are.

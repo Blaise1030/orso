@@ -1,0 +1,43 @@
+---
+import { render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { formatDate, loadPosts } from "../../lib/posts";
+import { absoluteUrl, breadcrumbs } from "../../lib/seo";
+
+export async function getStaticPaths() {
+  const posts = await loadPosts();
+  return posts.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const path = `/posts/${entry.id}/`;
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: entry.data.title,
+    datePublished: entry.data.date,
+    url: absoluteUrl(path),
+    mainEntityOfPage: absoluteUrl(path),
+  },
+  breadcrumbs([
+    { name: "Home", path: "/" },
+    { name: "Sample posts", path: "/posts/" },
+    { name: entry.data.title, path },
+  ]),
+];
+---
+
+<Base title={entry.data.title} description={entry.data.title} type="article" published={entry.data.date} jsonLd={jsonLd}>
+  <article class="page pt-14 pb-section md:pt-20">
+    <div class="mx-auto max-w-prose">
+      <a class="link text-sm text-muted" href="/posts/">Back to sample posts</a>
+      <time class="label rise mt-10 block" datetime={entry.data.date}>{formatDate(entry.data.date)}</time>
+      <h1 class="rise mt-4 text-4xl font-light tracking-display text-ink md:text-5xl">{entry.data.title}</h1>
+      <div class="prose mt-12 max-w-none border-t border-line pt-10 prose-img:h-auto prose-img:max-w-full prose-img:rounded-md">
+        <Content />
+      </div>
+    </div>
+  </article>
+</Base>

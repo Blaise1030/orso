@@ -1,0 +1,35 @@
+# Acme
+
+> Acme keeps projects, milestones and the reasons behind each decision in one shared plan, so a small team always knows what ships next.
+
+Help articles explain how to use Acme; blog posts cover product news and guides. The full text of every article is in [llms-full.txt](https://example.com/llms-full.txt).
+
+## Pages
+- [Home](https://example.com/): Acme keeps projects, milestones and the reasons behind each decision in one shared plan, so a small team always knows what ships next.
+- [Help](https://example.com/help/): Guides and answers, from your first sign-in to your next invoice.
+- [Blog](https://example.com/blog/): Product news, practical guides and stories from the team.
+
+## Help: Basics
+- [Getting started](https://example.com/help/getting-started/): Learn the basics and make your first changes.
+- [Create your account](https://example.com/help/create-your-account/): Sign up with your work email and set up your workspace.
+- [Invite your team](https://example.com/help/invite-your-team/): Add teammates to your workspace and choose what each person can do.
+
+## Help: Projects
+- [Create a project](https://example.com/help/create-a-project/): Start a project from scratch or from a template.
+- [Organise work with milestones](https://example.com/help/organise-work-with-milestones/): Group tasks under a shared goal and date to track progress.
+- [Share a project](https://example.com/help/share-a-project/): Give clients or teammates outside the project a link to follow along.
+
+## Help: Billing and account
+- [Choose a plan](https://example.com/help/choose-a-plan/): Compare plans and change yours whenever your team grows.
+- [Reset your password](https://example.com/help/reset-your-password/): Get back into your account when you cannot sign in.
+
+## Blog
+- [How we run design reviews](https://example.com/blog/how-we-run-design-reviews/): Thirty minutes, one decision, and written feedback before anyone joins the call.
+- [Release notes people actually read](https://example.com/blog/release-notes-people-read/): Lead with the change a customer will notice, keep it short, and show a picture.
+- [How to plan a launch in one week](https://example.com/blog/plan-a-launch-in-a-week/): A day-by-day plan for small teams that need to ship something real by Friday.
+- [Introducing milestones](https://example.com/blog/introducing-milestones/): Group related tasks under one goal, see progress at a glance, and know what ships next.
+- [Welcome to the blog](https://example.com/blog/welcome/): News, ideas, and updates from the Acme team.
+
+## Optional
+- [Privacy policy](https://example.com/privacy/)
+- [Terms of service](https://example.com/terms/)

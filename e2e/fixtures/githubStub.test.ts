@@ -215,6 +215,26 @@ describe("githubStub", () => {
 
       stub.setGraphqlStatus(403);
       expect((await gql({ id: "PR_kwStub1" })).status).toBe(403);
+      stub.setGraphqlStatus(null);
+
+      const draftRes = await fetch(`${stub.baseUrl}/graphql`, {
+        method: "POST",
+        headers: auth,
+        body: JSON.stringify({
+          query:
+            "mutation($id: ID!) { convertPullRequestToDraft(input: { pullRequestId: $id }) { pullRequest { isDraft } } }",
+          variables: { id: "PR_kwStub1" },
+        }),
+      });
+      expect(draftRes.status).toBe(200);
+      expect(await draftRes.json()).toEqual({
+        data: { convertPullRequestToDraft: { pullRequest: { isDraft: true } } },
+      });
+      expect(stub.convertToDraftCalls()).toEqual(["PR_kwStub1"]);
+      const drafted = (await (
+        await fetch(`${stub.baseUrl}/repos/acme/site/pulls?head=acme:content/t`, { headers: auth })
+      ).json()) as { draft: boolean }[];
+      expect(drafted[0]!.draft).toBe(true);
     } finally {
       await stub.close();
     }

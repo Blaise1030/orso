@@ -28,7 +28,7 @@ fn git_cli(dir: &Path, args: &[&str]) -> String {
 
 fn link_node_modules(dir: &Path) {
     let modules =
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("templates/astro-marketing/node_modules");
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("templates/astro-starter/node_modules");
     std::os::unix::fs::symlink(modules, dir.join("node_modules")).unwrap();
     // `.gitignore` has `node_modules/`, which does not match a symlink.
     let exclude = dir.join(".git/info/exclude");

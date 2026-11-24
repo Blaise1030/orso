@@ -264,12 +264,11 @@ fn content_editor_template_files_are_embedded() {
     for path in [
         "astro.config.mjs",
         "src/content.config.ts",
-        "src/pages/blog/index.astro",
-        "src/pages/blog/[slug].astro",
-        "src/pages/help/index.astro",
-        "src/pages/help/[slug].astro",
-        "src/content/blog/en/welcome.md",
-        "src/content/helpDocs/en/getting-started.md",
+        "src/pages/index.astro",
+        "src/pages/posts/index.astro",
+        "src/pages/posts/[slug].astro",
+        "src/content/posts/hello-orso.md",
+        "src/content/collections.js",
     ] {
         assert!(
             Template::get(path).is_some(),
@@ -280,6 +279,10 @@ fn content_editor_template_files_are_embedded() {
         "src/content-schemas.mjs",
         "scripts/orso-content.mjs",
         "scripts/orso-content.test.mjs",
+        "src/pages/blog/index.astro",
+        "src/pages/help/index.astro",
+        "src/content/blog/en/welcome.md",
+        "src/content/helpDocs/en/getting-started.md",
     ] {
         assert!(Template::get(path).is_none(), "stale template file: {path}");
     }

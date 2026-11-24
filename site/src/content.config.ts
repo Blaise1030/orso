@@ -22,7 +22,7 @@ const translations = (name: string) =>
     loader: glob({
       base: `./src/content/${name}`,
       pattern: `${folders}/*.md`,
-      // "zh/plan-a-launch-in-a-week": locale, then the English entry id.
+      // "zh/introducing-orso": locale, then the English entry id.
       generateId: ({ entry }) => entry.replace(/\.md$/, ""),
     }),
     schema: z

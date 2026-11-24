@@ -95,6 +95,8 @@ export type GithubStub = {
   setMainRulesetRequiresPr: (requiresPr: boolean) => void;
   /** PR node ids of every GraphQL `markPullRequestReadyForReview` mutation received. */
   readyForReviewCalls: () => string[];
+  /** PR node ids of every GraphQL `convertPullRequestToDraft` mutation received. */
+  convertToDraftCalls: () => string[];
   /** Force `POST /graphql` to return this HTTP status (null = normal). */
   setGraphqlStatus: (status: number | null) => void;
   /** Add an open PR to the repo's list, as a teammate's change waiting for review. */
@@ -129,7 +131,7 @@ export type GithubStubOptions = {
 };
 
 /** Minimal GitHub API stub: device flow + `/user` + repos + draft pulls + GraphQL
- *  `markPullRequestReadyForReview`. */
+ *  draft toggles (`markPullRequestReadyForReview`, `convertPullRequestToDraft`). */
 export function startGithubStub(
   clientId = "cid",
   opts: GithubStubOptions = {},
@@ -141,6 +143,7 @@ export function startGithubStub(
   let rulesetRequiresPr = false;
   let graphqlStatus: number | null = null;
   const readyCalls: string[] = [];
+  const draftCalls: string[] = [];
   const pullsPosts: PullsPost[] = [];
   const prs: StoredPr[] = [];
   const reviewPrs: ReviewPrSeed[] = [];
@@ -351,7 +354,9 @@ export function startGithubStub(
           res.writeHead(400).end();
           return;
         }
-        if (!body.query?.includes("markPullRequestReadyForReview")) {
+        const markReady = body.query?.includes("markPullRequestReadyForReview");
+        const toDraft = body.query?.includes("convertPullRequestToDraft");
+        if (!markReady && !toDraft) {
           sendJson(res, 200, { errors: [{ message: "unsupported query" }] });
           return;
         }
@@ -360,9 +365,19 @@ export function startGithubStub(
           | undefined;
         const pr = prs.find((p) => nodeId(p.number) === id);
         if (!id || !pr) {
+          const field = markReady ? "markPullRequestReadyForReview" : "convertPullRequestToDraft";
           sendJson(res, 200, {
-            data: { markPullRequestReadyForReview: null },
+            data: { [field]: null },
             errors: [{ type: "NOT_FOUND", message: `Could not resolve to a node with the global id of '${id}'` }],
+          });
+          return;
+        }
+        if (toDraft) {
+          draftCalls.push(id);
+          pr.draft = true;
+          status.draft = true;
+          sendJson(res, 200, {
+            data: { convertPullRequestToDraft: { pullRequest: { isDraft: true } } },
           });
           return;
         }
@@ -673,6 +688,7 @@ export function startGithubStub(
           rulesetRequiresPr = requiresPr;
         },
         readyForReviewCalls: () => readyCalls.slice(),
+        convertToDraftCalls: () => draftCalls.slice(),
         addReviewPr: (seed) => {
           reviewPrs.push(seed);
           commentsByPr.set(

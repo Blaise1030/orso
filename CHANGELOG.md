@@ -1,5 +1,104 @@
 # Changelog
 
+## v0.1.15
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.12...v0.1.15)
+
+### Features
+
+- **astro-starter:** Get-started home and site-owned posts sample ([a5d0e06](https://github.com/Blaise1030/CMS/commit/a5d0e06))
+- Add orso init to vendor integrations/orso and orso.json ([33dca4e](https://github.com/Blaise1030/CMS/commit/33dca4e))
+- **desktop:** Soft update nudge via GitHub releases ([dbc76db](https://github.com/Blaise1030/CMS/commit/dbc76db))
+- **changes:** Convert waiting PRs back to draft from Review menu ([dc532ce](https://github.com/Blaise1030/CMS/commit/dc532ce))
+- **content:** Add extensible named HTML blocks for rich Markdown ([bc88df8](https://github.com/Blaise1030/CMS/commit/bc88df8))
+
+### Fixes
+
+- **ci:** Update starter tests for posts and rustfmt ([6614c2f](https://github.com/Blaise1030/CMS/commit/6614c2f))
+- **ci:** Seed fixture content separately from catalog manifests ([5a06bcd](https://github.com/Blaise1030/CMS/commit/5a06bcd))
+- **ci:** Point content_history tests at starter posts path ([fb01f59](https://github.com/Blaise1030/CMS/commit/fb01f59))
+- **ci:** Restore DESIGN.md frontmatter on the starter ([d09352c](https://github.com/Blaise1030/CMS/commit/d09352c))
+- **ci:** Type PrMenu convert-to-draft mocks as PrStatus ([1a22894](https://github.com/Blaise1030/CMS/commit/1a22894))
+- **e2e:** Point content editor specs at starter posts collection ([b26bd61](https://github.com/Blaise1030/CMS/commit/b26bd61))
+
+## v0.1.14
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.12...v0.1.14)
+
+### Features
+
+- **astro-starter:** Get-started home and site-owned posts sample ([a5d0e06](https://github.com/Blaise1030/CMS/commit/a5d0e06))
+- Add orso init to vendor integrations/orso and orso.json ([33dca4e](https://github.com/Blaise1030/CMS/commit/33dca4e))
+- **desktop:** Soft update nudge via GitHub releases ([dbc76db](https://github.com/Blaise1030/CMS/commit/dbc76db))
+
+### Fixes
+
+- **ci:** Update starter tests for posts and rustfmt ([6614c2f](https://github.com/Blaise1030/CMS/commit/6614c2f))
+- **ci:** Seed fixture content separately from catalog manifests ([5a06bcd](https://github.com/Blaise1030/CMS/commit/5a06bcd))
+- **ci:** Point content_history tests at starter posts path ([fb01f59](https://github.com/Blaise1030/CMS/commit/fb01f59))
+
+## v0.1.13
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.12...v0.1.13)
+
+### Features
+
+- **astro-starter:** Get-started home and site-owned posts sample ([a5d0e06](https://github.com/Blaise1030/CMS/commit/a5d0e06))
+- Add orso init to vendor integrations/orso and orso.json ([33dca4e](https://github.com/Blaise1030/CMS/commit/33dca4e))
+- **desktop:** Soft update nudge via GitHub releases ([dbc76db](https://github.com/Blaise1030/CMS/commit/dbc76db))
+
+### Fixes
+
+- **ci:** Update starter tests for posts and rustfmt ([6614c2f](https://github.com/Blaise1030/CMS/commit/6614c2f))
+- **ci:** Seed fixture content separately from catalog manifests ([5a06bcd](https://github.com/Blaise1030/CMS/commit/5a06bcd))
+- **ci:** Point content_history tests at starter posts path ([fb01f59](https://github.com/Blaise1030/CMS/commit/fb01f59))
+
+## v0.1.12
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.11...v0.1.12)
+
+### Fixes
+
+- **deps:** Patch security vulnerabilities across workspaces ([c769d54](https://github.com/Blaise1030/CMS/commit/c769d54))
+- **deps:** Clear remaining dependency vulnerabilities ([495dcd5](https://github.com/Blaise1030/CMS/commit/495dcd5))
+
+## v0.1.11
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.10...v0.1.11)
+
+### Features
+
+- **history:** Search, a live filter, avatars and deployed-site links ([f230d68](https://github.com/Blaise1030/CMS/commit/f230d68))
+- **astro:** Hide collections from orso on purpose with orso({ hide }) ([4f49f03](https://github.com/Blaise1030/CMS/commit/4f49f03))
+- **publish:** Squash-merge published changes by default ([caf249c](https://github.com/Blaise1030/CMS/commit/caf249c))
+- **editor:** Headings 1-6, checklist, divider and strikethrough ([0063322](https://github.com/Blaise1030/CMS/commit/0063322))
+- **daemon:** Serve each preview at the root of its own origin ([a285acc](https://github.com/Blaise1030/CMS/commit/a285acc))
+- **orso-astro:** Set HMR and bridge origins from the daemon ([d2a9be8](https://github.com/Blaise1030/CMS/commit/d2a9be8))
+- **daemon:** Tell the app whether a conflict preview has a page ([3a3feba](https://github.com/Blaise1030/CMS/commit/3a3feba))
+- **web:** Frame previews on their own origin, only through the bridge ([8661df0](https://github.com/Blaise1030/CMS/commit/8661df0))
+
+### Performance
+
+- **review:** Upload review images to GitHub in parallel ([7e66505](https://github.com/Blaise1030/CMS/commit/7e66505))
+- **web:** Load each tab's panel on demand; shrink the start-up bundle ([8a06d03](https://github.com/Blaise1030/CMS/commit/8a06d03))
+
+### Fixes
+
+- **changes:** Disable Share preview and Publish until a new change has an edit ([00a6f21](https://github.com/Blaise1030/CMS/commit/00a6f21))
+- **changes:** Publish as its own button; keep Update preview joined to Review ([ce088dc](https://github.com/Blaise1030/CMS/commit/ce088dc))
+- **review:** Light-mode polish for the review inbox and rail ([8e51edf](https://github.com/Blaise1030/CMS/commit/8e51edf))
+- **agents:** Tell orso's agents never to work in a worktree or copy ([4708bda](https://github.com/Blaise1030/CMS/commit/4708bda))
+- **assistants:** Keep custom assistants the daemon offers ([e4c2cc2](https://github.com/Blaise1030/CMS/commit/e4c2cc2))
+- **assistants:** Keep a picked custom assistant; chat list stays built-in ([2e3fd1d](https://github.com/Blaise1030/CMS/commit/2e3fd1d))
+- **rail:** Keep the tab order with the daemon so it survives relaunch ([c5ca749](https://github.com/Blaise1030/CMS/commit/c5ca749))
+- **orso-astro:** Address the bridge's first reports to the framing app ([ab37420](https://github.com/Blaise1030/CMS/commit/ab37420))
+- **web:** Keep the preview's back stack across late reports and reloads ([0206a5d](https://github.com/Blaise1030/CMS/commit/0206a5d))
+- **preview:** Keep preview origins off the ports projects have claimed ([4d6df48](https://github.com/Blaise1030/CMS/commit/4d6df48))
+- **sync:** Build the combine in the site's folder, not the repository's top ([6caed92](https://github.com/Blaise1030/CMS/commit/6caed92))
+- **preview:** Ignore the page being left reporting late after a navigation ([0f01b5e](https://github.com/Blaise1030/CMS/commit/0f01b5e))
+- **preview:** Load the requested page again when the page being left cancels it ([1de6e11](https://github.com/Blaise1030/CMS/commit/1de6e11))
+- **sync:** Don't let the site folder's dependency link block the combine ([0004c91](https://github.com/Blaise1030/CMS/commit/0004c91))
+
 ## v0.1.10
 
 [compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.9...v0.1.10)

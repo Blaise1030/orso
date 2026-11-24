@@ -7,7 +7,7 @@ import UFieldGroup from "@nuxt/ui/components/FieldGroup.vue";
 import UModal from "@nuxt/ui/components/Modal.vue";
 import { site } from "../../site";
 
-const { version, repo, coffeeUrl, downloads } = site.release;
+const { repo, coffeeUrl, downloads } = site.release;
 
 /** The button's copy, from `download` in src/i18n/messages (`{platform}` is filled in here). */
 export type DownloadLabels = {
@@ -25,7 +25,8 @@ export type DownloadLabels = {
 const props = defineProps<{ labels: DownloadLabels }>();
 type Download = (typeof downloads)[number];
 
-const assetUrl = (d: { target: string; ext: string }) => `${repo}/releases/download/${version}/orso-${version}-${d.target}.${d.ext}`;
+/** `releases/latest/download` redirects to the newest release's asset, so no version is in the URL. */
+const assetUrl = (d: { target: string; ext: string }) => `${repo}/releases/latest/download/orso-${d.target}.${d.ext}`;
 
 /** Picks the build for the visitor's OS after hydration; macOS Apple Silicon is the server-rendered default. */
 function detectDownload(): Download {
@@ -105,7 +106,22 @@ const items = computed<DropdownMenuItem[][]>(() => [
     </template>
     <template #footer="{ close }">
       <div class="flex flex-wrap gap-3">
-        <UButton size="lg" icon="i-hugeicons-coffee-02" :label="props.labels.coffee" :to="coffeeUrl" target="_blank" rel="noopener noreferrer" />
+        <!-- Buy Me a Coffee's own button look; their embed script relies on document.write, so it can't render in a modal. -->
+        <a
+          :href="coffeeUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex h-11 items-center gap-2 rounded-lg border border-black bg-[#FFDD00] px-4 font-(family-name:--font-cookie) text-[1.6rem] leading-none text-black transition hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+        >
+          <!-- Cup drawn inline (white coffee, black outline) so it never depends on a third-party image. -->
+          <svg viewBox="0 0 24 32" width="18" height="24" aria-hidden="true" fill="none" stroke="#000" stroke-width="1.5" stroke-linejoin="round">
+            <path d="M2 7h20l-1 3H3z" fill="#fff" />
+            <path d="M4 4h16l1.5 3h-19z" fill="#fff" />
+            <path d="M3.5 10h17L18 30H6z" fill="#fff" />
+            <path d="M4.6 15h14.8l-.9 7H5.5z" fill="#FFDD00" />
+          </svg>
+          {{ props.labels.coffee }}
+        </a>
         <UButton size="lg" color="neutral" variant="outline" :label="props.labels.later" @click="close" />
       </div>
     </template>
