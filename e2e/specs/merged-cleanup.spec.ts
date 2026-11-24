@@ -75,14 +75,14 @@ test("merged change shows as merged; Clean up returns to updated main", async ({
 
   await cleanup.click();
 
-  // Back on updated main; the local branch is gone (the remote one is left alone).
+  // Back on updated main; the branch is gone locally and, now merged, on the remote too.
   await expect(page.getByTestId("active-change")).toHaveText("main", { timeout: 30_000 });
   await expect(page.getByTestId("pr-status")).toHaveCount(0);
   await expect(page.getByTestId("cleanup-change")).toHaveCount(0);
   expect(git(projectDir, ["branch", "--show-current"])).toBe("main");
   expect(git(projectDir, ["branch", "--list", BRANCH])).toBe("");
   expect(fs.readFileSync(path.join(projectDir, FILE), "utf8")).toBe(CONTENT);
-  expect(git(bareRemote, ["branch", "--list", BRANCH])).toContain(BRANCH);
+  expect(git(bareRemote, ["branch", "--list", BRANCH])).toBe("");
 
   // The changes menu no longer lists it.
   await page.getByTestId("changes-menu").click();
