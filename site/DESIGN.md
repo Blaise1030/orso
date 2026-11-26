@@ -172,7 +172,7 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 
 ## Components
 
-- **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons.
+- **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons. Omitted on the landing page; Blog, Help and other interiors keep it. Nav and download remain in the footer and hero CTAs.
 - **Hero**: left-aligned display headline, lead, dual CTAs, then one inset product shot.
 - **Logo strip**: one muted intro line and inline marks (Astro, Markdown, GitHub, Claude, Cursor, Codex); no bordered cells.
 - **How it works**: two-column grid on desktop (edit → preview → agent); each cell is an inset hairline figure (`max-w-md`), then a step number, title and body — usegui.com rhythm.

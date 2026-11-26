@@ -22,3 +22,11 @@ test("how-it-works is an ordered grid with inset figures", () => {
   assert.match(section, /max-w-/);
   assert.match(section, /<figure\b/);
 });
+
+test("landing page hides the site header", () => {
+  const home = read("src/pages/[...locale]/index.astro");
+  const base = read("src/layouts/Base.astro");
+  assert.match(home, /header=\{false\}/);
+  assert.match(base, /header\s*=\s*true/);
+  assert.match(base, /\{header && \(/);
+});

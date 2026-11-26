@@ -28,6 +28,8 @@ interface Props {
   published?: string;
   /** Keep the page out of search results. */
   noindex?: boolean;
+  /** Site chrome header. Off on the landing page (Gui-style open canvas). */
+  header?: boolean;
 }
 const { t, path, lang, locale } = getI18n(Astro.url);
 const tagline = t("site.tagline");
@@ -39,6 +41,7 @@ const {
   type = "website",
   published,
   noindex = false,
+  header = true,
 } = Astro.props;
 const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${tagline}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
@@ -111,41 +114,43 @@ const languages = localeKeys.map((key) => ({
       class="sr-only rounded-md bg-accent px-4 py-2 text-on-accent focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50"
       href="#main">{t("site.skipToContent")}</a
     >
-    <header class="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur-md" transition:animate="none">
-      <div class="mx-auto flex min-h-header w-full max-w-7xl items-center gap-x-4 border-x border-line px-3 py-1 md:px-6">
-        <a class="-m-1 shrink-0 rounded-sm p-1" href={path("/")} aria-label={t("site.homeLabel", { name: site.name })}><Wordmark /></a>
-        <div class="ml-auto flex shrink-0 items-center gap-1">
-          <SiteNav part="links" items={navItems} labels={navLabels} />
-          <LocaleMenu client:idle items={languages} label={t("site.language")} />
-          {site.secondaryCta && (
-            <UButton
-              color="neutral"
-              variant="ghost"
-              size="lg"
-              class="hidden sm:inline-flex"
-              to={path(site.secondaryCta.href)}
-              rel={external(site.secondaryCta.href) ? "noopener noreferrer" : undefined}
-            >
-              <svg class="size-4" viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.528 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"
-                ></path>
-              </svg>
-              {t(`nav.${site.secondaryCta.key}`)}
-            </UButton>
-          )}
-          {site.cta && (
-            <UButton size="lg" to={path(site.cta.href)} rel={external(site.cta.href) ? "noopener noreferrer" : undefined}>
-              {t(`nav.${site.cta.key}`)}
-            </UButton>
-          )}
-          <SiteNav client:load part="menu" items={navItems} labels={navLabels} />
+    {header && (
+      <header class="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur-md" transition:animate="none">
+        <div class="mx-auto flex min-h-header w-full max-w-7xl items-center gap-x-4 border-x border-line px-3 py-1 md:px-6">
+          <a class="-m-1 shrink-0 rounded-sm p-1" href={path("/")} aria-label={t("site.homeLabel", { name: site.name })}><Wordmark /></a>
+          <div class="ml-auto flex shrink-0 items-center gap-1">
+            <SiteNav part="links" items={navItems} labels={navLabels} />
+            <LocaleMenu client:idle items={languages} label={t("site.language")} />
+            {site.secondaryCta && (
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="lg"
+                class="hidden sm:inline-flex"
+                to={path(site.secondaryCta.href)}
+                rel={external(site.secondaryCta.href) ? "noopener noreferrer" : undefined}
+              >
+                <svg class="size-4" viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.528 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"
+                  ></path>
+                </svg>
+                {t(`nav.${site.secondaryCta.key}`)}
+              </UButton>
+            )}
+            {site.cta && (
+              <UButton size="lg" to={path(site.cta.href)} rel={external(site.cta.href) ? "noopener noreferrer" : undefined}>
+                {t(`nav.${site.cta.key}`)}
+              </UButton>
+            )}
+            <SiteNav client:load part="menu" items={navItems} labels={navLabels} />
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    )}
 
     <!-- A page whose root has data-fill becomes a column, so that root can grow (flex-1) to meet the footer. -->
     <main id="main" class="flex-1 has-[>[data-fill]]:flex has-[>[data-fill]]:flex-col"><slot /></main>
