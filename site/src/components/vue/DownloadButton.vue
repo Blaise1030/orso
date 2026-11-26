@@ -41,7 +41,7 @@ function detectDownload(): Download {
 const primary = ref<Download>(downloads[0]);
 onMounted(() => (primary.value = detectDownload()));
 
-const size = computed(() => (props.compact ? "md" : "lg"));
+const size = computed(() => (props.compact ? "sm" : "lg"));
 const fullLabel = computed(() => props.labels.button.replace("{platform}", primary.value.label));
 
 /** The link still downloads the file; the thank-you popup opens alongside it. */
