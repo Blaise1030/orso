@@ -1,6 +1,6 @@
 ---
 /**
- * Orso’s ASCII bear mascot — terminal-style face for the home hero.
+ * Orso’s ASCII bear mascot — square terminal face for the home hero.
  * Decorative; keep aria-hidden when a nearby heading names the product.
  */
 interface Props {
@@ -9,13 +9,12 @@ interface Props {
 const { class: className } = Astro.props;
 
 const art = [
-  ".---.         .---.",
-  "|   |_________|   |",
-  "|                 |",
-  "|   [o]     [o]   |",
-  "|       [Y]       |",
-  "|      '---'      |",
-  "|_________________|",
+  ".----------------.",
+  "|                |",
+  "|   @        @   |",
+  "|       ▽        |",
+  "|    ~~~~~~~~    |",
+  "'----------------'",
 ].join("\n");
 ---
 
