@@ -1,6 +1,6 @@
 {
   "site": {
-    "tagline": "Your repository is already the CMS",
+    "tagline": "Your repository is already a CMS",
     "description": "Give your team an editor for the Markdown in your repo. Every change is a pull request. Content stays yours.",
     "homeLabel": "{name} home",
     "alpha": "Alpha",
@@ -66,7 +66,7 @@
   },
   "home": {
     "hero": {
-      "headline": "Your repository is already the CMS.",
+      "headline": "Your repository is already a CMS.",
       "body": "Give marketers and writers an editor for the Markdown you already have. Every change is a pull request you review. Nothing goes live until you Publish.",
       "secondary": "See what it does",
       "note": "Free and open source. Runs on your machine. Content stays in your repo.",
