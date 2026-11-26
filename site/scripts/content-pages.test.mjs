@@ -27,7 +27,14 @@ test("built sample Blog and Help articles render Markdown and navigation", () =>
   assert.match(html(root, "blog/introducing-orso"), /<h2[^>]*>.*What Orso is/);
   assert.match(html(root, ""), /href="\/blog\/"[^>]*>(?:<[^>]+>)*Blog/);
   assert.match(html(root, ""), /href="\/help\/"[^>]*>(?:<[^>]+>)*Help/);
-  for (const id of ["product", "logos", "how-it-works", "proof", "faq", "cta"]) assert.match(html(root, ""), new RegExp(`id="${id}"`));
+  const home = html(root, "");
+  for (const id of ["product", "logos", "how-it-works", "bands", "proof", "faq", "cta"]) {
+    assert.match(home, new RegExp(`id="${id}"`));
+  }
+  // Gui-style home: numbered how-it-works steps, feature bands, no bento grid.
+  assert.match(home, /id="how-it-works"[\s\S]*?<ol\b/);
+  assert.match(home, /id="bands"/);
+  assert.doesNotMatch(home, /id="capabilities"/);
 });
 
 test("built sample blog categories link their posts", () => {

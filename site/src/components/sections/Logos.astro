@@ -13,18 +13,18 @@ const logos = [
 ];
 ---
 
-<section class="mx-auto max-w-7xl border-x border-line py-section" id="logos" aria-label={t("home.logos.label")}>
-  <p class="page mb-6 text-small text-muted">{t("home.logos.intro")}</p>
-  <ul class="grid grid-cols-2 gap-px border-y border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
-    {logos.map((logo) => (
-      <li class="flex min-h-20 items-center justify-center bg-surface px-4 py-5">
-        <span class="inline-flex h-7 w-full max-w-[7.5rem] items-center justify-center">
+<section class="mx-auto max-w-7xl border-x border-b border-line py-8 md:py-10" id="logos" aria-label={t("home.logos.label")}>
+  <div class="page flex flex-col gap-5 md:flex-row md:items-center md:justify-between md:gap-10">
+    <p class="shrink-0 text-small text-muted">{t("home.logos.intro")}</p>
+    <ul class="flex flex-wrap items-center gap-x-6 gap-y-4 md:justify-end md:gap-x-8">
+      {logos.map((logo) => (
+        <li class="inline-flex h-6 items-center justify-center">
           <img
             src={`/logos/${logo.file}.svg`}
             alt={logo.name}
             width="120"
             height="32"
-            class="logo-on-light h-auto max-h-7 w-auto max-w-full object-contain object-center"
+            class="logo-on-light h-auto max-h-5 w-auto max-w-[5.5rem] object-contain object-center"
             loading="lazy"
             decoding="async"
           />
@@ -33,16 +33,13 @@ const logos = [
             alt=""
             width="120"
             height="32"
-            class="logo-on-dark h-auto max-h-7 w-auto max-w-full object-contain object-center"
+            class="logo-on-dark h-auto max-h-5 w-auto max-w-[5.5rem] object-contain object-center"
             loading="lazy"
             decoding="async"
             aria-hidden="true"
           />
-        </span>
-      </li>
-    ))}
-  </ul>
-  <p class="page mt-5 text-small text-muted">
-    {t("home.logos.outro")}
-  </p>
+        </li>
+      ))}
+    </ul>
+  </div>
 </section>

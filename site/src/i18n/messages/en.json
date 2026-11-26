@@ -90,94 +90,7 @@
     },
     "logos": {
       "label": "Works with your stack",
-      "intro": "Works with the stack and agents you already have",
-      "outro": "Same files. Same history. Same deploy."
-    },
-    "features": {
-      "eyebrow": "Built on your repo",
-      "title": "Easy for editors. Safe for developers.",
-      "body": "Your team gets forms, live preview and an agent. Your repo keeps its Markdown, its history and its deploy.",
-      "cards": {
-        "drafts": {
-          "title": "A Markdown editor for your content",
-          "description": "Collections, fields and rich text — or the source itself — for the Markdown you already own. No second CMS to keep in sync.",
-          "alt": "Orso's Markdown editor open on a post, with the slash menu for headings and lists.",
-          "editor": {
-            "demoTitle": "A fresh start for our website"
-          }
-        },
-        "review": {
-          "title": "Preview every change on a branch",
-          "description": "Each edit is a draft branch with a live preview of the real site. Share it, review the pull request, then Publish.",
-          "alt": "Orso previewing a draft of the real site, with desktop and mobile toggles.",
-          "frame": {
-            "desktopLabel": "Desktop",
-            "mobileLabel": "Mobile",
-            "pageTitle": "Pricing"
-          }
-        },
-        "agent": {
-          "title": "An agent for bigger changes",
-          "description": "Ask for a page, a pass on the FAQ, or a new section. The agent edits the repo; you still own Publish.",
-          "alt": "Orso's agent panel next to the site preview, ready for a request.",
-          "composer": {
-            "userMessage": "Can you update the pricing page?",
-            "assistantMessage": "Sure — what should change? I can rewrite copy, add a section, or adjust the layout.",
-            "prompt": "Add an FAQ section to the pricing page",
-            "placeholder": "Ask your assistant to change your site",
-            "pageContext": "pricing",
-            "modelLabel": "Claude",
-            "askLabel": "Ask",
-            "sendLabel": "Send",
-            "attachLabel": "Attach image or file"
-          }
-        }
-      }
-    },
-    "bento": {
-      "label": "What you get",
-      "cells": {
-        "git": {
-          "title": "Stays in Git",
-          "body": "Markdown in your repo. Every save is a commit.",
-          "statement": "Every save is a commit.",
-          "statementMeta": "a3f81d2 · welcome.md"
-        },
-        "editor": {
-          "title": "Markdown editor",
-          "body": "Forms and rich text for the files you already own.",
-          "demoTitle": "A fresh start for our website"
-        },
-        "preview": {
-          "title": "Live preview",
-          "body": "See the real site before you Publish.",
-          "frame": {
-            "desktopLabel": "Desktop",
-            "mobileLabel": "Mobile",
-            "pageTitle": "Pricing"
-          }
-        },
-        "branches": {
-          "title": "Draft branches",
-          "body": "Each change is a branch you review, then Publish.",
-          "picker": {
-            "trigger": "FAQ on pricing",
-            "liveLabel": "Live site",
-            "draftLabel": "FAQ on pricing",
-            "draftDescription": "change/faq-pricing · 2h ago"
-          }
-        },
-        "stack": {
-          "title": "Your stack",
-          "body": "Astro, Markdown, GitHub — same deploy."
-        },
-        "open": {
-          "title": "Yours to run",
-          "body": "Local app. MIT licence. No paid tier.",
-          "statLead": "Licence",
-          "statValue": "MIT"
-        }
-      }
+      "intro": "Works with the stack and agents you already have"
     },
     "proof": {
       "eyebrow": "Delete the CMS. Keep the editors.",
@@ -255,6 +168,66 @@
           "title": "Static files, any host",
           "detail": "No runtime and no lock-in."
         }
+      }
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "body": "Your team gets forms, live preview and an agent. Your repo keeps its Markdown, its history and its deploy.",
+      "steps": {
+        "edit": {
+          "title": "Edit the Markdown in your repo",
+          "body": "Forms and rich text for the Markdown already in your repo.",
+          "editor": {
+            "demoTitle": "A fresh start for our website"
+          }
+        },
+        "preview": {
+          "title": "Preview the change on a branch",
+          "body": "Each edit is a draft branch with a live preview of the real site.",
+          "frame": {
+            "desktopLabel": "Desktop",
+            "mobileLabel": "Mobile",
+            "pageTitle": "Pricing"
+          }
+        },
+        "agent": {
+          "title": "Ask the agent for bigger changes",
+          "body": "Ask for a page or a section. The agent edits; you still own Publish.",
+          "composer": {
+            "userMessage": "Can you update the pricing page?",
+            "assistantMessage": "Sure — what should change? I can rewrite copy, add a section, or adjust the layout.",
+            "prompt": "Add an FAQ section to the pricing page",
+            "placeholder": "Ask your assistant to change your site",
+            "pageContext": "pricing",
+            "modelLabel": "Claude",
+            "askLabel": "Ask",
+            "sendLabel": "Send",
+            "attachLabel": "Attach image or file"
+          }
+        }
+      }
+    },
+    "bands": {
+      "label": "What you get",
+      "git": {
+        "title": "Stays in Git",
+        "body": "Markdown in your repo. Every save is a commit.",
+        "statement": "Every save is a commit.",
+        "statementMeta": "a3f81d2 · welcome.md"
+      },
+      "branches": {
+        "title": "Draft branches",
+        "body": "Each change is a branch you review, then Publish.",
+        "picker": {
+          "trigger": "FAQ on pricing",
+          "liveLabel": "Live site",
+          "draftLabel": "FAQ on pricing",
+          "draftDescription": "change/faq-pricing · 2h ago"
+        }
+      },
+      "stack": {
+        "title": "Your stack",
+        "body": "Astro, Markdown, GitHub — same deploy."
       }
     }
   },
