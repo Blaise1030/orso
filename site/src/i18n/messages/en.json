@@ -151,7 +151,7 @@
     },
     "howItWorks": {
       "title": "How it works",
-      "body": "Your team gets forms, live preview and an agent. Your repo keeps its Markdown, its history and its deploy. Open a collection, change a page, ask for something larger — Publish is still a human decision.",
+      "body": "Give teammates a GitHub account, access to the repo, and an agent seat you already subscribe to. They edit real Markdown with forms and live preview, and ask the agent for bigger work — Publish is still a human decision.",
       "steps": {
         "edit": {
           "title": "Edit the Markdown in your repo",
