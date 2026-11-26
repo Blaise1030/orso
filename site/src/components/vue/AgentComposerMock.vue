@@ -8,7 +8,7 @@ import UChatPromptSubmit from "@nuxt/ui/components/ChatPromptSubmit.vue";
 import UIcon from "@nuxt/ui/components/Icon.vue";
 import UTextarea from "@nuxt/ui/components/Textarea.vue";
 
-/** Agent panel chrome for how-it-works — mirrors Orso chat: context chips, steps, composer. */
+/** Agent panel chrome for how-it-works — one panel: thread + composer (Orso chat shape). */
 const props = defineProps<{
   userMessage: string;
   assistantMessage: string;
@@ -31,12 +31,12 @@ const text = ref(props.prompt);
 
 <template>
   <div
-    class="flex size-full min-h-0 flex-col gap-2 overflow-hidden"
+    class="flex size-full min-h-0 flex-col overflow-hidden rounded-md border border-line bg-surface-raised shadow-raised"
     aria-hidden="true"
     @click.prevent
     @keydown.prevent
   >
-    <div class="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden rounded-md border border-line bg-surface-raised/90 p-3 shadow-raised">
+    <div class="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden p-3">
       <div class="flex flex-col items-end gap-1.5">
         <div class="flex max-w-full flex-wrap justify-end gap-1">
           <UBadge color="neutral" variant="soft" size="sm" class="max-w-full" :label="props.previewContext" />
@@ -80,81 +80,83 @@ const text = ref(props.prompt);
       </div>
     </div>
 
-    <UChatPrompt
-      as="div"
-      variant="outline"
-      class="w-full shrink-0"
-      :ui="{ root: 'bg-surface-raised shadow-raised', header: 'flex-wrap gap-1' }"
-    >
-      <template #header>
-        <UBadge color="neutral" variant="soft" size="sm" class="max-w-full gap-1">
-          <span class="min-w-0 truncate">{{ props.previewContext }}</span>
-          <UIcon name="i-hugeicons-cancel-01" class="size-3 shrink-0 opacity-60" />
-        </UBadge>
-        <UBadge color="neutral" variant="soft" size="sm" class="gap-1">
-          <span>{{ props.viewport }}</span>
-          <UIcon name="i-hugeicons-cancel-01" class="size-3 shrink-0 opacity-60" />
-        </UBadge>
-      </template>
+    <div class="shrink-0 border-t border-line p-2">
+      <UChatPrompt
+        as="div"
+        variant="soft"
+        class="w-full"
+        :ui="{ root: 'bg-sand/50 ring-0', header: 'flex-wrap gap-1' }"
+      >
+        <template #header>
+          <UBadge color="neutral" variant="soft" size="sm" class="max-w-full gap-1">
+            <span class="min-w-0 truncate">{{ props.previewContext }}</span>
+            <UIcon name="i-hugeicons-cancel-01" class="size-3 shrink-0 opacity-60" />
+          </UBadge>
+          <UBadge color="neutral" variant="soft" size="sm" class="gap-1">
+            <span>{{ props.viewport }}</span>
+            <UIcon name="i-hugeicons-cancel-01" class="size-3 shrink-0 opacity-60" />
+          </UBadge>
+        </template>
 
-      <template #body>
-        <UTextarea
-          v-model="text"
-          variant="none"
-          :rows="2"
-          autoresize
-          :maxrows="3"
-          tabindex="-1"
-          :placeholder="props.placeholder"
-          class="w-full"
-          :ui="{ base: 'max-h-20 min-h-8 px-0 py-1 text-small' }"
-          readonly
-        />
-      </template>
+        <template #body>
+          <UTextarea
+            v-model="text"
+            variant="none"
+            :rows="2"
+            autoresize
+            :maxrows="3"
+            tabindex="-1"
+            :placeholder="props.placeholder"
+            class="w-full"
+            :ui="{ base: 'max-h-20 min-h-8 px-0 py-1 text-small' }"
+            readonly
+          />
+        </template>
 
-      <template #footer>
-        <div class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            icon="i-hugeicons-attachment-01"
+        <template #footer>
+          <div class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              icon="i-hugeicons-attachment-01"
+              tabindex="-1"
+              class="shrink-0"
+              :aria-label="props.attachLabel"
+            />
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              trailing-icon="i-hugeicons-arrow-down-01"
+              tabindex="-1"
+              class="h-7 max-w-28 min-w-0"
+              :ui="{ trailingIcon: 'size-3 text-muted' }"
+            >
+              <span class="min-w-0 truncate">{{ props.modelLabel }}</span>
+            </UButton>
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              icon="i-hugeicons-shield-01"
+              trailing-icon="i-hugeicons-arrow-down-01"
+              :label="props.autoLabel"
+              tabindex="-1"
+              class="h-7 shrink-0"
+              :ui="{ trailingIcon: 'size-3 text-muted' }"
+            />
+          </div>
+          <UChatPromptSubmit
+            status="ready"
+            size="sm"
+            icon="i-hugeicons-arrow-up-01"
             tabindex="-1"
             class="shrink-0"
-            :aria-label="props.attachLabel"
+            :aria-label="props.sendLabel"
           />
-          <UButton
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            trailing-icon="i-hugeicons-arrow-down-01"
-            tabindex="-1"
-            class="h-7 max-w-28 min-w-0"
-            :ui="{ trailingIcon: 'size-3 text-muted' }"
-          >
-            <span class="min-w-0 truncate">{{ props.modelLabel }}</span>
-          </UButton>
-          <UButton
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            icon="i-hugeicons-shield-01"
-            trailing-icon="i-hugeicons-arrow-down-01"
-            :label="props.autoLabel"
-            tabindex="-1"
-            class="h-7 shrink-0"
-            :ui="{ trailingIcon: 'size-3 text-muted' }"
-          />
-        </div>
-        <UChatPromptSubmit
-          status="ready"
-          size="sm"
-          icon="i-hugeicons-arrow-up-01"
-          tabindex="-1"
-          class="shrink-0"
-          :aria-label="props.sendLabel"
-        />
-      </template>
-    </UChatPrompt>
+        </template>
+      </UChatPrompt>
+    </div>
   </div>
 </template>
