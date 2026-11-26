@@ -1,0 +1,34 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "01M8BA2K2N5MZ0M7S92W2T3ZQ4",
+  "session_id": "82dabb8f-6583-46e7-b288-a4c4b30cdf69",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-26T06:53:19.625264Z",
+  "branch": "main",
+  "checkpoints_count": 51,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Cursor",
+  "model": "default",
+  "turn_id": "01cb9863ad5c",
+  "compact_transcript_start": 0,
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 51,
+    "context_tokens": 234754,
+    "context_window_size": 256000
+  }
+}
