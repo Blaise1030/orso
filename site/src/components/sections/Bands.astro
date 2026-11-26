@@ -12,7 +12,7 @@ const { t } = getI18n(Astro.url);
       <h2 class="max-w-measure text-heading tracking-normal text-ink">{t("home.bands.git.title")}</h2>
       <p class="mt-3 max-w-measure text-small leading-6 text-muted">{t("home.bands.git.body")}</p>
       <figure class="mt-8 m-0 max-w-xl overflow-hidden border border-line bg-surface">
-        <div class="relative aspect-4/3 w-full overflow-hidden md:aspect-video">
+        <div class="relative aspect-5/4 w-full overflow-hidden">
           <GitDiffMock client:visible file="welcome.md" />
         </div>
       </figure>
