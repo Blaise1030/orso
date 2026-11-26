@@ -3,17 +3,30 @@
 defineProps<{ file: string }>();
 
 const lines = [
-  { kind: "hunk", text: "@@ -1,7 +1,7 @@" },
+  { kind: "hunk", text: "@@ -1,18 +1,20 @@" },
   { kind: "ctx", text: "---" },
   { kind: "del", text: 'title: "Hello world"' },
   { kind: "add", text: 'title: "Welcome to Orso"' },
-  { kind: "ctx", text: 'description: "A short intro."' },
+  { kind: "del", text: 'description: "A short intro."' },
+  { kind: "add", text: 'description: "Edit Markdown. Every save is a commit."' },
   { kind: "ctx", text: "---" },
   { kind: "ctx", text: "" },
   { kind: "del", text: "A starter page for the site." },
   { kind: "add", text: "Your repository is already a CMS." },
   { kind: "ctx", text: "" },
-  { kind: "ctx", text: "Edit in Orso. Every save is a commit." },
+  { kind: "ctx", text: "Orso gives marketers and writers forms," },
+  { kind: "del", text: "previews, and a Publish button — while" },
+  { kind: "add", text: "drafts, previews, and a Publish button —" },
+  { kind: "add", text: "while the content stays in your repo." },
+  { kind: "ctx", text: "" },
+  { kind: "hunk", text: "@@ -24,6 +26,9 @@" },
+  { kind: "ctx", text: "## What you get" },
+  { kind: "ctx", text: "" },
+  { kind: "del", text: "- A form for every collection" },
+  { kind: "add", text: "- Forms for posts, pages, and docs" },
+  { kind: "add", text: "- A live preview on every draft branch" },
+  { kind: "add", text: "- History you can roll back" },
+  { kind: "ctx", text: "- Publish when you are ready" },
 ] as const;
 </script>
 
