@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "appRoot": "/Users/blaise/orso-projects/cms/web",
+  "framework": "vite-generic",
+  "port": 8400,
+  "pid": 71330,
+  "recordedAt": "2026-11-26T08:01:29.967Z",
+  "artifacts": [
+    {
+      "kind": "patched",
+      "path": "index.html",
+      "patch": "live-tag",
+      "markers": [
+        "impeccable-live-start",
+        "data-impeccable-csp-original"
+      ]
+    }
+  ]
+}
