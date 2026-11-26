@@ -40,11 +40,9 @@ test("landing page content is centred at max-w-5xl", () => {
   assert.match(home, /mx-auto/);
 });
 
-test("landing page includes a setup copy band", () => {
+test("landing page omits the setup copy band", () => {
   const home = read("src/pages/[...locale]/index.astro");
-  assert.match(home, /Setup/);
-  assert.match(read("src/components/sections/Setup.astro"), /id="setup"/);
-  assert.match(read("src/i18n/messages/en.json"), /"setup"/);
+  assert.doesNotMatch(home, /Setup/);
 });
 
 test("logos split stack and agents, include OpenCode and Codex caption", () => {

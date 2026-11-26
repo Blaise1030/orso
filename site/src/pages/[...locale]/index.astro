@@ -4,7 +4,6 @@ import Faq from "../../components/sections/Faq.astro";
 import Hero from "../../components/sections/Hero.astro";
 import HowItWorks from "../../components/sections/HowItWorks.astro";
 import Logos from "../../components/sections/Logos.astro";
-import Setup from "../../components/sections/Setup.astro";
 import Base from "../../layouts/Base.astro";
 import { organization, website } from "../../lib/seo";
 import { getI18n, localeStaticPaths } from "../../i18n";
@@ -18,7 +17,6 @@ const { t } = getI18n(Astro.url);
     <Hero />
     <Logos />
     <HowItWorks />
-    <Setup />
     <Bands />
     <Faq />
   </div>
