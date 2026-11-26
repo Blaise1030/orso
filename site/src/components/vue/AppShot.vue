@@ -43,6 +43,7 @@ const props = withDefaults(
         v-for="scheme in (['light', 'dark'] as const)"
         :key="scheme"
         :src="props.shot.video[scheme]"
+        :poster="props.shot[scheme].src"
         class="absolute inset-0 size-full object-cover object-top-left motion-reduce:hidden!"
         :class="scheme === 'light' ? 'scheme-light' : 'scheme-dark'"
         autoplay
