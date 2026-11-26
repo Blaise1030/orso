@@ -13,7 +13,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex size-full flex-col justify-end gap-3 p-4" aria-hidden="true">
+  <div class="flex size-full flex-col items-start justify-start gap-3 p-4" aria-hidden="true">
     <UButton
       color="neutral"
       variant="outline"
