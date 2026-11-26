@@ -151,7 +151,7 @@
     },
     "howItWorks": {
       "title": "How it works",
-      "body": "Give teammates a GitHub account, access to the repo, and an agent seat you already subscribe to. They edit real Markdown with forms and live preview, and ask the agent for bigger work — Publish is still a human decision.",
+      "body": "Give teammates a GitHub account, access to the repo, and an agent seat you already subscribe to. They edit real pages and write content in real Markdown — the same proven workflow developers have used forever. Publish is still a human decision.",
       "steps": {
         "edit": {
           "title": "Edit the Markdown in your repo",
