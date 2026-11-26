@@ -16,11 +16,16 @@ const preview = group<{
 const composer = group<{
   userMessage: string;
   assistantMessage: string;
+  statusMessage: string;
   prompt: string;
   placeholder: string;
-  pageContext: string;
+  previewContext: string;
+  viewport: string;
+  elementLabel: string;
+  stepsWorking: string;
+  stepsDone: string;
   modelLabel: string;
-  askLabel: string;
+  autoLabel: string;
   sendLabel: string;
   attachLabel: string;
 }>("home.howItWorks.steps.agent.composer");
@@ -75,11 +80,16 @@ const steps = [
                   client:visible
                   user-message={composer.userMessage}
                   assistant-message={composer.assistantMessage}
+                  status-message={composer.statusMessage}
                   prompt={composer.prompt}
                   placeholder={composer.placeholder}
-                  page-context={composer.pageContext}
+                  preview-context={composer.previewContext}
+                  viewport={composer.viewport}
+                  element-label={composer.elementLabel}
+                  steps-working={composer.stepsWorking}
+                  steps-done={composer.stepsDone}
                   model-label={composer.modelLabel}
-                  ask-label={composer.askLabel}
+                  auto-label={composer.autoLabel}
                   send-label={composer.sendLabel}
                   attach-label={composer.attachLabel}
                 />

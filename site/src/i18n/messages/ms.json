@@ -122,15 +122,20 @@
           "description": "Minta halaman, suntingan FAQ, atau bahagian baharu. Ejen menyunting repo; anda masih mengawal Publish.",
           "alt": "Panel ejen Orso di sebelah pratonton laman, sedia menerima permintaan.",
           "composer": {
-            "prompt": "Tambah bahagian FAQ pada halaman harga",
+            "prompt": "Minta pembantu anda mengubah laman anda",
             "placeholder": "Minta pembantu anda mengubah laman anda",
-            "pageContext": "pricing",
+            "previewContext": "Preview · /pricing",
+            "viewport": "Desktop",
+            "elementLabel": "section#pricing",
+            "stepsWorking": "Menyelesaikan 1 langkah",
+            "stepsDone": "Menyelesaikan 4 langkah",
+            "statusMessage": "Mengedit pricing.md dan membuka pratonton draf.",
             "modelLabel": "Claude",
+            "autoLabel": "Auto",
             "sendLabel": "Hantar",
             "attachLabel": "Lampirkan imej atau fail",
-            "userMessage": "Boleh kemas kini halaman harga?",
-            "assistantMessage": "Baik — apa yang perlu diubah? Saya boleh tulis semula salinan, tambah bahagian, atau laraskan susun atur.",
-            "askLabel": "Tanya"
+            "userMessage": "Tambah bahagian FAQ pada halaman harga",
+            "assistantMessage": "Bahagian FAQ ditambah pada draf harga — semak pratonton, kemudian Publish bila sedia."
           }
         }
       }
