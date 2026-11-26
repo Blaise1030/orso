@@ -1,9 +1,11 @@
 ---
 import UButton from "@nuxt/ui/components/Button.vue";
 import AppShot from "../vue/AppShot.vue";
+import BearMark from "../BearMark.astro";
 import DownloadButton from "../vue/DownloadButton.vue";
 import { getI18n } from "../../i18n";
 import { appShot } from "../../lib/appShots";
+import { site } from "../../site";
 
 const shot = await appShot("hero-preview");
 const { t, group, path, locale } = getI18n(Astro.url);
@@ -15,6 +17,10 @@ const words = locale === "zh" ? [headline] : headline.split(" ");
 <section class="pt-section md:pt-section-wide" id="product">
   <div class="page">
     <div class="w-full md:max-w-3/4">
+      <div class="rise mb-6 inline-flex items-center gap-2.5 text-ink">
+        <BearMark class="h-5 w-auto" />
+        <span class="text-body font-medium tracking-tight">{site.name}</span>
+      </div>
       <h1 class="text-display font-medium tracking-display text-ink">
         {words.map((word, index) => (
           <><span class="word" style={`--word-delay: ${index * 45}ms`}>{word}</span>{" "}</>
