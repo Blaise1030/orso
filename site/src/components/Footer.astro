@@ -27,21 +27,10 @@ const groups = [
 
 <footer class="relative mx-auto w-full max-w-5xl" id="site-footer">
   <div class="page py-10 md:py-12 lg:py-16">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <a class="inline-flex items-center gap-2.5 text-ink" href={path("/")} aria-label={t("site.homeLabel", { name: site.name })}>
-        <BearMark class="h-5 w-auto" />
-        <span class="text-body font-medium tracking-tight">{site.name}</span>
-      </a>
-      <UButton
-        color="neutral"
-        variant="outline"
-        size="lg"
-        label={t("nav.getOrso")}
-        trailing-icon="i-hugeicons-arrow-up-right-01"
-        to={path(site.cta.href)}
-        rel={/^https?:\/\//.test(site.cta.href) ? "noopener noreferrer" : undefined}
-      />
-    </div>
+    <a class="inline-flex items-center gap-2.5 text-ink" href={path("/")} aria-label={t("site.homeLabel", { name: site.name })}>
+      <BearMark class="h-5 w-auto" />
+      <span class="text-body font-medium tracking-tight">{site.name}</span>
+    </a>
 
     <nav class="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4" aria-label={t("footer.label")}>
       {groups.map((group) => (
