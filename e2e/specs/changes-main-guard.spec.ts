@@ -81,6 +81,8 @@ test("local-only project edits main with no Start a change dialog", async ({
   }
   expect(created?.ok).toBeTruthy();
   const { id: localId } = (await created!.json()) as { id: string };
+  const init = await api(origin, token, "POST", `/api/projects/${localId}/init`);
+  expect(init.ok).toBeTruthy();
 
   await page.goto(`${origin}/?t=${token}`);
   await page.goto(`${origin}/p/${localId}`);

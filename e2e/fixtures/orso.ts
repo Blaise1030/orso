@@ -29,6 +29,9 @@ export const test = base.extend<{ orso: orsoEnv; templateProject: TemplateProjec
       });
       if (!res.ok) throw new Error(`template project create failed: ${await res.text()}`);
       const { id } = (await res.json()) as { id: string };
+      // Template ships without orso.json (ask-first). Init writes it and starts preview.
+      const init = await api(orso.origin, orso.token, "POST", `/api/projects/${id}/init`);
+      if (!init.ok) throw new Error(`template project init failed: ${await init.text()}`);
       await use({ id, dir: path.join(orso.tmp, "projects", id) });
     },
     { timeout: 600_000 },
