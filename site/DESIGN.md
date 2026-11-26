@@ -174,7 +174,7 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 
 - **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons. Omitted on the landing page; Blog, Help and other interiors keep it. Nav and download remain in the footer and hero CTAs.
 - **Hero**: left-aligned display headline, lead, dual CTAs, then one inset product shot.
-- **Logos**: section title, short body, then a wrapping row of marks (Astro, Markdown, GitHub, Claude, Cursor, Codex); no bordered cells.
+- **Logos**: section title, short body, then two labeled rows — Stack (Astro, Markdown, GitHub) and Agents (Claude, Cursor, Codex icon+caption, OpenCode); no bordered cells.
 - **How it works**: two-by-two grid on desktop (edit → preview → agent → publish); each cell is an inset hairline figure (`max-w-md`), then a step number, title and body — usegui.com rhythm.
 - **Setup**: Gui-style cost-and-setup copy — free/open source, bring your own agent, nothing to migrate.
 - **Bands**: open essays (git statement, draft branches + inset figure, stack logos) separated by whitespace.

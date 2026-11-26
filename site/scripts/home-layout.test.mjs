@@ -46,3 +46,14 @@ test("landing page includes a setup copy band", () => {
   assert.match(read("src/components/sections/Setup.astro"), /id="setup"/);
   assert.match(read("src/i18n/messages/en.json"), /"setup"/);
 });
+
+test("logos split stack and agents, include OpenCode and Codex caption", () => {
+  const logos = read("src/components/sections/Logos.astro");
+  assert.match(logos, /key: "stack"/);
+  assert.match(logos, /key: "agents"/);
+  assert.match(logos, /opencode/);
+  assert.match(logos, /caption: "Codex"/);
+  assert.match(read("src/i18n/messages/en.json"), /"agents": "Agents"/);
+  assert.ok(existsSync(resolve(root, "public/logos/opencode.svg")));
+  assert.ok(existsSync(resolve(root, "public/logos/opencode-on-dark.svg")));
+});

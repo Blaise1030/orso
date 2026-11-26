@@ -3,13 +3,22 @@ import { getI18n } from "../../i18n";
 
 const { t } = getI18n(Astro.url);
 
-const logos = [
+/** Stack marks are full lockups; Codex is icon-only (OpenAI monoblossom) so it gets a caption. */
+const stack = [
   { name: "Astro", file: "astro" },
   { name: "Markdown", file: "markdown" },
   { name: "GitHub", file: "github" },
+];
+const agents = [
   { name: "Claude", file: "claude" },
   { name: "Cursor", file: "cursor" },
-  { name: "Codex", file: "codex" },
+  { name: "Codex", file: "codex", caption: "Codex" },
+  { name: "OpenCode", file: "opencode" },
+];
+
+const groups = [
+  { key: "stack" as const, items: stack },
+  { key: "agents" as const, items: agents },
 ];
 ---
 
@@ -19,27 +28,37 @@ const logos = [
       {t("home.logos.title")}
     </h2>
     <p class="mt-3 max-w-measure text-small leading-6 text-muted">{t("home.logos.body")}</p>
-    {/* One <picture> per mark so light/dark variants never share a flex slot (that caused overlap). */}
-    <ul
-      class="mt-8 grid list-none grid-cols-2 gap-x-8 gap-y-6 p-0 sm:grid-cols-3 md:grid-cols-6"
-      aria-label={t("home.logos.label")}
-    >
-      {logos.map((logo) => (
-        <li class="flex h-8 items-center">
-          <picture>
-            <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
-            <img
-              src={`/logos/${logo.file}.svg`}
-              alt={logo.name}
-              width="120"
-              height="32"
-              class="h-6 w-auto max-w-full object-contain object-left"
-              loading="lazy"
-              decoding="async"
-            />
-          </picture>
-        </li>
+
+    <div class="mt-10 space-y-8">
+      {groups.map((group) => (
+        <div>
+          <p class="text-label font-medium text-muted">{t(`home.logos.${group.key}`)}</p>
+          <ul class="mt-4 grid list-none grid-cols-2 gap-x-8 gap-y-5 p-0 sm:grid-cols-4">
+            {group.items.map((logo) => (
+              <li class="flex h-8 min-w-0 items-center gap-2">
+                <picture class="min-w-0">
+                  <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
+                  <img
+                    src={`/logos/${logo.file}.svg`}
+                    alt={"caption" in logo && logo.caption ? "" : logo.name}
+                    width="120"
+                    height="32"
+                    class:list={[
+                      "h-6 w-auto object-contain object-left",
+                      "caption" in logo && logo.caption ? "max-h-6 max-w-6" : "max-w-full",
+                    ]}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+                {"caption" in logo && logo.caption && (
+                  <span class="truncate text-small font-medium text-ink">{logo.caption}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
-    </ul>
+    </div>
   </div>
 </section>

@@ -75,7 +75,9 @@
     "logos": {
       "label": "Works with your stack",
       "title": "Works with the stack you already have",
-      "body": "Orso sits on Astro, Markdown and GitHub. Connect Claude, Cursor, Codex or OpenCode with the account and plan you already pay for — no second AI subscription from us."
+      "body": "Astro, Markdown and GitHub for the site. Claude, Cursor, Codex or OpenCode for the agent — with the account and plan you already pay for. Orso adds no AI usage charges.",
+      "stack": "Stack",
+      "agents": "Agents"
     },
     "setup": {
       "title": "Cost and setup",
