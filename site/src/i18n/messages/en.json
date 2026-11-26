@@ -45,6 +45,7 @@
   },
   "download": {
     "button": "Download for {platform}",
+    "short": "Download",
     "otherPlatform": "Choose another platform",
     "allReleases": "All releases on GitHub",
     "thanksTitle": "Thanks for downloading Orso",

@@ -108,9 +108,9 @@ const languages = localeKeys.map((key) => ({
       <header class="sticky top-0 z-40 bg-surface/90 backdrop-blur-md" transition:animate="none">
         <div class="page mx-auto flex min-h-header w-full max-w-5xl items-center gap-x-4 py-1">
           <a class="-m-1 shrink-0 rounded-sm p-1" href={path("/")} aria-label={t("site.homeLabel", { name: site.name })}><Wordmark /></a>
-          <div class="ml-auto flex shrink-0 items-center gap-2">
+          <div class="ml-auto flex min-w-0 shrink items-center gap-1 sm:gap-2">
             <LocaleMenu client:idle items={languages} label={t("site.language")} />
-            <DownloadButton client:load labels={group("download")} />
+            <DownloadButton client:load compact labels={group("download")} />
           </div>
         </div>
       </header>

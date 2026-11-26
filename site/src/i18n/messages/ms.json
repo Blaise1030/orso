@@ -45,6 +45,7 @@
   },
   "download": {
     "button": "Muat turun untuk {platform}",
+    "short": "Muat turun",
     "otherPlatform": "Pilih platform lain",
     "allReleases": "Semua keluaran di GitHub",
     "thanksTitle": "Terima kasih kerana memuat turun Orso",

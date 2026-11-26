@@ -45,6 +45,7 @@
   },
   "download": {
     "button": "下载 {platform} 版",
+    "short": "下载",
     "otherPlatform": "选择其他平台",
     "allReleases": "在 GitHub 上查看所有版本",
     "thanksTitle": "感谢下载 Orso",

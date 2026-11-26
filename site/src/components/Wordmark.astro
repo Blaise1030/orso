@@ -12,5 +12,5 @@ const { t } = getI18n(Astro.url);
 <span class="inline-flex items-center gap-2.5 text-ink">
   <BearMark class="h-4 w-auto shrink-0" />
   <span class="text-body font-medium tracking-tight whitespace-nowrap">{site.name}</span>
-  <UBadge color="neutral" variant="outline" size="sm" class="rounded-full" label={t("site.alpha")} />
+  <UBadge color="neutral" variant="outline" size="sm" class="hidden rounded-full sm:inline-flex" label={t("site.alpha")} />
 </span>

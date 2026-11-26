@@ -12,6 +12,7 @@ const { repo, coffeeUrl, downloads } = site.release;
 /** The button's copy, from `download` in src/i18n/messages (`{platform}` is filled in here). */
 export type DownloadLabels = {
   button: string;
+  short: string;
   otherPlatform: string;
   allReleases: string;
   thanksTitle: string;
@@ -22,7 +23,9 @@ export type DownloadLabels = {
   coffee: string;
   later: string;
 };
-const props = defineProps<{ labels: DownloadLabels }>();
+const props = withDefaults(defineProps<{ labels: DownloadLabels; /** Shorter control for tight chrome (header). */ compact?: boolean }>(), {
+  compact: false,
+});
 type Download = (typeof downloads)[number];
 
 /** `releases/latest/download` redirects to the newest release's asset, so no version is in the URL. */
@@ -37,6 +40,9 @@ function detectDownload(): Download {
 
 const primary = ref<Download>(downloads[0]);
 onMounted(() => (primary.value = detectDownload()));
+
+const size = computed(() => (props.compact ? "md" : "lg"));
+const fullLabel = computed(() => props.labels.button.replace("{platform}", primary.value.label));
 
 /** The link still downloads the file; the thank-you popup opens alongside it. */
 const downloaded = ref<Download | null>(null);
@@ -60,19 +66,25 @@ const items = computed<DropdownMenuItem[][]>(() => [
 </script>
 
 <template>
-  <UFieldGroup>
+  <UFieldGroup class="min-w-0">
     <UButton
-      size="lg"
+      :size="size"
       icon="i-hugeicons-download-04"
-      :label="props.labels.button.replace('{platform}', primary.label)"
       :to="assetUrl(primary)"
       target="_self"
       rel="noopener noreferrer"
+      class="min-w-0"
       @click="downloaded = primary"
-    />
+    >
+      <template v-if="compact">
+        <span class="sm:hidden">{{ props.labels.short }}</span>
+        <span class="hidden sm:inline">{{ fullLabel }}</span>
+      </template>
+      <template v-else>{{ fullLabel }}</template>
+    </UButton>
     <UDropdownMenu :items="items" :content="{ align: 'end' }" :ui="{ content: 'w-64' }">
       <UButton
-        size="lg"
+        :size="size"
         icon="i-hugeicons-arrow-down-01"
         :aria-label="props.labels.otherPlatform"
         class="border-l border-on-accent/20"
