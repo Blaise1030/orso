@@ -178,7 +178,7 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 - **How it works**: two-by-two grid on desktop (edit → preview → agent → publish); each cell is an inset hairline figure (`max-w-md`), then a step number, title and body — usegui.com rhythm.
 - **Setup**: Gui-style cost-and-setup copy — free/open source, bring your own agent, nothing to migrate.
 - **Bands**: open essays (git statement, draft branches + inset figure) separated by whitespace.
-- **FAQ**: stacked title and intro, then a full-width hairline accordion with FAQPage JSON-LD.
+- **FAQ**: stacked title, intro and hairline accordion inside `max-w-measure`, with FAQPage JSON-LD.
 - **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.
 - **Footer**: centred `max-w-5xl` column with no outer border frame. Wordmark, then stacked closing CTA (`#cta` / `#get-orso`: title, body, download + GitHub, platforms), then a four-column link grid (Product, Resources, More, Legal).
 
