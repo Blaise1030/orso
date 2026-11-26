@@ -9,8 +9,6 @@ const shots = {
   content: await appShot("hero-content"),
   preview: await appShot("hero-preview"),
   publish: await appShot("hero-publish"),
-  agent: await appShot("hero-agent"),
-  history: await appShot("hero-history"),
 };
 
 const { t, group, path, locale } = getI18n(Astro.url);
@@ -32,7 +30,7 @@ const words = locale === "zh" ? [headline] : headline.split(" ");
       </p>
       <div id="get-orso" class="rise-3 mt-8 flex flex-wrap items-center gap-3">
         <DownloadButton client:load labels={group("download")} />
-        <UButton color="neutral" variant="outline" size="lg" label={t("home.hero.secondary")} to={path("#scale")} />
+        <UButton color="neutral" variant="outline" size="lg" label={t("home.hero.secondary")} to={path("#how-it-works")} />
       </div>
       <p class="rise-3 mt-4 text-small text-muted">{t("home.hero.note")}</p>
     </div>

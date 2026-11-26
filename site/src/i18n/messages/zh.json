@@ -1,7 +1,7 @@
 {
   "site": {
-    "tagline": "面向内容团队的开发者工具",
-    "description": "让内容团队借助智能体编辑网站。草稿、预览和 Publish——内容始终保留在你的仓库中。",
+    "tagline": "你的仓库本身就是 CMS",
+    "description": "给团队一个编辑器，直接改仓库里的 Markdown。每次修改都是拉取请求。内容始终归你。",
     "homeLabel": "{name} 首页",
     "alpha": "Alpha",
     "skipToContent": "跳到主要内容",
@@ -66,108 +66,125 @@
   },
   "home": {
     "hero": {
-      "headline": "让内容团队借助智能体编辑网站。",
-      "body": "仓库归你管，所以每一句“能帮忙改下价格吗？”都会落到你头上。有了 Orso，市场人员、写作者和创始人可以自己完成这些修改——填写表单，或者直接让智能体代劳。每次修改都是一个拉取请求，上线前由你审核。",
+      "headline": "你的仓库本身就是 CMS。",
+      "body": "给市场人员和写作者一个编辑器，直接改你已有的 Markdown。每次修改都是你审核的拉取请求。在你点击 Publish 之前，不会上线。",
       "secondary": "看看它能做什么",
-      "note": "免费开源。内容始终保留在你的仓库中。",
+      "note": "免费开源。在你自己的机器上运行。内容始终保留在你的仓库中。",
       "tabs": {
         "content": {
           "label": "内容",
-          "description": "仓库中的每个集合，都是一份可直接使用的列表。",
+          "description": "为仓库里已有的集合提供表单。",
           "alt": "Orso 编辑器中打开的一篇博客文章：Markdown 正文旁边是标题、slug、日期和标签。"
         },
         "preview": {
           "label": "预览",
-          "description": "抢先在桌面端和移动端查看草稿。",
+          "description": "在桌面端和移动端查看真实网站。",
           "alt": "Orso 正在预览草稿网站上渲染的同一篇博客文章，旁边打开着智能体面板。"
         },
         "publish": {
           "label": "发布",
-          "description": "先运行检查，再一键上线。",
+          "description": "审核拉取请求，再一键上线。",
           "alt": "Orso 的更改菜单覆盖在预览之上，列出线上网站和未完成的草稿，旁边是 Review 和 Publish 按钮。"
-        },
-        "agent": {
-          "label": "智能体",
-          "description": "让它新建页面、整体润色，或添加一个全新的版块。",
-          "alt": "Orso 的智能体面板位于网站预览旁，随时待命。"
-        },
-        "history": {
-          "label": "历史记录",
-          "description": "每次保存都是一个可以回退的检查点。",
-          "alt": "Orso 的历史记录：包含作者、提交和时间的检查点时间线。"
         }
       }
     },
     "logos": {
       "label": "兼容你的技术栈",
       "intro": "兼容你现有的技术栈和智能体",
-      "outro": "同样的文件。同样的历史。同样的部署——在你现有的仓库上使用草稿、检查点和 Publish。"
-    },
-    "ops": {
-      "title": "大规模处理内容工作",
-      "body": "团队处理草稿、预览、Publish 和历史记录的工作台，构建于你已搭建好的仓库之上。",
-      "slides": {
-        "content": {
-          "title": "可浏览的集合",
-          "caption": "仓库中的每个 Markdown 集合，都以带状态的列表呈现。",
-          "alt": "Orso 正在编辑一篇博客文章：左侧是正文，右侧表单中是其字段（slug、标题、日期、标签）。"
-        },
-        "preview": {
-          "title": "桌面端与移动端预览",
-          "caption": "分享草稿链接、留下评论，在 Publish 前批准。",
-          "alt": "Orso 正在预览网站草稿，旁边打开着智能体面板。"
-        },
-        "publish": {
-          "title": "按清单发布",
-          "caption": "先运行构建、链接检查和审核，一键即可上线。",
-          "alt": "Orso 的更改菜单，列出线上网站和未完成的草稿。"
-        },
-        "agent": {
-          "title": "用自然语言提需求",
-          "caption": "整个页面、润色常见问题，或新增版块——都以草稿形式呈现。",
-          "alt": "Orso 的智能体面板位于网站预览旁。"
-        },
-        "history": {
-          "title": "可恢复的检查点",
-          "caption": "每次保存都会留下历史。恢复会生成新草稿，绝不改写历史。",
-          "alt": "从历史时间线中打开的 Orso 检查点。"
-        }
-      }
+      "outro": "同样的文件。同样的历史。同样的部署。"
     },
     "features": {
-      "eyebrow": "他们的工具，你的仓库",
-      "title": "用团队真正会用的工具，充分发挥仓库的价值",
-      "body": "还是你已拥有的那些文件，只是多了草稿、预览和智能体。无需再维护第二套需要同步的 CMS。",
+      "eyebrow": "构建于你的仓库之上",
+      "title": "对编辑友好。对开发者安全。",
+      "body": "团队获得表单、实时预览和智能体。仓库保留 Markdown、历史记录和部署方式。",
       "cards": {
         "drafts": {
-          "title": "草稿与检查点",
-          "description": "每次编辑都会进入草稿，并生成可恢复的检查点。在有人点击 Publish 之前，任何内容都不会上线。",
-          "alt": "Orso 的历史记录：检查点时间线，最新的在前，包含作者、提交和时间。"
+          "title": "Markdown 编辑器，面向你的内容",
+          "description": "集合、字段和富文本——也可以直接编辑源码——针对你已拥有的 Markdown。无需再维护第二套需要同步的 CMS。",
+          "alt": "Orso 的 Markdown 编辑器打开一篇文章，斜杠菜单显示标题和列表。",
+          "editor": {
+            "demoTitle": "网站的全新开始"
+          }
         },
         "review": {
-          "title": "预览与审核",
-          "description": "分享预览链接、在页面上留下评论，并在更改上线前批准——桌面端和移动端均可。",
-          "alt": "Orso 正在预览草稿，页面详情面板中显示其标题、描述和社交分享图。"
+          "title": "在分支上预览每一次改动",
+          "description": "每次编辑都是带真实网站实时预览的草稿分支。分享它，审核拉取请求，然后 Publish。",
+          "alt": "Orso 正在预览真实网站的草稿，可切换桌面端和移动端。",
+          "frame": {
+            "desktopLabel": "桌面端",
+            "mobileLabel": "移动端",
+            "pageTitle": "定价"
+          }
         },
         "agent": {
-          "title": "用自然语言驱动的智能体",
-          "description": "让它新建页面、润色常见问题，或添加一个全新的版块。智能体负责修改仓库，Publish 的决定权仍在你手中。",
-          "alt": "Orso 的智能体面板位于网站预览旁，随时待命。"
+          "title": "更大改动交给智能体",
+          "description": "让它新建页面、润色常见问题，或添加新版块。智能体改仓库；Publish 仍由你决定。",
+          "alt": "Orso 的智能体面板位于网站预览旁，随时待命。",
+          "composer": {
+            "prompt": "给定价页加一个常见问题版块",
+            "placeholder": "让助手修改你的网站",
+            "pageContext": "pricing",
+            "modelLabel": "Claude",
+            "sendLabel": "发送",
+            "attachLabel": "附加图片或文件",
+            "userMessage": "能帮忙改一下定价页吗？",
+            "assistantMessage": "可以——想改什么？我可以改文案、加版块，或调整布局。",
+            "askLabel": "询问"
+          }
         }
       }
     },
-    "agentBand": {
-      "title": "让智能体接入你的仓库，更快上线页面",
-      "editing": "智能体编辑",
-      "agents": "支持哪些智能体",
-      "alt": "Orso 的智能体面板位于网站预览旁，团队成员可以用自然语言提出修改需求。"
+    "bento": {
+      "label": "你能得到什么",
+      "cells": {
+        "git": {
+          "title": "留在 Git",
+          "body": "仓库里的 Markdown。每次保存都是一次提交。",
+          "statement": "每次保存都是一次提交。",
+          "statementMeta": "a3f81d2 · welcome.md"
+        },
+        "editor": {
+          "title": "Markdown 编辑器",
+          "body": "为你已有的文件提供表单和富文本。",
+          "demoTitle": "网站的全新开始"
+        },
+        "preview": {
+          "title": "实时预览",
+          "body": "Publish 前先看真实网站。",
+          "frame": {
+            "desktopLabel": "桌面端",
+            "mobileLabel": "移动端",
+            "pageTitle": "定价"
+          }
+        },
+        "branches": {
+          "title": "草稿分支",
+          "body": "每次修改都是一个分支，审阅后再 Publish。",
+          "picker": {
+            "trigger": "定价页常见问题",
+            "liveLabel": "线上网站",
+            "draftLabel": "定价页常见问题",
+            "draftDescription": "change/faq-pricing · 2 小时前"
+          }
+        },
+        "stack": {
+          "title": "你的技术栈",
+          "body": "Astro、Markdown、GitHub — 同一套部署。"
+        },
+        "open": {
+          "title": "由你运行",
+          "body": "本地应用。MIT 许可。没有付费档。",
+          "statLead": "许可",
+          "statValue": "MIT"
+        }
+      }
     },
     "proof": {
-      "eyebrow": "越来越多的团队正在删除 CMS。Orso 让其他人也能跟上。",
-      "quote": "“有了 AI 和编程智能体，抽象的代价从未如此之高。”",
+      "eyebrow": "删掉 CMS。留住编辑者。",
+      "quote": "“有了 AI 和编程智能体，抽象的成本从未如此之高。”",
       "source": "Coding Agents & Complexity Budgets",
-      "noteTitle": "来自开发者的话",
-      "note": "当编辑网站的人本身就像开发者一样工作时，这种做法行得通。但大多数市场团队并非如此。删掉 CMS 之后，一周后还是会有人问：“能帮忙改下价格吗？”我开发 Orso，就是为了让他们能自己动手——用上 CMS 曾经提供的表单、草稿和安全的 Publish 按钮，同时内容仍保留在仓库中。如果它还没有简单到让我身边不懂技术的同事也能上手，那它就还没完成。"
+      "noteTitle": "来自作者的说明",
+      "note": "只有当编辑网站的人已经像开发者一样工作时，删掉 CMS 才行得通。大多数市场团队并非如此。Orso 给他们表单、草稿和 Publish 按钮——同时内容仍留在你的仓库里。如果连我自己的非技术同事都觉得不够简单，那它就还没完成。"
     },
     "faq": {
       "title": "常见问题，一一解答。",
@@ -221,8 +238,8 @@
       }
     },
     "cta": {
-      "title": "准备好让团队自己管理网站了吗？",
-      "body": "你只需安装 Orso 并连接一次仓库。之后，团队就能通过草稿、预览和 Publish 进行编辑。",
+      "title": "准备好让团队管理网站了吗？",
+      "body": "安装一次 Orso 并连接仓库。之后，团队就能用草稿、预览和 Publish 进行编辑。",
       "github": "在 GitHub 上查看",
       "platforms": "支持 macOS 和 Linux。",
       "facts": {

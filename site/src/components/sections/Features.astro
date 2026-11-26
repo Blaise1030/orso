@@ -1,35 +1,32 @@
 ---
 import UCard from "@nuxt/ui/components/Card.vue";
 import Painting from "../Painting.astro";
-import AppShot from "../vue/AppShot.vue";
-import { appShot } from "../../lib/appShots";
+import AgentComposerMock from "../vue/AgentComposerMock.vue";
+import BentoHeroEditor from "../vue/BentoHeroEditor.vue";
+import BentoPreviewTile from "../vue/BentoPreviewTile.vue";
 import { getI18n } from "../../i18n";
 
-const { t } = getI18n(Astro.url);
+const { t, group } = getI18n(Astro.url);
 
-const cards = [
-  {
-    title: t("home.features.cards.drafts.title"),
-    description: t("home.features.cards.drafts.description"),
-    painting: "bridge" as const,
-    shot: await appShot("how-drafts"),
-    alt: t("home.features.cards.drafts.alt"),
-  },
-  {
-    title: t("home.features.cards.review.title"),
-    description: t("home.features.cards.review.description"),
-    painting: "toledo" as const,
-    shot: await appShot("how-review"),
-    alt: t("home.features.cards.review.alt"),
-  },
-  {
-    title: t("home.features.cards.agent.title"),
-    description: t("home.features.cards.agent.description"),
-    painting: "rocks" as const,
-    shot: await appShot("how-agent"),
-    alt: t("home.features.cards.agent.alt"),
-  },
-];
+const editor = group<{ demoTitle: string }>("home.features.cards.drafts.editor");
+const preview = group<{
+  desktopLabel: string;
+  mobileLabel: string;
+  pageTitle: string;
+}>("home.features.cards.review.frame");
+const composer = group<{
+  userMessage: string;
+  assistantMessage: string;
+  prompt: string;
+  placeholder: string;
+  pageContext: string;
+  modelLabel: string;
+  askLabel: string;
+  sendLabel: string;
+  attachLabel: string;
+}>("home.features.cards.agent.composer");
+
+const cardUi = { header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" };
 ---
 
 <section class="mx-auto max-w-7xl border-x border-b border-line pt-section" id="how-it-works">
@@ -44,29 +41,66 @@ const cards = [
   </div></div>
 
   <ul class="mt-12 grid border-t border-line md:grid-cols-3">
-    {cards.map((card) => (
-      <li class="border-b border-line last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0">
-        <UCard
-          variant="ghost"
-          class="h-full rounded-none bg-transparent p-2"
-          ui={{ header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" }}
-        >
-          <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
-            <Painting id={card.painting} />
-            <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-            <div class="relative flex size-full items-center justify-center p-3 md:p-4">
-              <AppShot
-                shot={card.shot}
-                alt={card.alt}
-                sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 33vw, 100vw"
-                class="h-full max-h-full w-auto max-w-full"
-              />
-            </div>
+    <li class="border-b border-line md:border-r md:border-b-0">
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+          <Painting id="bridge" />
+          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+          <div class="relative size-full">
+            <BentoHeroEditor
+              client:visible
+              title={editor.demoTitle}
+              slash-hint="/"
+            />
           </div>
-          <h3 class="text-heading tracking-normal text-ink">{card.title}</h3>
-          <p class="mt-1 text-small leading-6 text-muted">{card.description}</p>
-        </UCard>
-      </li>
-    ))}
+        </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.features.cards.drafts.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.features.cards.drafts.description")}</p>
+      </UCard>
+    </li>
+
+    <li class="border-b border-line md:border-r md:border-b-0">
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+          <Painting id="toledo" />
+          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+          <div class="relative size-full">
+            <BentoPreviewTile
+              client:visible
+              desktop-label={preview.desktopLabel}
+              mobile-label={preview.mobileLabel}
+              page-title={preview.pageTitle}
+            />
+          </div>
+        </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.features.cards.review.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.features.cards.review.description")}</p>
+      </UCard>
+    </li>
+
+    <li class="border-b border-line last:border-b-0 md:border-b-0">
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+          <Painting id="rocks" />
+          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+          <div class="relative flex size-full p-2 md:p-3">
+            <AgentComposerMock
+              client:visible
+              user-message={composer.userMessage}
+              assistant-message={composer.assistantMessage}
+              prompt={composer.prompt}
+              placeholder={composer.placeholder}
+              page-context={composer.pageContext}
+              model-label={composer.modelLabel}
+              ask-label={composer.askLabel}
+              send-label={composer.sendLabel}
+              attach-label={composer.attachLabel}
+            />
+          </div>
+        </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.features.cards.agent.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.features.cards.agent.description")}</p>
+      </UCard>
+    </li>
   </ul>
 </section>

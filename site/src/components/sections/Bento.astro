@@ -1,0 +1,262 @@
+---
+import BentoBranchTile from "../vue/BentoBranchTile.vue";
+import BentoHeroEditor from "../vue/BentoHeroEditor.vue";
+import BentoPreviewTile from "../vue/BentoPreviewTile.vue";
+import { getI18n } from "../../i18n";
+
+const { t } = getI18n(Astro.url);
+
+const stack = [
+  { name: "Astro", file: "astro" },
+  { name: "Markdown", file: "markdown" },
+  { name: "GitHub", file: "github" },
+];
+---
+
+<section class="mx-auto max-w-7xl border-x border-b border-line" id="capabilities" aria-label={t("home.bento.label")}>
+  <div class="bento page py-section">
+    <ul class="bento-grid">
+      <!-- Hero: Markdown editor (2 × 1) -->
+      <li class="bento-tile bento-tile--hero">
+        <div class="bento-picture">
+          <BentoHeroEditor
+            client:visible
+            title={t("home.bento.cells.editor.demoTitle")}
+            slash-hint="/"
+          />
+        </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.editor.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.editor.body")}</p>
+        </div>
+      </li>
+
+      <!-- Stat: Free / MIT (dark) -->
+      <li class="bento-tile bento-tile--stat" data-dark>
+        <div class="bento-picture bento-picture--stat">
+          <p class="bento-stat-lead">{t("home.bento.cells.open.statLead")}</p>
+          <p class="bento-stat-value">{t("home.bento.cells.open.statValue")}</p>
+        </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-on-night">{t("home.bento.cells.open.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-on-night-muted">{t("home.bento.cells.open.body")}</p>
+        </div>
+      </li>
+
+      <!-- Component: Live preview -->
+      <li class="bento-tile">
+        <div class="bento-picture">
+          <BentoPreviewTile
+            client:visible
+            desktop-label={t("home.bento.cells.preview.frame.desktopLabel")}
+            mobile-label={t("home.bento.cells.preview.frame.mobileLabel")}
+            page-title={t("home.bento.cells.preview.frame.pageTitle")}
+          />
+        </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.preview.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.preview.body")}</p>
+        </div>
+      </li>
+
+      <!-- Component: Branching -->
+      <li class="bento-tile">
+        <div class="bento-picture">
+          <BentoBranchTile
+            client:visible
+            trigger={t("home.bento.cells.branches.picker.trigger")}
+            live-label={t("home.bento.cells.branches.picker.liveLabel")}
+            draft-label={t("home.bento.cells.branches.picker.draftLabel")}
+            draft-meta={t("home.bento.cells.branches.picker.draftDescription")}
+          />
+        </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.branches.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.branches.body")}</p>
+        </div>
+      </li>
+
+      <!-- Collection: Stack -->
+      <li class="bento-tile">
+        <div class="bento-picture bento-picture--collection">
+          <ul class="bento-logos">
+            {stack.map((logo) => (
+              <li>
+                <img
+                  src={`/logos/${logo.file}.svg`}
+                  alt={logo.name}
+                  width="120"
+                  height="32"
+                  class="logo-on-light h-auto max-h-8 w-auto max-w-[6.5rem] object-contain"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <img
+                  src={`/logos/${logo.file}-on-dark.svg`}
+                  alt=""
+                  width="120"
+                  height="32"
+                  class="logo-on-dark h-auto max-h-8 w-auto max-w-[6.5rem] object-contain"
+                  loading="lazy"
+                  decoding="async"
+                  aria-hidden="true"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.stack.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.stack.body")}</p>
+        </div>
+      </li>
+
+      <!-- Statement: Git -->
+      <li class="bento-tile">
+        <div class="bento-picture bento-picture--statement">
+          <p class="bento-statement">{t("home.bento.cells.git.statement")}</p>
+          <p class="bento-statement-meta font-mono">{t("home.bento.cells.git.statementMeta")}</p>
+        </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.git.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.git.body")}</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .bento-grid {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .bento-tile {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-raised);
+  }
+
+  .bento-tile[data-dark] {
+    background: var(--color-night);
+    border-color: var(--color-night-line);
+  }
+
+  .bento-picture {
+    position: relative;
+    min-height: 14rem;
+    overflow: hidden;
+    background: var(--color-sand);
+  }
+
+  .bento-picture > :global(*) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .bento-picture--stat > :global(*),
+  .bento-picture--statement > :global(*),
+  .bento-picture--collection > :global(*) {
+    position: static;
+    width: auto;
+    height: auto;
+  }
+
+  .bento-tile[data-dark] .bento-picture {
+    background: var(--color-night-raised);
+  }
+
+  .bento-tile--hero .bento-picture {
+    min-height: 18rem;
+  }
+
+  .bento-picture--stat,
+  .bento-picture--statement,
+  .bento-picture--collection {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.25rem;
+  }
+
+  .bento-picture--collection {
+    justify-content: center;
+  }
+
+  .bento-stat-lead {
+    margin: 0;
+    font-size: var(--text-small);
+    color: var(--color-on-night-muted);
+  }
+
+  .bento-stat-value {
+    margin: 0.25rem 0 0;
+    font-size: clamp(2.75rem, 8vw, 3.75rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--color-on-night);
+    white-space: nowrap;
+  }
+
+  .bento-statement {
+    margin: 0;
+    max-width: 16rem;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: var(--color-ink);
+  }
+
+  .bento-statement-meta {
+    margin: 0.75rem 0 0;
+    font-size: var(--text-label);
+    color: var(--color-muted);
+  }
+
+  .bento-logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bento-copy {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    .bento-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .bento-tile--hero {
+      grid-column: span 2;
+    }
+
+    .bento-tile--hero .bento-picture {
+      min-height: 22rem;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .bento-tile--hero {
+      order: -1;
+    }
+  }
+</style>

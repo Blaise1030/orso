@@ -1,7 +1,7 @@
 {
   "site": {
-    "tagline": "Developer tools for content teams",
-    "description": "Let your content team edit the site with an agent. Drafts, previews and Publish — content stays in your repo.",
+    "tagline": "Your repository is already the CMS",
+    "description": "Give your team an editor for the Markdown in your repo. Every change is a pull request. Content stays yours.",
     "homeLabel": "{name} home",
     "alpha": "Alpha",
     "skipToContent": "Skip to content",
@@ -66,108 +66,125 @@
   },
   "home": {
     "hero": {
-      "headline": "Let your content team edit the site with an agent.",
-      "body": "You own the repo, so every “can you change the pricing?” lands on you. With Orso, marketers, writers and founders make those changes themselves, in a form or by asking an agent. Each one is a pull request you review before it goes live.",
+      "headline": "Your repository is already the CMS.",
+      "body": "Give marketers and writers an editor for the Markdown you already have. Every change is a pull request you review. Nothing goes live until you Publish.",
       "secondary": "See what it does",
-      "note": "Free and open source. Content stays in your repo.",
+      "note": "Free and open source. Runs on your machine. Content stays in your repo.",
       "tabs": {
         "content": {
           "label": "Content",
-          "description": "Every collection in the repo, as a list you can use.",
+          "description": "Forms for the collections already in your repo.",
           "alt": "Orso's editor open on a blog post: the markdown body beside its title, slug, date and tags."
         },
         "preview": {
           "label": "Preview",
-          "description": "See the draft on desktop and mobile before anyone else.",
+          "description": "See the real site on desktop and mobile.",
           "alt": "Orso previewing the same blog post rendered on the draft site, with the agent panel open beside it."
         },
         "publish": {
           "label": "Publish",
-          "description": "Checks run first, then one button puts it live.",
+          "description": "Review the pull request, then one button goes live.",
           "alt": "Orso's changes menu over the preview, listing the live site and open drafts, next to Review and Publish."
-        },
-        "agent": {
-          "label": "Agent",
-          "description": "Ask for a page, a pass or a whole new section.",
-          "alt": "Orso's agent panel next to the site preview, ready for a request."
-        },
-        "history": {
-          "label": "History",
-          "description": "Every save is a checkpoint you can go back to.",
-          "alt": "Orso's history: a timeline of checkpoints with author, commit and time."
         }
       }
     },
     "logos": {
       "label": "Works with your stack",
       "intro": "Works with the stack and agents you already have",
-      "outro": "Same files. Same history. Same deploy — drafts, checkpoints and Publish on the repo you already have."
-    },
-    "ops": {
-      "title": "Handle content work at scale",
-      "body": "The desk your team uses for drafts, previews, Publish and history, built on the repo you already set up.",
-      "slides": {
-        "content": {
-          "title": "Collections you can browse",
-          "caption": "Every Markdown collection in the repo, as a list with status.",
-          "alt": "Orso editing a blog post: the body on the left, its fields (slug, title, date, tags) in a form on the right."
-        },
-        "preview": {
-          "title": "Desktop and mobile preview",
-          "caption": "Share a draft link, leave comments, approve before Publish.",
-          "alt": "Orso previewing a draft of the site, with the agent panel open beside it."
-        },
-        "publish": {
-          "title": "Publish with a checklist",
-          "caption": "Build, links and review run first. One button puts it live.",
-          "alt": "Orso's changes menu listing the live site and open drafts."
-        },
-        "agent": {
-          "title": "Ask in plain English",
-          "caption": "Whole pages, a pass on the FAQ, or a new section — as a draft.",
-          "alt": "Orso's agent panel beside the site preview."
-        },
-        "history": {
-          "title": "Checkpoints you can restore",
-          "caption": "Every save is history. Restoring makes a new draft, never a rewrite.",
-          "alt": "An Orso checkpoint opened from the history timeline."
-        }
-      }
+      "outro": "Same files. Same history. Same deploy."
     },
     "features": {
-      "eyebrow": "Their tools, your repo",
-      "title": "Get the most out of your repo with tools the team can actually use",
-      "body": "The same files you already own, with drafts, previews and an agent on top. There's no second CMS to keep in sync.",
+      "eyebrow": "Built on your repo",
+      "title": "Easy for editors. Safe for developers.",
+      "body": "Your team gets forms, live preview and an agent. Your repo keeps its Markdown, its history and its deploy.",
       "cards": {
         "drafts": {
-          "title": "Drafts and checkpoints",
-          "description": "Every edit lands in a draft with a checkpoint you can restore. Nothing reaches the live site until someone presses Publish.",
-          "alt": "Orso's history: a timeline of checkpoints, newest first, with author, commit and time."
+          "title": "A Markdown editor for your content",
+          "description": "Collections, fields and rich text — or the source itself — for the Markdown you already own. No second CMS to keep in sync.",
+          "alt": "Orso's Markdown editor open on a post, with the slash menu for headings and lists.",
+          "editor": {
+            "demoTitle": "A fresh start for our website"
+          }
         },
         "review": {
-          "title": "Previews and review",
-          "description": "Share a preview link, leave comments on the page, and approve the change before it goes live — on desktop and mobile.",
-          "alt": "Orso previewing a draft, with the page details panel showing its title, description and social image."
+          "title": "Preview every change on a branch",
+          "description": "Each edit is a draft branch with a live preview of the real site. Share it, review the pull request, then Publish.",
+          "alt": "Orso previewing a draft of the real site, with desktop and mobile toggles.",
+          "frame": {
+            "desktopLabel": "Desktop",
+            "mobileLabel": "Mobile",
+            "pageTitle": "Pricing"
+          }
         },
         "agent": {
-          "title": "Agent in plain English",
-          "description": "Ask for a page, a pass on the FAQ, or a whole new section. The agent edits the repo; you still own Publish.",
-          "alt": "Orso's agent panel next to the site preview, ready for a request."
+          "title": "An agent for bigger changes",
+          "description": "Ask for a page, a pass on the FAQ, or a new section. The agent edits the repo; you still own Publish.",
+          "alt": "Orso's agent panel next to the site preview, ready for a request.",
+          "composer": {
+            "userMessage": "Can you update the pricing page?",
+            "assistantMessage": "Sure — what should change? I can rewrite copy, add a section, or adjust the layout.",
+            "prompt": "Add an FAQ section to the pricing page",
+            "placeholder": "Ask your assistant to change your site",
+            "pageContext": "pricing",
+            "modelLabel": "Claude",
+            "askLabel": "Ask",
+            "sendLabel": "Send",
+            "attachLabel": "Attach image or file"
+          }
         }
       }
     },
-    "agentBand": {
-      "title": "Ship pages faster with an agent on your repo",
-      "editing": "Agentic editing",
-      "agents": "Which agents work",
-      "alt": "Orso's agent panel beside the site preview, where a teammate asks for changes in plain English."
+    "bento": {
+      "label": "What you get",
+      "cells": {
+        "git": {
+          "title": "Stays in Git",
+          "body": "Markdown in your repo. Every save is a commit.",
+          "statement": "Every save is a commit.",
+          "statementMeta": "a3f81d2 · welcome.md"
+        },
+        "editor": {
+          "title": "Markdown editor",
+          "body": "Forms and rich text for the files you already own.",
+          "demoTitle": "A fresh start for our website"
+        },
+        "preview": {
+          "title": "Live preview",
+          "body": "See the real site before you Publish.",
+          "frame": {
+            "desktopLabel": "Desktop",
+            "mobileLabel": "Mobile",
+            "pageTitle": "Pricing"
+          }
+        },
+        "branches": {
+          "title": "Draft branches",
+          "body": "Each change is a branch you review, then Publish.",
+          "picker": {
+            "trigger": "FAQ on pricing",
+            "liveLabel": "Live site",
+            "draftLabel": "FAQ on pricing",
+            "draftDescription": "change/faq-pricing · 2h ago"
+          }
+        },
+        "stack": {
+          "title": "Your stack",
+          "body": "Astro, Markdown, GitHub — same deploy."
+        },
+        "open": {
+          "title": "Yours to run",
+          "body": "Local app. MIT licence. No paid tier.",
+          "statLead": "Licence",
+          "statValue": "MIT"
+        }
+      }
     },
     "proof": {
-      "eyebrow": "Teams are deleting their CMS. Orso brings everyone else along.",
+      "eyebrow": "Delete the CMS. Keep the editors.",
       "quote": "“With AI and coding agents, the cost of an abstraction has never been higher.”",
       "source": "Coding Agents & Complexity Budgets",
       "noteTitle": "A note from the maker",
-      "note": "That move works when the people editing the site already work like developers. Most marketing teams don't. Delete the CMS and someone still asks, the week after, “can you change the pricing?” I built Orso so they can do it themselves, with the forms, drafts and safe Publish button a CMS gave them, while the content stays in the repo. If it isn't simple enough for my own non-technical teammates, it isn't done."
+      "note": "That move works when everyone editing the site already works like a developer. Most marketing teams don't. Orso gives them forms, drafts and a Publish button — while the content stays in your repo. If it isn't simple enough for my own non-technical teammates, it isn't done."
     },
     "faq": {
       "title": "Questions, answered.",
@@ -221,8 +238,8 @@
       }
     },
     "cta": {
-      "title": "Ready to let your team run the site?",
-      "body": "You install Orso and connect the repo once. After that, your team edits with drafts, previews and Publish.",
+      "title": "Ready for your team to run the site?",
+      "body": "Install Orso once and connect the repo. After that, your team edits with drafts, previews and Publish.",
       "github": "View on GitHub",
       "platforms": "macOS and Linux.",
       "facts": {
