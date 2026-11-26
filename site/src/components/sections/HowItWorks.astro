@@ -34,6 +34,7 @@ const publish = group<{
   liveLabel: string;
   draftLabel: string;
   draftDescription: string;
+  newChange: string;
 }>("home.howItWorks.steps.publish.picker");
 
 const steps = [
@@ -103,6 +104,7 @@ const steps = [
                   live-label={publish.liveLabel}
                   draft-label={publish.draftLabel}
                   draft-meta={publish.draftDescription}
+                  new-change-label={publish.newChange}
                 />
               </div>
             )}
