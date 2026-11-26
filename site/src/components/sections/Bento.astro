@@ -1,119 +1,111 @@
 ---
+import UBadge from "@nuxt/ui/components/Badge.vue";
+import UCard from "@nuxt/ui/components/Card.vue";
+import Painting from "../Painting.astro";
+import AppShot from "../vue/AppShot.vue";
+import { appShot } from "../../lib/appShots";
 import { getI18n } from "../../i18n";
+import type { PaintingId } from "../../lib/paintings";
 
 const { t } = getI18n(Astro.url);
+
+const shotCells = [
+  {
+    key: "git" as const,
+    painting: "bridge" as PaintingId,
+    shot: await appShot("ops-history"),
+  },
+  {
+    key: "editor" as const,
+    painting: "toledo" as PaintingId,
+    shot: await appShot("ops-content"),
+  },
+  {
+    key: "preview" as const,
+    painting: "rocks" as PaintingId,
+    shot: await appShot("ops-preview"),
+  },
+  {
+    key: "branches" as const,
+    painting: "alps" as PaintingId,
+    shot: await appShot("ops-publish"),
+  },
+];
 
 const stack = [
   { name: "Astro", file: "astro" },
   { name: "Markdown", file: "markdown" },
   { name: "GitHub", file: "github" },
 ];
+
+const cardUi = { header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" };
 ---
 
 <section class="mx-auto max-w-7xl border-x border-b border-line" id="capabilities" aria-label={t("home.bento.label")}>
-  <ul class="grid sm:grid-cols-2 lg:grid-cols-3">
-    <li class="flex flex-col border-b border-line p-6 sm:border-r lg:p-8">
-      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.git.title")}</h3>
-      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.git.body")}</p>
-      <div class="mt-auto pt-8">
-        <div class="overflow-hidden rounded-md border border-line bg-surface-raised font-mono text-label">
-          <p class="border-b border-line px-3 py-2 text-muted">{t("home.bento.cells.git.diffFile")}</p>
-          <pre class="space-y-1 px-3 py-3 text-small leading-5"><code><span class="block text-status-danger">- {t("home.bento.cells.git.diffBefore")}</span><span class="block text-status-live">+ {t("home.bento.cells.git.diffAfter")}</span></code></pre>
+  <ul class="grid border-t border-line sm:grid-cols-2 lg:grid-cols-3">
+    {shotCells.map((cell) => (
+      <li class="border-b border-line sm:odd:border-r lg:border-r lg:border-b-0 lg:[&:nth-child(-n+3)]:border-b lg:[&:nth-child(3n)]:border-r-0">
+        <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+          <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+            <Painting id={cell.painting} />
+            <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+            <div class="relative flex size-full items-center justify-center p-3 md:p-4">
+              <AppShot
+                shot={cell.shot}
+                alt={t(`home.bento.cells.${cell.key}.alt`)}
+                sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 50vw, 100vw"
+                class="h-full max-h-full w-auto max-w-full"
+              />
+            </div>
+          </div>
+          <h3 class="text-heading tracking-normal text-ink">{t(`home.bento.cells.${cell.key}.title`)}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t(`home.bento.cells.${cell.key}.body`)}</p>
+        </UCard>
+      </li>
+    ))}
+
+    <li class="border-b border-line sm:odd:border-r lg:border-r lg:border-b-0 lg:[&:nth-child(-n+3)]:border-b lg:[&:nth-child(3n)]:border-r-0">
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-md border border-line bg-sand">
+          <ul class="flex flex-wrap items-center justify-center gap-5 px-4">
+            {stack.map((logo) => (
+              <li class="inline-flex h-8 items-center">
+                <img
+                  src={`/logos/${logo.file}.svg`}
+                  alt={logo.name}
+                  width="120"
+                  height="32"
+                  class="logo-on-light h-auto max-h-8 w-auto max-w-[6rem] object-contain"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <img
+                  src={`/logos/${logo.file}-on-dark.svg`}
+                  alt=""
+                  width="120"
+                  height="32"
+                  class="logo-on-dark h-auto max-h-8 w-auto max-w-[6rem] object-contain"
+                  loading="lazy"
+                  decoding="async"
+                  aria-hidden="true"
+                />
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.stack.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.stack.body")}</p>
+      </UCard>
     </li>
 
-    <li class="flex flex-col border-b border-line p-6 sm:border-r-0 lg:border-r lg:p-8">
-      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.editor.title")}</h3>
-      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.editor.body")}</p>
-      <div class="mt-auto pt-8">
-        <div class="space-y-3 rounded-md border border-line bg-surface-raised p-3">
-          <label class="block">
-            <span class="text-label text-muted">{t("home.bento.cells.editor.fieldTitle")}</span>
-            <span class="mt-1 block rounded-md border border-line bg-surface px-3 py-2 text-small text-ink">
-              {t("home.bento.cells.editor.fieldTitleValue")}
-            </span>
-          </label>
-          <label class="block">
-            <span class="text-label text-muted">{t("home.bento.cells.editor.fieldBody")}</span>
-            <span class="mt-1 block rounded-md border border-line bg-surface px-3 py-2 text-small text-ink">
-              {t("home.bento.cells.editor.fieldBodyValue")}
-            </span>
-          </label>
+    <li class="border-b border-line last:border-b-0 sm:odd:border-r lg:border-r-0 lg:border-b-0">
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-md border border-line bg-sand">
+          <UBadge color="neutral" variant="outline" size="lg" label={t("home.bento.cells.open.badge")} />
         </div>
-      </div>
-    </li>
-
-    <li class="flex flex-col border-b border-line p-6 sm:border-r lg:border-r-0 lg:p-8">
-      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.preview.title")}</h3>
-      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.preview.body")}</p>
-      <div class="mt-auto flex gap-2 pt-8">
-        <span class="rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
-          {t("home.bento.cells.preview.desktop")}
-        </span>
-        <span class="rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
-          {t("home.bento.cells.preview.mobile")}
-        </span>
-      </div>
-    </li>
-
-    <li class="flex flex-col border-b border-line p-6 sm:border-r-0 lg:border-r lg:border-b-0 lg:p-8">
-      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.branches.title")}</h3>
-      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.branches.body")}</p>
-      <div class="mt-auto flex flex-wrap gap-2 pt-8">
-        <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
-          <span class="size-1.5 rounded-full bg-status-draft" aria-hidden="true"></span>
-          {t("home.bento.cells.branches.draft")}
-        </span>
-        <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
-          <span class="size-1.5 rounded-full bg-status-review" aria-hidden="true"></span>
-          {t("home.bento.cells.branches.review")}
-        </span>
-        <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
-          <span class="size-1.5 rounded-full bg-status-live" aria-hidden="true"></span>
-          {t("home.bento.cells.branches.live")}
-        </span>
-      </div>
-    </li>
-
-    <li class="flex flex-col border-b border-line p-6 sm:border-r lg:border-b-0 lg:p-8">
-      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.stack.title")}</h3>
-      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.stack.body")}</p>
-      <ul class="mt-auto flex items-center gap-4 pt-8">
-        {stack.map((logo) => (
-          <li class="inline-flex h-7 items-center">
-            <img
-              src={`/logos/${logo.file}.svg`}
-              alt={logo.name}
-              width="96"
-              height="28"
-              class="logo-on-light h-auto max-h-7 w-auto max-w-[5.5rem] object-contain"
-              loading="lazy"
-              decoding="async"
-            />
-            <img
-              src={`/logos/${logo.file}-on-dark.svg`}
-              alt=""
-              width="96"
-              height="28"
-              class="logo-on-dark h-auto max-h-7 w-auto max-w-[5.5rem] object-contain"
-              loading="lazy"
-              decoding="async"
-              aria-hidden="true"
-            />
-          </li>
-        ))}
-      </ul>
-    </li>
-
-    <li class="flex flex-col border-b border-line p-6 last:border-b-0 sm:border-r-0 lg:border-b-0 lg:p-8">
-      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.open.title")}</h3>
-      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.open.body")}</p>
-      <div class="mt-auto pt-8">
-        <span class="inline-flex rounded-md border border-line bg-surface-raised px-3 py-1.5 text-label font-medium text-ink">
-          {t("home.bento.cells.open.badge")}
-        </span>
-      </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.open.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.open.body")}</p>
+      </UCard>
     </li>
   </ul>
 </section>

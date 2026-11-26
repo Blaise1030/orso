@@ -120,31 +120,23 @@
       "cells": {
         "git": {
           "title": "一切都留在 Git 里",
-          "body": "你的 Markdown、YAML 和 JSON 仍在仓库中。每次保存都会进入你现有工作流的历史记录。",
-          "diffBefore": "title: Hello, world",
-          "diffAfter": "title: A fresh start",
-          "diffFile": "content/posts/welcome.md"
+          "body": "文章、配置和数据都以 Markdown、YAML 和 JSON 的形式留在仓库中。每次保存都会进入你现有工作流的历史记录。",
+          "alt": "Orso 的历史记录：包含作者、提交和时间的检查点时间线。"
         },
         "editor": {
           "title": "Markdown 编辑器",
           "body": "为仓库里已有的集合提供结构化字段、富文本和源码视图。",
-          "fieldTitle": "标题",
-          "fieldTitleValue": "网站的全新开始",
-          "fieldBody": "正文",
-          "fieldBodyValue": "好事往往从一个简单的想法开始。"
+          "alt": "Orso 的 TipTap 编辑器打开一篇博客文章，Markdown 正文在字段旁边。"
         },
         "preview": {
           "title": "实时预览",
-          "body": "编辑时就能在真实网站上查看改动——桌面端和移动端——抢在其他人之前。",
-          "desktop": "桌面端",
-          "mobile": "移动端"
+          "body": "草稿会在真实网站上渲染。Publish 前可检查桌面端和移动端。",
+          "alt": "Orso 正在预览画布上预览真实网站的草稿。"
         },
         "branches": {
           "title": "像草稿一样的分支",
           "body": "每次修改都是一个分支和拉取请求。在有人点击 Publish 之前，不会进入 main。",
-          "draft": "草稿",
-          "review": "审核中",
-          "live": "已上线"
+          "alt": "Orso 的更改菜单列出线上网站和未完成的草稿，旁边是 Review 和 Publish。"
         },
         "stack": {
           "title": "保留你的技术栈",

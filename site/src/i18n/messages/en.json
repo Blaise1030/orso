@@ -120,31 +120,23 @@
       "cells": {
         "git": {
           "title": "Everything stays in Git",
-          "body": "Your Markdown, YAML and JSON stay in the repository. Every save is history in the workflow you already use.",
-          "diffBefore": "title: Hello, world",
-          "diffAfter": "title: A fresh start",
-          "diffFile": "content/posts/welcome.md"
+          "body": "Posts, config and data stay as Markdown, YAML and JSON in your repository. Every save is history in the workflow you already use.",
+          "alt": "Orso history: a timeline of checkpoints with author, commit and time."
         },
         "editor": {
           "title": "Markdown editor",
           "body": "Structured fields, rich text and a source view for the collections already in your repo.",
-          "fieldTitle": "Title",
-          "fieldTitleValue": "A fresh start for our website",
-          "fieldBody": "Body",
-          "fieldBodyValue": "Good things start with a simple idea."
+          "alt": "Orso's TipTap editor open on a blog post, with the markdown body beside its fields."
         },
         "preview": {
           "title": "Live preview",
-          "body": "See how changes look on the real site while you edit — desktop and mobile — before anyone else.",
-          "desktop": "Desktop",
-          "mobile": "Mobile"
+          "body": "Your draft renders on the real site. Check desktop and mobile before you Publish.",
+          "alt": "Orso previewing a draft of the real site on the live preview canvas."
         },
         "branches": {
           "title": "Branching that feels like drafts",
           "body": "Every change is a branch and a pull request. Nothing reaches main until someone presses Publish.",
-          "draft": "Draft",
-          "review": "In review",
-          "live": "Live"
+          "alt": "Orso's changes menu listing the live site and open drafts, next to Review and Publish."
         },
         "stack": {
           "title": "Keep your stack",

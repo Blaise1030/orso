@@ -120,31 +120,23 @@
       "cells": {
         "git": {
           "title": "Semuanya kekal dalam Git",
-          "body": "Markdown, YAML dan JSON anda kekal dalam repositori. Setiap simpanan menjadi sejarah dalam aliran kerja yang sudah anda gunakan.",
-          "diffBefore": "title: Hello, world",
-          "diffAfter": "title: A fresh start",
-          "diffFile": "content/posts/welcome.md"
+          "body": "Catatan, konfigurasi dan data kekal sebagai Markdown, YAML dan JSON dalam repositori anda. Setiap simpanan menjadi sejarah dalam aliran kerja yang sudah anda gunakan.",
+          "alt": "Sejarah Orso: garis masa titik semak dengan pengarang, commit dan masa."
         },
         "editor": {
           "title": "Editor Markdown",
           "body": "Medan berstruktur, teks kaya dan paparan sumber untuk koleksi yang sudah ada dalam repo anda.",
-          "fieldTitle": "Tajuk",
-          "fieldTitleValue": "Permulaan baharu untuk laman web kami",
-          "fieldBody": "Badan",
-          "fieldBodyValue": "Perkara baik bermula dengan idea yang ringkas."
+          "alt": "Editor TipTap Orso membuka catatan blog, dengan badan Markdown di sebelah medan."
         },
         "preview": {
           "title": "Pratonton langsung",
-          "body": "Lihat bagaimana perubahan kelihatan pada laman sebenar semasa anda menyunting — desktop dan mudah alih — sebelum orang lain.",
-          "desktop": "Desktop",
-          "mobile": "Mudah alih"
+          "body": "Draf anda dipaparkan pada laman sebenar. Semak desktop dan mudah alih sebelum anda Publish.",
+          "alt": "Orso memaparkan pratonton draf laman sebenar pada kanvas pratonton."
         },
         "branches": {
           "title": "Percabangan yang terasa seperti draf",
           "body": "Setiap perubahan ialah cabang dan pull request. Tiada apa-apa sampai ke main sehingga seseorang menekan Publish.",
-          "draft": "Draf",
-          "review": "Dalam semakan",
-          "live": "Langsung"
+          "alt": "Menu perubahan Orso menyenaraikan laman langsung dan draf terbuka, di sebelah Review dan Publish."
         },
         "stack": {
           "title": "Kekalkan stack anda",
