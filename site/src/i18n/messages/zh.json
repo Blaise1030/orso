@@ -117,7 +117,8 @@
             "placeholder": "让助手修改你的网站",
             "pageContext": "pricing",
             "modelLabel": "Claude",
-            "sendLabel": "发送"
+            "sendLabel": "发送",
+            "attachLabel": "附加图片或文件"
           }
         }
       }
@@ -133,7 +134,9 @@
         "editor": {
           "title": "Markdown 编辑器",
           "body": "为仓库里已有的集合提供结构化字段、富文本和源码视图。",
-          "alt": "Orso 的 TipTap 编辑器打开一篇博客文章，Markdown 正文在字段旁边。"
+          "alt": "Orso 的 TipTap 编辑器打开一篇博客文章，Markdown 正文在字段旁边。",
+          "demoTitle": "网站的全新开始",
+          "demoBody": "好事往往从一个简单的想法开始。"
         },
         "preview": {
           "title": "实时预览",

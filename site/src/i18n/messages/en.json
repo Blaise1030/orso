@@ -117,7 +117,8 @@
             "placeholder": "Ask your assistant to change your site",
             "pageContext": "pricing",
             "modelLabel": "Claude",
-            "sendLabel": "Send"
+            "sendLabel": "Send",
+            "attachLabel": "Attach image or file"
           }
         }
       }
@@ -133,7 +134,9 @@
         "editor": {
           "title": "Markdown editor",
           "body": "Structured fields, rich text and a source view for the collections already in your repo.",
-          "alt": "Orso's TipTap editor open on a blog post, with the markdown body beside its fields."
+          "alt": "Orso's TipTap editor open on a blog post, with the markdown body beside its fields.",
+          "demoTitle": "A fresh start for our website",
+          "demoBody": "Good things start with a simple idea."
         },
         "preview": {
           "title": "Live preview",

@@ -10,28 +10,16 @@ import type { PaintingId } from "../../lib/paintings";
 
 const { t } = getI18n(Astro.url);
 
-const shotCells = [
-  {
-    key: "git" as const,
-    painting: "bridge" as PaintingId,
-    shot: await appShot("ops-history"),
-  },
-  {
-    key: "editor" as const,
-    painting: "toledo" as PaintingId,
-    shot: await appShot("ops-content"),
-    slash: true,
-  },
-  {
-    key: "preview" as const,
-    painting: "rocks" as PaintingId,
-    shot: await appShot("ops-preview"),
-  },
-  {
-    key: "branches" as const,
-    painting: "alps" as PaintingId,
-    shot: await appShot("ops-publish"),
-  },
+type ShotCell = {
+  key: "git" | "preview" | "branches";
+  painting: PaintingId;
+  shot: Awaited<ReturnType<typeof appShot>>;
+};
+
+const shotCells: ShotCell[] = [
+  { key: "git", painting: "bridge", shot: await appShot("ops-history") },
+  { key: "preview", painting: "rocks", shot: await appShot("ops-preview") },
+  { key: "branches", painting: "alps", shot: await appShot("ops-publish") },
 ];
 
 const stack = [
@@ -47,33 +35,76 @@ const cellBorder =
 
 <section class="mx-auto max-w-7xl border-x border-b border-line" id="capabilities" aria-label={t("home.bento.label")}>
   <ul class="grid border-t border-line sm:grid-cols-2 lg:grid-cols-3">
-    {shotCells.map((cell) => (
-      <li class={cellBorder}>
-        <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
-          <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
-            <Painting id={cell.painting} />
-            <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-            <div class="relative flex size-full items-center justify-center p-3 md:p-4">
-              <AppShot
-                shot={cell.shot}
-                alt={t(`home.bento.cells.${cell.key}.alt`)}
-                sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 50vw, 100vw"
-                class="h-full max-h-full w-auto max-w-full"
-              />
-              {cell.slash && (
-                <div class="pointer-events-none absolute inset-0 flex items-center justify-center p-4 md:justify-end md:p-6">
-                  <div class="md:translate-x-1 md:translate-y-2">
-                    <SlashMenuMock client:visible />
-                  </div>
-                </div>
-              )}
-            </div>
+    <li class={cellBorder}>
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+          <Painting id={shotCells[0].painting} />
+          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+          <div class="relative flex size-full items-center justify-center p-3 md:p-4">
+            <AppShot
+              shot={shotCells[0].shot}
+              alt={t("home.bento.cells.git.alt")}
+              sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 50vw, 100vw"
+              class="h-full max-h-full w-auto max-w-full"
+            />
           </div>
-          <h3 class="text-heading tracking-normal text-ink">{t(`home.bento.cells.${cell.key}.title`)}</h3>
-          <p class="mt-1 text-small leading-6 text-muted">{t(`home.bento.cells.${cell.key}.body`)}</p>
-        </UCard>
-      </li>
-    ))}
+        </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.git.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.git.body")}</p>
+      </UCard>
+    </li>
+
+    <li class={cellBorder}>
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line bg-sand p-3 md:p-4">
+          <SlashMenuMock
+            client:visible
+            title={t("home.bento.cells.editor.demoTitle")}
+            body={t("home.bento.cells.editor.demoBody")}
+          />
+        </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.editor.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.editor.body")}</p>
+      </UCard>
+    </li>
+
+    <li class={cellBorder}>
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+          <Painting id={shotCells[1].painting} />
+          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+          <div class="relative flex size-full items-center justify-center p-3 md:p-4">
+            <AppShot
+              shot={shotCells[1].shot}
+              alt={t("home.bento.cells.preview.alt")}
+              sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 50vw, 100vw"
+              class="h-full max-h-full w-auto max-w-full"
+            />
+          </div>
+        </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.preview.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.preview.body")}</p>
+      </UCard>
+    </li>
+
+    <li class={cellBorder}>
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+          <Painting id={shotCells[2].painting} />
+          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+          <div class="relative flex size-full items-center justify-center p-3 md:p-4">
+            <AppShot
+              shot={shotCells[2].shot}
+              alt={t("home.bento.cells.branches.alt")}
+              sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 50vw, 100vw"
+              class="h-full max-h-full w-auto max-w-full"
+            />
+          </div>
+        </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.branches.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.branches.body")}</p>
+      </UCard>
+    </li>
 
     <li class={cellBorder}>
       <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>

@@ -175,9 +175,8 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 - **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons.
 - **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs (Content, Preview, Publish) that switch one large product panel underneath. The tab rail sits in a framed surface, and the panels float on a single painted stage that stays put while the tabs change.
 - **Logo grid**: bordered cells for Astro, Markdown, GitHub, Claude, Cursor, Codex, plus a short stack note.
-- **Feature cards**: three equal frames — Markdown editor, Preview on a branch, Agent for bigger changes — each holding a mini preview over a painting. The agent card overlays a decorative `UChatPrompt` composer (same Nuxt UI pieces as the app) on the shot.
-- **Bento slash menu**: the Markdown editor cell overlays a decorative slash-command list (same Hugeicons/labels as the TipTap slash menu) on the TipTap shot.
-- **Capability bento**: six equal `UCard` cells in a hairline grid. Four use real app shots over paintings (history, TipTap editor, live preview, changes/Publish); Keep your stack and Open source use the same card shell with logos or a MIT `UBadge`.
+- **Feature cards**: three equal frames — drafts and review use app shots over paintings; the agent card is a live `UChatPrompt` composer (same Nuxt UI as the app), not a screenshot.
+- **Capability bento**: six equal `UCard` cells. Git / preview / branching use app shots; Markdown editor is a live slash-command surface (same Hugeicons/labels as TipTap); stack and open source use logos / MIT `UBadge`.
 - **Proof**: Lee Robinson's quote and a note from the maker.
 - **FAQ**: hairline `<details>` accordion with FAQPage JSON-LD.
 - **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.

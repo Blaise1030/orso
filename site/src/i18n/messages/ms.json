@@ -117,7 +117,8 @@
             "placeholder": "Minta pembantu anda mengubah laman anda",
             "pageContext": "pricing",
             "modelLabel": "Claude",
-            "sendLabel": "Hantar"
+            "sendLabel": "Hantar",
+            "attachLabel": "Lampirkan imej atau fail"
           }
         }
       }
@@ -133,7 +134,9 @@
         "editor": {
           "title": "Editor Markdown",
           "body": "Medan berstruktur, teks kaya dan paparan sumber untuk koleksi yang sudah ada dalam repo anda.",
-          "alt": "Editor TipTap Orso membuka catatan blog, dengan badan Markdown di sebelah medan."
+          "alt": "Editor TipTap Orso membuka catatan blog, dengan badan Markdown di sebelah medan.",
+          "demoTitle": "Permulaan baharu untuk laman web kami",
+          "demoBody": "Perkara baik bermula dengan idea yang ringkas."
         },
         "preview": {
           "title": "Pratonton langsung",
