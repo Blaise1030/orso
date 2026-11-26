@@ -331,7 +331,6 @@ export const useAssistantStore = defineStore("assistant", () => {
   async function signOut(id: string) {
     try {
       await daemon.api.signOutProvider(id);
-      const provider = providers.value.find((p) => p.id === id);
       patchProvider(id, {
         signedIn: false,
         // OpenCode free models still need Console login before chat works.
