@@ -84,7 +84,7 @@
     "setup": {
       "title": "Cost and setup",
       "body": "Orso is free and open source. Connect your own AI coding agent and use your existing account and plan. You pay the agent provider directly; Orso adds no AI usage charges.",
-      "detail": "Install on your machine, open a repo, and your Markdown collections show up. There is nothing to migrate and no content database to leave behind."
+      "detail": "Install on your machine, open a repo, and your Markdown collections show up. There is nothing to migrate and no content database to leave behind. Teammates get drafts, previews and Publish; developers keep the same Git history and deploy path."
     },
     "proof": {
       "eyebrow": "Delete the CMS. Keep the editors.",
@@ -158,7 +158,11 @@
           "title": "Edit the Markdown in your repo",
           "body": "Forms and rich text for the posts, pages and docs already in your repo. Editors never have to open a code editor for day-to-day copy.",
           "editor": {
-            "demoTitle": "A fresh start for our website"
+            "demoTitle": "A fresh start for our website",
+            "demoBody": [
+              "We're rebuilding the marketing site around the content we already keep in Git — posts, pages and docs in Markdown.",
+              "Editors get forms and a live preview. Every save is a commit on a draft branch, and nothing goes live until someone clicks Publish."
+            ]
           }
         },
         "preview": {

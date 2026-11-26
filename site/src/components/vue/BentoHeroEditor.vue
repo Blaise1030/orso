@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import UIcon from "@nuxt/ui/components/Icon.vue";
 
-/** Hero tile: one cropped editor with slash menu — stageshow restraint (few real strings). */
-const props = defineProps<{ title: string; slashHint: string }>();
+/** Hero tile: cropped editor with real body copy and an open slash menu. */
+const props = defineProps<{
+  title: string;
+  body: string[];
+  slashHint: string;
+}>();
 
 const items = [
   { id: "h2", label: "Heading 2", icon: "i-hugeicons-heading-02" },
@@ -24,10 +28,10 @@ const items = [
       </div>
       <div class="relative p-5 md:p-6">
         <p class="text-heading font-medium tracking-normal text-ink">{{ props.title }}</p>
-        <div class="mt-4 space-y-2">
-          <div class="h-2 w-[72%] rounded-full bg-sand" />
-          <div class="h-2 w-[58%] rounded-full bg-sand" />
-          <div class="h-2 w-[64%] rounded-full bg-sand" />
+        <div class="mt-4 space-y-3">
+          <p v-for="(paragraph, index) in props.body" :key="index" class="max-w-[36ch] text-small leading-6 text-muted">
+            {{ paragraph }}
+          </p>
         </div>
         <div class="relative mt-5">
           <span class="font-mono text-body text-ink">{{ props.slashHint }}</span>

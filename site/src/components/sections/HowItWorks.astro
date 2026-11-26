@@ -7,7 +7,7 @@ import { getI18n } from "../../i18n";
 
 const { t, group } = getI18n(Astro.url);
 
-const editor = group<{ demoTitle: string }>("home.howItWorks.steps.edit.editor");
+const editor = group<{ demoTitle: string; demoBody: string[] }>("home.howItWorks.steps.edit.editor");
 const preview = group<{
   desktopLabel: string;
   mobileLabel: string;
@@ -61,6 +61,7 @@ const steps = [
                 <BentoHeroEditor
                   client:visible
                   title={editor.demoTitle}
+                  body={editor.demoBody}
                   slash-hint="/"
                 />
               </div>
