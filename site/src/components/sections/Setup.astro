@@ -1,0 +1,15 @@
+---
+import { getI18n } from "../../i18n";
+
+const { t } = getI18n(Astro.url);
+---
+
+<section class="py-section" id="setup">
+  <div class="page">
+    <div class="max-w-measure">
+      <h2 class="text-heading tracking-normal text-ink">{t("home.setup.title")}</h2>
+      <p class="mt-4 text-small leading-6 text-muted">{t("home.setup.body")}</p>
+      <p class="mt-4 text-small leading-6 text-muted">{t("home.setup.detail")}</p>
+    </div>
+  </div>
+</section>

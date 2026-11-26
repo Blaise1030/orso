@@ -139,7 +139,7 @@ The scale has six roles (`--text-*`): `label` 0.75rem/1.5, `small` 0.875rem/1.55
 
 The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Landing sections sit in a centred `max-w-5xl` column (`mx-auto`) on `bg-surface` and separate with whitespace (`py-section` / `py-section-wide`), not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog, help, header and footer keep the earlier desk look (centred columns, hairline chrome); do not copy the home’s open-canvas rules onto interiors.
 
-Home order: hero (left-aligned headline, lead, dual CTAs, one inset product shot) → quiet logo strip → how-it-works grid → feature bands → proof → FAQ → closing CTA. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
+Home order: hero (left-aligned headline, lead, dual CTAs, one inset product shot) → logos (title, body, marks) → how-it-works grid → cost-and-setup copy band → feature bands → proof → FAQ → closing CTA. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
 
 The hero shows a single product capture (preview shot, with clip when available) filling the `max-w-5xl` column — Gui-style, not a multi-tab grid. No sand plate and no `shadow-raised` on the shot.
 
@@ -174,8 +174,9 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 
 - **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons. Omitted on the landing page; Blog, Help and other interiors keep it. Nav and download remain in the footer and hero CTAs.
 - **Hero**: left-aligned display headline, lead, dual CTAs, then one inset product shot.
-- **Logo strip**: one muted intro line and inline marks (Astro, Markdown, GitHub, Claude, Cursor, Codex); no bordered cells.
+- **Logos**: section title, short body, then a wrapping row of marks (Astro, Markdown, GitHub, Claude, Cursor, Codex); no bordered cells.
 - **How it works**: two-column grid on desktop (edit → preview → agent); each cell is an inset hairline figure (`max-w-md`), then a step number, title and body — usegui.com rhythm.
+- **Setup**: Gui-style cost-and-setup copy — free/open source, bring your own agent, nothing to migrate.
 - **Bands**: open essays (git statement, draft branches + inset figure, stack logos) separated by whitespace.
 - **Proof**: Lee Robinson's quote and a note from the maker on open paper.
 - **FAQ**: hairline accordion with FAQPage JSON-LD on open paper.

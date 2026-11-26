@@ -67,14 +67,20 @@
   "home": {
     "hero": {
       "headline": "Your repository is already a CMS.",
-      "body": "Give marketers and writers an editor for the Markdown you already have. Every change is a pull request you review. Nothing goes live until you Publish.",
+      "body": "Give marketers and writers an editor for the Markdown you already have. Every change is a pull request you review. Nothing goes live until you Publish. Developers keep the repo, the history and the deploy; the rest of the team gets drafts, previews and a Publish button.",
       "secondary": "See what it does",
       "note": "Free and open source. Runs on your machine. Content stays in your repo.",
       "shotAlt": "Orso previewing a blog post on the draft site, with the agent panel open beside it."
     },
     "logos": {
       "label": "Works with your stack",
-      "intro": "Works with the stack and agents you already have"
+      "title": "Works with the stack you already have",
+      "body": "Orso sits on Astro, Markdown and GitHub. Connect Claude, Cursor, Codex or OpenCode with the account and plan you already pay for — no second AI subscription from us."
+    },
+    "setup": {
+      "title": "Cost and setup",
+      "body": "Orso is free and open source. Connect your own AI coding agent and use your existing account and plan. You pay the agent provider directly; Orso adds no AI usage charges.",
+      "detail": "Install on your machine, open a repo, and your Markdown collections show up. There is nothing to migrate and no content database to leave behind."
     },
     "proof": {
       "eyebrow": "Delete the CMS. Keep the editors.",
@@ -156,18 +162,18 @@
     },
     "howItWorks": {
       "title": "How it works",
-      "body": "Your team gets forms, live preview and an agent. Your repo keeps its Markdown, its history and its deploy.",
+      "body": "Your team gets forms, live preview and an agent. Your repo keeps its Markdown, its history and its deploy. Open a collection, change a page, ask for something larger — Publish is still a human decision.",
       "steps": {
         "edit": {
           "title": "Edit the Markdown in your repo",
-          "body": "Forms and rich text for the Markdown already in your repo.",
+          "body": "Forms and rich text for the posts, pages and docs already in your repo. Editors never have to open a code editor for day-to-day copy.",
           "editor": {
             "demoTitle": "A fresh start for our website"
           }
         },
         "preview": {
           "title": "Preview the change on a branch",
-          "body": "Each edit is a draft branch with a live preview of the real site.",
+          "body": "Each edit is a draft branch with a live preview of the real site — desktop and phone — so you see the page as visitors will.",
           "frame": {
             "desktopLabel": "Desktop",
             "mobileLabel": "Mobile",
@@ -176,7 +182,7 @@
         },
         "agent": {
           "title": "Ask the agent for bigger changes",
-          "body": "Ask for a page or a section. The agent edits; you still own Publish.",
+          "body": "Ask for a page, a section or a layout change in plain English. The agent edits the files; you still review the draft and own Publish.",
           "composer": {
             "userMessage": "Can you update the pricing page?",
             "assistantMessage": "Sure — what should change? I can rewrite copy, add a section, or adjust the layout.",
@@ -195,13 +201,13 @@
       "label": "What you get",
       "git": {
         "title": "Stays in Git",
-        "body": "Markdown in your repo. Every save is a commit.",
+        "body": "Your content is Markdown in your repo — not a proprietary database. Every save is a commit with a real author, a message and a history you can roll back.",
         "statement": "Every save is a commit.",
         "statementMeta": "a3f81d2 · welcome.md"
       },
       "branches": {
         "title": "Draft branches",
-        "body": "Each change is a branch you review, then Publish.",
+        "body": "Each change lands on its own draft branch with a live preview. Review the page, then Publish to merge into main. Branch protection still applies.",
         "picker": {
           "trigger": "FAQ on pricing",
           "liveLabel": "Live site",
@@ -211,7 +217,7 @@
       },
       "stack": {
         "title": "Your stack",
-        "body": "Astro, Markdown, GitHub — same deploy."
+        "body": "Astro for the site, Markdown for the words, GitHub for review and deploy. Orso does not replace your host or ask you to move the content elsewhere."
       }
     }
   },

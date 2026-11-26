@@ -6,6 +6,7 @@ import Hero from "../../components/sections/Hero.astro";
 import HowItWorks from "../../components/sections/HowItWorks.astro";
 import Logos from "../../components/sections/Logos.astro";
 import Proof from "../../components/sections/Proof.astro";
+import Setup from "../../components/sections/Setup.astro";
 import Base from "../../layouts/Base.astro";
 import { organization, website } from "../../lib/seo";
 import { getI18n, localeStaticPaths } from "../../i18n";
@@ -19,6 +20,7 @@ const { t } = getI18n(Astro.url);
     <Hero />
     <Logos />
     <HowItWorks />
+    <Setup />
     <Bands />
     <Proof />
     <Faq />

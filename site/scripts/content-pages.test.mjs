@@ -28,7 +28,7 @@ test("built sample Blog and Help articles render Markdown and navigation", () =>
   assert.match(html(root, ""), /href="\/blog\/"[^>]*>(?:<[^>]+>)*Blog/);
   assert.match(html(root, ""), /href="\/help\/"[^>]*>(?:<[^>]+>)*Help/);
   const home = html(root, "");
-  for (const id of ["product", "logos", "how-it-works", "bands", "proof", "faq", "cta"]) {
+  for (const id of ["product", "logos", "how-it-works", "setup", "bands", "proof", "faq", "cta"]) {
     assert.match(home, new RegExp(`id="${id}"`));
   }
   // Gui-style home: numbered how-it-works steps, feature bands, no bento grid.
