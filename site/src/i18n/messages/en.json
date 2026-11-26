@@ -146,21 +146,7 @@
       "title": "Ready for your team to run the site?",
       "body": "Install Orso once and connect the repo. After that, your team edits with drafts, previews and Publish.",
       "github": "View on GitHub",
-      "platforms": "macOS and Linux.",
-      "facts": {
-        "free": {
-          "title": "Free and open source",
-          "detail": "MIT licence, no paid tier."
-        },
-        "repo": {
-          "title": "Content stays in your repo",
-          "detail": "Plain Markdown you already own."
-        },
-        "static": {
-          "title": "Static files, any host",
-          "detail": "No runtime and no lock-in."
-        }
-      }
+      "platforms": "macOS and Linux."
     },
     "howItWorks": {
       "title": "How it works",
