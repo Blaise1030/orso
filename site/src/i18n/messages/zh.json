@@ -169,79 +169,44 @@
       "label": "你能得到什么",
       "cells": {
         "git": {
-          "title": "一切都留在 Git 里",
-          "body": "文章、配置和数据都以 Markdown、YAML 和 JSON 的形式留在仓库中。每次保存都会进入你现有工作流的历史记录。",
-          "alt": "Orso 的历史记录：包含作者、提交和时间的检查点时间线。",
-          "timeline": {
-            "dayLabel": "今天",
-            "currentLabel": "当前",
-            "items": [
-              {
-                "summary": "欢迎页换上新标题",
-                "author": "Alex",
-                "sha": "a3f81d2",
-                "time": "刚刚",
-                "current": true
-              },
-              {
-                "summary": "调整首页主视觉文案",
-                "author": "Alex",
-                "sha": "9c2e1ab",
-                "time": "3 小时前"
-              },
-              {
-                "summary": "添加定价页常见问题草稿",
-                "author": "Jordan",
-                "sha": "4b7d0ee",
-                "time": "昨天"
-              }
-            ]
-          }
+          "title": "留在 Git",
+          "body": "仓库里的 Markdown。每次保存都是一次提交。",
+          "statement": "每次保存都是一次提交。",
+          "statementMeta": "a3f81d2 · welcome.md"
         },
         "editor": {
           "title": "Markdown 编辑器",
-          "body": "为仓库里已有的集合提供结构化字段、富文本和源码视图。",
-          "alt": "Orso 的 TipTap 编辑器打开一篇博客文章，Markdown 正文在字段旁边。",
-          "demoTitle": "网站的全新开始",
-          "demoBody": "好事往往从一个简单的想法开始。"
+          "body": "为你已有的文件提供表单和富文本。",
+          "demoTitle": "网站的全新开始"
         },
         "preview": {
           "title": "实时预览",
-          "body": "草稿会在真实网站上渲染。Publish 前可检查桌面端和移动端。",
-          "alt": "Orso 正在预览画布上预览真实网站的草稿。",
+          "body": "Publish 前先看真实网站。",
           "frame": {
             "desktopLabel": "桌面端",
             "mobileLabel": "移动端",
-            "url": "localhost:4321/pricing/",
-            "pageTitle": "定价",
-            "pageBody": "面向在自己仓库里编辑网站的团队的方案。"
+            "pageTitle": "定价"
           }
         },
         "branches": {
-          "title": "像草稿一样的分支",
-          "body": "每次修改都是一个分支和拉取请求。在有人点击 Publish 之前，不会进入 main。",
-          "alt": "Orso 的更改菜单列出线上网站和未完成的草稿，旁边是 Review 和 Publish。",
+          "title": "草稿分支",
+          "body": "每次修改都是一个分支，审阅后再 Publish。",
           "picker": {
             "trigger": "定价页常见问题",
-            "searchPlaceholder": "搜索更改…",
             "liveLabel": "线上网站",
-            "liveDescription": "main",
             "draftLabel": "定价页常见问题",
-            "draftDescription": "change/faq-pricing · 2 小时前",
-            "reviewLabel": "首页主视觉润色",
-            "reviewDescription": "change/homepage-hero · 昨天",
-            "reviewBadge": "审核中",
-            "newChangeLabel": "新建更改"
+            "draftDescription": "change/faq-pricing · 2 小时前"
           }
         },
         "stack": {
-          "title": "保留你的技术栈",
-          "body": "为你已在部署的 Astro 网站加上编辑器。同样的文件、历史和托管。"
+          "title": "你的技术栈",
+          "body": "Astro、Markdown、GitHub — 同一套部署。"
         },
         "open": {
-          "title": "免费、开源、属于你",
-          "body": "MIT 许可，本地运行。在你自己的机器上使用，内容归你，基础设施自选。",
-          "badge": "MIT 许可"
+          "title": "由你运行",
+          "body": "本地应用。MIT 许可。没有付费档。",
+          "statLead": "许可",
+          "statValue": "MIT"
         }
       }
     },

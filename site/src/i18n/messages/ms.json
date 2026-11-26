@@ -169,79 +169,44 @@
       "label": "Apa yang anda dapat",
       "cells": {
         "git": {
-          "title": "Semuanya kekal dalam Git",
-          "body": "Catatan, konfigurasi dan data kekal sebagai Markdown, YAML dan JSON dalam repositori anda. Setiap simpanan menjadi sejarah dalam aliran kerja yang sudah anda gunakan.",
-          "alt": "Sejarah Orso: garis masa titik semak dengan pengarang, commit dan masa.",
-          "timeline": {
-            "dayLabel": "Hari ini",
-            "currentLabel": "Semasa",
-            "items": [
-              {
-                "summary": "Tajuk baharu untuk welcome.md",
-                "author": "Alex",
-                "sha": "a3f81d2",
-                "time": "Baru sahaja",
-                "current": true
-              },
-              {
-                "summary": "Laraskan salinan hero laman utama",
-                "author": "Alex",
-                "sha": "9c2e1ab",
-                "time": "3j lalu"
-              },
-              {
-                "summary": "Tambah draf FAQ harga",
-                "author": "Jordan",
-                "sha": "4b7d0ee",
-                "time": "Semalam"
-              }
-            ]
-          }
+          "title": "Kekal dalam Git",
+          "body": "Markdown dalam repo anda. Setiap simpanan ialah commit.",
+          "statement": "Setiap simpanan ialah commit.",
+          "statementMeta": "a3f81d2 · welcome.md"
         },
         "editor": {
           "title": "Editor Markdown",
-          "body": "Medan berstruktur, teks kaya dan paparan sumber untuk koleksi yang sudah ada dalam repo anda.",
-          "alt": "Editor TipTap Orso membuka catatan blog, dengan badan Markdown di sebelah medan.",
-          "demoTitle": "Permulaan baharu untuk laman web kami",
-          "demoBody": "Perkara baik bermula dengan idea yang ringkas."
+          "body": "Borang dan teks kaya untuk fail yang sudah anda miliki.",
+          "demoTitle": "Permulaan baharu untuk laman web kami"
         },
         "preview": {
           "title": "Pratonton langsung",
-          "body": "Draf anda dipaparkan pada laman sebenar. Semak desktop dan mudah alih sebelum anda Publish.",
-          "alt": "Orso memaparkan pratonton draf laman sebenar pada kanvas pratonton.",
+          "body": "Lihat laman sebenar sebelum anda Publish.",
           "frame": {
             "desktopLabel": "Desktop",
             "mobileLabel": "Mudah alih",
-            "url": "localhost:4321/pricing/",
-            "pageTitle": "Harga",
-            "pageBody": "Pelan untuk pasukan yang menyunting laman dalam repo sendiri."
+            "pageTitle": "Harga"
           }
         },
         "branches": {
-          "title": "Percabangan yang terasa seperti draf",
-          "body": "Setiap perubahan ialah cabang dan pull request. Tiada apa-apa sampai ke main sehingga seseorang menekan Publish.",
-          "alt": "Menu perubahan Orso menyenaraikan laman langsung dan draf terbuka, di sebelah Review dan Publish.",
+          "title": "Cabang draf",
+          "body": "Setiap perubahan ialah cabang yang anda semak, kemudian Publish.",
           "picker": {
             "trigger": "FAQ pada harga",
-            "searchPlaceholder": "Cari perubahan…",
             "liveLabel": "Laman langsung",
-            "liveDescription": "main",
             "draftLabel": "FAQ pada harga",
-            "draftDescription": "change/faq-pricing · 2j lalu",
-            "reviewLabel": "Semakan hero laman utama",
-            "reviewDescription": "change/homepage-hero · semalam",
-            "reviewBadge": "Dalam semakan",
-            "newChangeLabel": "Perubahan baharu"
+            "draftDescription": "change/faq-pricing · 2j lalu"
           }
         },
         "stack": {
-          "title": "Kekalkan stack anda",
-          "body": "Tambah editor kepada laman Astro yang sudah anda deploy. Fail, sejarah dan hos yang sama."
+          "title": "Stack anda",
+          "body": "Astro, Markdown, GitHub — deploy yang sama."
         },
         "open": {
-          "title": "Percuma, sumber terbuka, milik anda",
-          "body": "Dilesenkan MIT dan tempatan. Jalankan pada mesin anda, kekalkan kandungan anda, dan pilih infrastruktur sendiri.",
-          "badge": "Lesen MIT"
+          "title": "Milik anda untuk dijalankan",
+          "body": "Aplikasi tempatan. Lesen MIT. Tiada peringkat berbayar.",
+          "statLead": "Lesen",
+          "statValue": "MIT"
         }
       }
     },

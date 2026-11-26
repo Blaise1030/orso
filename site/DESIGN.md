@@ -176,7 +176,7 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 - **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs (Content, Preview, Publish) that switch one large product panel underneath. The tab rail sits in a framed surface, and the panels float on a single painted stage that stays put while the tabs change.
 - **Logo grid**: bordered cells for Astro, Markdown, GitHub, Claude, Cursor, Codex, plus a short stack note.
 - **Feature cards**: three equal frames over paintings — checkpoint timeline, page-details panel, and live `UChatPrompt` composer (Nuxt UI mocks, not screenshots).
-- **Capability bento**: six equal `UCard` cells of live Nuxt UI — checkpoint timeline, slash menu, preview frame (desktop/mobile), changes menu, stack logos, MIT badge.
+- **Capability bento**: stageshow-style mix — hero Markdown editor (2×1) with slash menu, dark MIT stat, live preview frame, draft-branch picker, stack logos, and a Git statement. Short copy under each tile; no equal-card grid of the same kind.
 - **Proof**: Lee Robinson's quote and a note from the maker.
 - **FAQ**: hairline `<details>` accordion with FAQPage JSON-LD.
 - **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.

@@ -1,140 +1,93 @@
 ---
-import UBadge from "@nuxt/ui/components/Badge.vue";
-import UCard from "@nuxt/ui/components/Card.vue";
-import Painting from "../Painting.astro";
-import BranchPickerMock from "../vue/BranchPickerMock.vue";
-import HistoryTimelineMock from "../vue/HistoryTimelineMock.vue";
-import PreviewFrameMock from "../vue/PreviewFrameMock.vue";
-import SlashMenuMock from "../vue/SlashMenuMock.vue";
+import BentoBranchTile from "../vue/BentoBranchTile.vue";
+import BentoHeroEditor from "../vue/BentoHeroEditor.vue";
+import BentoPreviewTile from "../vue/BentoPreviewTile.vue";
 import { getI18n } from "../../i18n";
-import type { TimelineItem } from "../vue/HistoryTimelineMock.vue";
 
-const { t, group } = getI18n(Astro.url);
-
-const gitTimeline = group<{ dayLabel: string; currentLabel: string; items: TimelineItem[] }>(
-  "home.bento.cells.git.timeline",
-);
-const previewFrame = group<{
-  desktopLabel: string;
-  mobileLabel: string;
-  url: string;
-  pageTitle: string;
-  pageBody: string;
-}>("home.bento.cells.preview.frame");
-const branchPicker = group<{
-  trigger: string;
-  searchPlaceholder: string;
-  liveLabel: string;
-  liveDescription: string;
-  draftLabel: string;
-  draftDescription: string;
-  reviewLabel: string;
-  reviewDescription: string;
-  reviewBadge: string;
-  newChangeLabel: string;
-}>("home.bento.cells.branches.picker");
+const { t } = getI18n(Astro.url);
 
 const stack = [
   { name: "Astro", file: "astro" },
   { name: "Markdown", file: "markdown" },
   { name: "GitHub", file: "github" },
 ];
-
-const cardUi = { header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" };
-const cellBorder =
-  "border-b border-line sm:odd:border-r lg:border-r lg:border-b-0 lg:[&:nth-child(-n+3)]:border-b lg:[&:nth-child(3n)]:border-r-0";
 ---
 
 <section class="mx-auto max-w-7xl border-x border-b border-line" id="capabilities" aria-label={t("home.bento.label")}>
-  <ul class="grid border-t border-line sm:grid-cols-2 lg:grid-cols-3">
-    <li class={cellBorder}>
-      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
-        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
-          <Painting id="bridge" />
-          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-          <div class="relative flex size-full p-2 md:p-3">
-            <HistoryTimelineMock
-              client:visible
-              day-label={gitTimeline.dayLabel}
-              current-label={gitTimeline.currentLabel}
-              items={gitTimeline.items}
-            />
-          </div>
-        </div>
-        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.git.title")}</h3>
-        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.git.body")}</p>
-      </UCard>
-    </li>
-
-    <li class={cellBorder}>
-      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
-        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line bg-sand p-3 md:p-4">
-          <SlashMenuMock
+  <div class="bento page py-section">
+    <ul class="bento-grid">
+      <!-- Hero: Markdown editor (2 × 1) -->
+      <li class="bento-tile bento-tile--hero">
+        <div class="bento-picture">
+          <BentoHeroEditor
             client:visible
             title={t("home.bento.cells.editor.demoTitle")}
-            body={t("home.bento.cells.editor.demoBody")}
+            slash-hint="/"
           />
         </div>
-        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.editor.title")}</h3>
-        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.editor.body")}</p>
-      </UCard>
-    </li>
-
-    <li class={cellBorder}>
-      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
-        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
-          <Painting id="rocks" />
-          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-          <div class="relative flex size-full p-2 md:p-3">
-            <PreviewFrameMock
-              client:visible
-              desktop-label={previewFrame.desktopLabel}
-              mobile-label={previewFrame.mobileLabel}
-              url={previewFrame.url}
-              page-title={previewFrame.pageTitle}
-              page-body={previewFrame.pageBody}
-            />
-          </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.editor.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.editor.body")}</p>
         </div>
-        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.preview.title")}</h3>
-        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.preview.body")}</p>
-      </UCard>
-    </li>
+      </li>
 
-    <li class={cellBorder}>
-      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
-        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line bg-sand p-2 md:p-3">
-          <BranchPickerMock
+      <!-- Stat: Free / MIT (dark) -->
+      <li class="bento-tile bento-tile--stat" data-dark>
+        <div class="bento-picture bento-picture--stat">
+          <p class="bento-stat-lead">{t("home.bento.cells.open.statLead")}</p>
+          <p class="bento-stat-value">{t("home.bento.cells.open.statValue")}</p>
+        </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-on-night">{t("home.bento.cells.open.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-on-night-muted">{t("home.bento.cells.open.body")}</p>
+        </div>
+      </li>
+
+      <!-- Component: Live preview -->
+      <li class="bento-tile">
+        <div class="bento-picture">
+          <BentoPreviewTile
             client:visible
-            trigger={branchPicker.trigger}
-            search-placeholder={branchPicker.searchPlaceholder}
-            live-label={branchPicker.liveLabel}
-            live-description={branchPicker.liveDescription}
-            draft-label={branchPicker.draftLabel}
-            draft-description={branchPicker.draftDescription}
-            review-label={branchPicker.reviewLabel}
-            review-description={branchPicker.reviewDescription}
-            review-badge={branchPicker.reviewBadge}
-            new-change-label={branchPicker.newChangeLabel}
+            desktop-label={t("home.bento.cells.preview.frame.desktopLabel")}
+            mobile-label={t("home.bento.cells.preview.frame.mobileLabel")}
+            page-title={t("home.bento.cells.preview.frame.pageTitle")}
           />
         </div>
-        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.branches.title")}</h3>
-        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.branches.body")}</p>
-      </UCard>
-    </li>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.preview.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.preview.body")}</p>
+        </div>
+      </li>
 
-    <li class={cellBorder}>
-      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
-        <div slot="header" class="relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-md border border-line bg-sand">
-          <ul class="flex flex-wrap items-center justify-center gap-5 px-4">
+      <!-- Component: Branching -->
+      <li class="bento-tile">
+        <div class="bento-picture">
+          <BentoBranchTile
+            client:visible
+            trigger={t("home.bento.cells.branches.picker.trigger")}
+            live-label={t("home.bento.cells.branches.picker.liveLabel")}
+            draft-label={t("home.bento.cells.branches.picker.draftLabel")}
+            draft-meta={t("home.bento.cells.branches.picker.draftDescription")}
+          />
+        </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.branches.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.branches.body")}</p>
+        </div>
+      </li>
+
+      <!-- Collection: Stack -->
+      <li class="bento-tile">
+        <div class="bento-picture bento-picture--collection">
+          <ul class="bento-logos">
             {stack.map((logo) => (
-              <li class="inline-flex h-8 items-center">
+              <li>
                 <img
                   src={`/logos/${logo.file}.svg`}
                   alt={logo.name}
                   width="120"
                   height="32"
-                  class="logo-on-light h-auto max-h-8 w-auto max-w-[6rem] object-contain"
+                  class="logo-on-light h-auto max-h-8 w-auto max-w-[6.5rem] object-contain"
                   loading="lazy"
                   decoding="async"
                 />
@@ -143,7 +96,7 @@ const cellBorder =
                   alt=""
                   width="120"
                   height="32"
-                  class="logo-on-dark h-auto max-h-8 w-auto max-w-[6rem] object-contain"
+                  class="logo-on-dark h-auto max-h-8 w-auto max-w-[6.5rem] object-contain"
                   loading="lazy"
                   decoding="async"
                   aria-hidden="true"
@@ -152,19 +105,158 @@ const cellBorder =
             ))}
           </ul>
         </div>
-        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.stack.title")}</h3>
-        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.stack.body")}</p>
-      </UCard>
-    </li>
-
-    <li class="border-b border-line last:border-b-0 sm:odd:border-r lg:border-r-0 lg:border-b-0">
-      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
-        <div slot="header" class="relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-md border border-line bg-sand">
-          <UBadge color="neutral" variant="outline" size="lg" label={t("home.bento.cells.open.badge")} />
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.stack.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.stack.body")}</p>
         </div>
-        <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.open.title")}</h3>
-        <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.open.body")}</p>
-      </UCard>
-    </li>
-  </ul>
+      </li>
+
+      <!-- Statement: Git -->
+      <li class="bento-tile">
+        <div class="bento-picture bento-picture--statement">
+          <p class="bento-statement">{t("home.bento.cells.git.statement")}</p>
+          <p class="bento-statement-meta font-mono">{t("home.bento.cells.git.statementMeta")}</p>
+        </div>
+        <div class="bento-copy">
+          <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.git.title")}</h3>
+          <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.git.body")}</p>
+        </div>
+      </li>
+    </ul>
+  </div>
 </section>
+
+<style>
+  .bento-grid {
+    display: grid;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .bento-tile {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-raised);
+  }
+
+  .bento-tile[data-dark] {
+    background: var(--color-night);
+    border-color: var(--color-night-line);
+  }
+
+  .bento-picture {
+    position: relative;
+    min-height: 14rem;
+    overflow: hidden;
+    background: var(--color-sand);
+  }
+
+  .bento-picture > :global(*) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .bento-picture--stat > :global(*),
+  .bento-picture--statement > :global(*),
+  .bento-picture--collection > :global(*) {
+    position: static;
+    width: auto;
+    height: auto;
+  }
+
+  .bento-tile[data-dark] .bento-picture {
+    background: var(--color-night-raised);
+  }
+
+  .bento-tile--hero .bento-picture {
+    min-height: 18rem;
+  }
+
+  .bento-picture--stat,
+  .bento-picture--statement,
+  .bento-picture--collection {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.25rem;
+  }
+
+  .bento-picture--collection {
+    justify-content: center;
+  }
+
+  .bento-stat-lead {
+    margin: 0;
+    font-size: var(--text-small);
+    color: var(--color-on-night-muted);
+  }
+
+  .bento-stat-value {
+    margin: 0.25rem 0 0;
+    font-size: clamp(2.75rem, 8vw, 3.75rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--color-on-night);
+    white-space: nowrap;
+  }
+
+  .bento-statement {
+    margin: 0;
+    max-width: 16rem;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: var(--color-ink);
+  }
+
+  .bento-statement-meta {
+    margin: 0.75rem 0 0;
+    font-size: var(--text-label);
+    color: var(--color-muted);
+  }
+
+  .bento-logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bento-copy {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    .bento-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .bento-tile--hero {
+      grid-column: span 2;
+    }
+
+    .bento-tile--hero .bento-picture {
+      min-height: 22rem;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .bento-tile--hero {
+      order: -1;
+    }
+  }
+</style>

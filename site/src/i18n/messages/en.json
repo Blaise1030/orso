@@ -153,63 +153,44 @@
       "label": "What you get",
       "cells": {
         "git": {
-          "title": "Everything stays in Git",
-          "body": "Posts, config and data stay as Markdown, YAML and JSON in your repository. Every save is history in the workflow you already use.",
-          "alt": "Orso history: a timeline of checkpoints with author, commit and time.",
-          "timeline": {
-            "dayLabel": "Today",
-            "currentLabel": "Current",
-            "items": [
-              { "summary": "A fresh start for welcome.md", "author": "Alex", "sha": "a3f81d2", "time": "Just now", "current": true },
-              { "summary": "Tune homepage hero copy", "author": "Alex", "sha": "9c2e1ab", "time": "3h ago" },
-              { "summary": "Add pricing FAQ draft", "author": "Jordan", "sha": "4b7d0ee", "time": "Yesterday" }
-            ]
-          }
+          "title": "Stays in Git",
+          "body": "Markdown in your repo. Every save is a commit.",
+          "statement": "Every save is a commit.",
+          "statementMeta": "a3f81d2 · welcome.md"
         },
         "editor": {
           "title": "Markdown editor",
-          "body": "Structured fields, rich text and a source view for the collections already in your repo.",
-          "alt": "Orso's TipTap editor open on a blog post, with the markdown body beside its fields.",
-          "demoTitle": "A fresh start for our website",
-          "demoBody": "Good things start with a simple idea."
+          "body": "Forms and rich text for the files you already own.",
+          "demoTitle": "A fresh start for our website"
         },
         "preview": {
           "title": "Live preview",
-          "body": "Your draft renders on the real site. Check desktop and mobile before you Publish.",
-          "alt": "Orso previewing a draft of the real site on the live preview canvas.",
+          "body": "See the real site before you Publish.",
           "frame": {
             "desktopLabel": "Desktop",
             "mobileLabel": "Mobile",
-            "url": "localhost:4321/pricing/",
-            "pageTitle": "Pricing",
-            "pageBody": "Plans for teams editing the site in their own repo."
+            "pageTitle": "Pricing"
           }
         },
         "branches": {
-          "title": "Branching that feels like drafts",
-          "body": "Every change is a branch and a pull request. Nothing reaches main until someone presses Publish.",
-          "alt": "Orso's changes menu listing the live site and open drafts, next to Review and Publish.",
+          "title": "Draft branches",
+          "body": "Each change is a branch you review, then Publish.",
           "picker": {
             "trigger": "FAQ on pricing",
-            "searchPlaceholder": "Search changes…",
             "liveLabel": "Live site",
-            "liveDescription": "main",
             "draftLabel": "FAQ on pricing",
-            "draftDescription": "change/faq-pricing · 2h ago",
-            "reviewLabel": "Homepage hero pass",
-            "reviewDescription": "change/homepage-hero · yesterday",
-            "reviewBadge": "In review",
-            "newChangeLabel": "New change"
+            "draftDescription": "change/faq-pricing · 2h ago"
           }
         },
         "stack": {
-          "title": "Keep your stack",
-          "body": "Add an editor to the Astro site you already deploy. Same files, same history, same host."
+          "title": "Your stack",
+          "body": "Astro, Markdown, GitHub — same deploy."
         },
         "open": {
-          "title": "Free, open source, yours",
-          "body": "MIT-licensed and local. Run it on your machine, keep your content, and choose your own infrastructure.",
-          "badge": "MIT licence"
+          "title": "Yours to run",
+          "body": "Local app. MIT licence. No paid tier.",
+          "statLead": "Licence",
+          "statValue": "MIT"
         }
       }
     },
