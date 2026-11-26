@@ -5,7 +5,7 @@ import type { AppShotData } from "../../lib/appShotTypes";
 import { paintingSize, paintingUrl } from "../../lib/paintings";
 import AppShot from "./AppShot.vue";
 
-const order = ["content", "preview", "publish", "agent", "history"] as const;
+const order = ["content", "preview", "publish"] as const;
 type TabValue = (typeof order)[number];
 type TabCopy = { label: string; description: string; alt: string };
 
