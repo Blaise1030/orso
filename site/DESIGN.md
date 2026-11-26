@@ -139,7 +139,7 @@ The scale has six roles (`--text-*`): `label` 0.75rem/1.5, `small` 0.875rem/1.55
 
 The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Landing sections sit in a centred `max-w-5xl` column (`mx-auto`) on `bg-surface` and separate with whitespace (`py-section` / `py-section-wide`), not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog, help, header and footer keep the earlier desk look (centred columns, hairline chrome); do not copy the home’s open-canvas rules onto interiors.
 
-Home order: hero (left-aligned headline, lead, dual CTAs, one inset product shot) → logos (title, body, marks) → how-it-works grid → cost-and-setup copy band → feature bands → proof → FAQ. The closing CTA lives in the footer under the wordmark. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
+Home order: hero (left-aligned headline, lead, dual CTAs, one inset product shot) → logos (title, body, marks) → how-it-works grid → cost-and-setup copy band → feature bands → FAQ. The closing CTA lives in the footer under the wordmark. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
 
 The hero shows a single product capture (preview shot, with clip when available) filling the `max-w-5xl` column — Gui-style, not a multi-tab grid. No sand plate and no `shadow-raised` on the shot.
 
@@ -177,8 +177,7 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 - **Logos**: section title, short body, then two labeled rows — Stack (Astro, Markdown, GitHub) and Agents (Claude, Cursor, Codex icon+caption, OpenCode); no bordered cells.
 - **How it works**: two-by-two grid on desktop (edit → preview → agent → publish); each cell is an inset hairline figure (`max-w-md`), then a step number, title and body — usegui.com rhythm.
 - **Setup**: Gui-style cost-and-setup copy — free/open source, bring your own agent, nothing to migrate.
-- **Bands**: open essays (git statement, draft branches + inset figure, stack logos) separated by whitespace.
-- **Proof**: Lee Robinson's quote and a note from the maker on open paper.
+- **Bands**: open essays (git statement, draft branches + inset figure) separated by whitespace.
 - **FAQ**: stacked title and intro, then a full-width hairline accordion with FAQPage JSON-LD.
 - **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.
 - **Footer**: centred `max-w-5xl` column with no outer border frame. Wordmark, then stacked closing CTA (`#cta` / `#get-orso`: title, body, download + GitHub, platforms), then a four-column link grid (Product, Resources, More, Legal).

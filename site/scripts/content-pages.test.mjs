@@ -28,7 +28,7 @@ test("built sample Blog and Help articles render Markdown and navigation", () =>
   assert.match(html(root, ""), /href="\/blog\/"[^>]*>(?:<[^>]+>)*Blog/);
   assert.match(html(root, ""), /href="\/help\/"[^>]*>(?:<[^>]+>)*Help/);
   const home = html(root, "");
-  for (const id of ["product", "logos", "how-it-works", "setup", "bands", "proof", "faq"]) {
+  for (const id of ["product", "logos", "how-it-works", "setup", "bands", "faq"]) {
     assert.match(home, new RegExp(`id="${id}"`));
   }
   // Closing CTA sits in the shared footer, not the home section stack.
