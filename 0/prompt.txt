@@ -1,0 +1,195 @@
+Can you check how is this relevant https://github.com/cloudflare/vibesdk to this proejct ?
+
+---
+
+can you check the Agent, how are they configured different to our agents ?
+
+---
+
+If I wanted the orso to have closed tool surface too ? and skills ?
+
+---
+
+No, I need both I need the CLI tools, and I need ta more secured toolbelt so less things can go wrong
+
+---
+
+Tell me what are the tools that the durable agents has ?
+
+---
+
+Can we limit a set of git tools that the agent is able to perform ?
+
+---
+
+Please show a list of tools the agent is allowed to use, make it hard but all tools that allowed the user to work with the repo
+
+---
+
+Also check what are the skills being injected, so the text the agent generated is more plain ?
+
+---
+
+Also check what are the skills being injected, in Vibe SDK ? please expose a skill module as well that users can configure what get's injected
+
+---
+
+in vibe sdk are the skills always being injected ?
+
+---
+
+Instead of adding it into the sysstem prompt, during the orso init project, we need add in orso's skill as per the vibe-sdk into the skills folder, please pull in the skills that vibe sdk has in the setup
+
+---
+
+Make sure to respect the orso.json subdirectory
+
+---
+
+frontend-design/
+    frontend-design-landing-page/
+    frontend-design-saas/
+
+---
+
+Can you start the dev app ?
+
+---
+
+Can we pull from remote ?
+
+---
+
+[plugin:vite:import-analysis] Failed to resolve import "@wterm/vue" from "src/app/SetupTerminal.vue". Does the file exist?
+/Users/blaise/Developer/cms/web/src/app/SetupTerminal.vue:11:37
+1  |  import { defineComponent as _defineComponent } from "vue";
+2  |  import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
+3  |  import { Terminal } from "@wterm/vue";
+   |                            ^
+4  |  import "@wterm/vue/css";
+5  |  import { useDaemon } from "@/core/daemon";
+
+---
+
+Here’s what I can use in this session:
+
+File & code
+
+Read / Write / StrReplace / Delete — read, create, edit, and delete files
+Glob / Grep — find files by name/pattern and search code
+EditNotebook — edit Jupyter notebook cells
+ReadLints — check linter diagnostics after edits
+Shell & jobs
+
+Shell — run terminal commands
+AwaitShell — wait on / poll background shell jobs
+Web & media
+
+WebSearch / WebFetch — look up and fetch web content
+GenerateImage — create images when you explicitly ask
+ListMcpResources / FetchMcpResource — MCP resources (if configured)
+Agents & workflow
+
+Task — launch specialized subagents for larger or parallel work
+SwitchMode — switch between Agent / Plan modes when useful
+TodoWrite — track multi-step tasks
+CreateGoal / UpdateGoal — long-running goals (only when you ask)
+Other
+
+SendToCall — speak on a live voice call when one is active See, why ? it still has access ?
+
+---
+
+let's work on tthat
+
+---
+
+Sounds good
+
+---
+
+We need to allow the users to keep their existing MC still
+
+---
+
+[Image #1]
+
+---
+
+[Image #1] When here we are kinda stuck
+
+---
+
+Also when going into a project if there are no orso.json don't start redirectly, check if there are orso.json first, if no, we can run orso init to add in the required skills. or config
+
+---
+
+I also can't delete aloading session
+
+---
+
+[Image #1] Im stuck here again, can you check the onboarding setup wizard how are open code being setup ? a/var/folders/bk/vm0wjmvn4rx1drzkrkqllr_h0000gn/T/TemporaryItems/NSIRD_screencaptureui_rihBUp/Screenshot\ 2026-11-26\ at\ 1.00.49 AM.png OPen code needs an auth step too
+
+---
+
+[Image #1] Can we show the side by side terminal one like the setup screen in the model ?
+
+---
+
+Yeap let's do it
+
+---
+
+When I click connect it jusst says it's connected but does not allow me to sign in omboarding need to allow sign in as well [Image #1]
+
+---
+
+When I click connect it jusst says it's connected but does not allow me to sign in omboarding need to allow sign in as well [Image #1] for opencode
+
+---
+
+[Image #1] i dont see anything here
+
+---
+
+Whats the new dameon
+
+---
+
+With token
+
+---
+
+[Image #1] Only the left hand side should be scrollable, th eterminal should not be
+
+---
+
+[Image #1] It starts the app directly
+
+---
+
+[Image #1] It starts the app directly it should actually ask the user first if they want to setup the orso.json first, only start the server on enter when there is orso.json
+
+---
+
+ok
+
+---
+
+Restart the server
+
+---
+
+With tken
+
+---
+
+[Image #1] Can we add a button here, to like ask the agent to help you setup the toolkit
+
+---
+
+Can we let the agent knows in the agent prompt that user is non tech and it should omit lots of non tech terms
+
+---
+
+Commit all changes and release
