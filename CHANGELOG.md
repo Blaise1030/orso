@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.1.20
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.19...v0.1.20)
+
+### Fixes
+
+- **e2e:** Init orso.json after creating template projects ([943b55c](https://github.com/Blaise1030/CMS/commit/943b55c))
+
 ## v0.1.19
 
 [compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.16...v0.1.19)
