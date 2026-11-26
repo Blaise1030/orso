@@ -105,7 +105,7 @@ const languages = localeKeys.map((key) => ({
       href="#main">{t("site.skipToContent")}</a
     >
     {header && (
-      <header class="sticky top-0 z-40 bg-surface/90 backdrop-blur-md" transition:animate="none">
+      <header class="sticky top-0 z-40 bg-gradient-to-b from-surface from-55% to-transparent pb-6" transition:animate="none">
         <div class="page mx-auto flex min-h-header w-full max-w-5xl items-center gap-x-4 py-1">
           <a class="-m-1 shrink-0 rounded-sm p-1" href={path("/")} aria-label={t("site.homeLabel", { name: site.name })}><Wordmark /></a>
           <div class="ml-auto flex min-w-0 shrink items-center gap-1 sm:gap-2">
