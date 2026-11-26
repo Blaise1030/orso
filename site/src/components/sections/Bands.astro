@@ -7,7 +7,7 @@ const { t } = getI18n(Astro.url);
 ---
 
 <section class="pt-section" id="bands" aria-label={t("home.bands.label")}>
-  <div class="page space-y-0">
+  <div class="page">
     <article>
       <h2 class="max-w-measure text-heading tracking-normal text-ink">{t("home.bands.git.title")}</h2>
       <p class="mt-3 max-w-measure text-small leading-6 text-muted">{t("home.bands.git.body")}</p>
@@ -18,7 +18,7 @@ const { t } = getI18n(Astro.url);
       </figure>
     </article>
 
-    <article>
+    <article class="mt-16 md:mt-20">
       <h2 class="max-w-measure text-heading tracking-normal text-ink">{t("home.bands.branches.title")}</h2>
       <p class="mt-3 max-w-measure text-small leading-6 text-muted">{t("home.bands.branches.body")}</p>
       <figure class="mt-8 m-0 max-w-xl overflow-hidden border border-line bg-surface">
