@@ -137,9 +137,9 @@ The scale has six roles (`--text-*`): `label` 0.75rem/1.5, `small` 0.875rem/1.55
 
 ## Layout
 
-The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Landing sections sit in a centred `max-w-5xl` column (`mx-auto`) on `bg-surface` and separate with whitespace (`py-section` / `py-section-wide`), not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog, help, header and footer keep the earlier desk look (centred columns, hairline chrome); do not copy the home’s open-canvas rules onto interiors.
+The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Landing sections sit in a centred `max-w-5xl` column (`mx-auto`) on `bg-surface` and separate with one `--spacing-section` gap each (`pt-section`), not stacked `py-section` pairs and not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog and help keep the earlier desk look (centred columns, hairline chrome); do not copy the home’s open-canvas rules onto interiors.
 
-Home order: hero (left-aligned headline, lead, dual CTAs, one inset product shot) → logos (title, body, marks) → how-it-works grid → cost-and-setup copy band → feature bands → FAQ. The closing CTA lives in the footer under the wordmark. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
+Home order: hero (left-aligned headline, lead, dual CTAs, one inset product shot) → logos (title, body, marks) → how-it-works grid → cost-and-setup copy band → feature bands → FAQ → footer CTA. Sections use `pt-section` (`--spacing-section`, 4.5rem) so the gap between any two is one token; the hero may use `pt-section-wide` (7rem) for page top only; the footer adds `pb-section` for the page bottom.
 
 The hero shows a single product capture (preview shot, with clip when available) filling the `max-w-5xl` column — Gui-style, not a multi-tab grid. No sand plate and no `shadow-raised` on the shot.
 
