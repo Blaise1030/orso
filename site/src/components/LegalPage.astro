@@ -27,14 +27,14 @@ const { Content } = await render(entry);
     breadcrumbs([{ name: t("common.home"), path: sitePath("/") }, { name: title, path: sitePath(`/${entry.id}/`) }]),
   ]}
 >
-  <div class="mx-auto w-full max-w-7xl border-x border-b border-line pb-section">
+  <div class="page mx-auto w-full max-w-5xl pb-section">
     <PageHeader title={title} description={description} />
-    <div class="page mt-12">
-      <p class="max-w-prose rounded-md border-l-2 border-accent bg-mist px-5 py-4 text-small text-ink" role="note">
+    <div class="mt-12 max-w-measure">
+      <p class="rounded-md border-l-2 border-accent bg-mist px-5 py-4 text-small text-ink" role="note">
         {t("legal.placeholder")}
       </p>
       <p class="label mt-10">{t("legal.lastUpdated")} <time datetime={updated}>{date(updated, "long")}</time></p>
-      <div class="prose mt-6 max-w-prose"><Content /></div>
+      <div class="prose mt-6 max-w-none"><Content /></div>
     </div>
   </div>
 </Base>

@@ -24,9 +24,9 @@ const count = (n: number) => t("help.articleCount", { count: n });
     {docs.length === 0 ? <p class="mt-12 text-muted">{t("help.empty")}</p> : (
       <section class="mt-12" aria-labelledby="browse">
           <h2 class="text-heading tracking-tight text-ink" id="browse">{t("help.browse")}</h2>
-          <ul class="mt-5 grid gap-3 sm:grid-cols-2">
+          <ul class="mt-5 divide-y divide-line border-t border-line">
             {shown.map((category) => (
-              <li class="group relative flex items-center gap-3 rounded-lg border border-line bg-surface-raised px-4 py-3 transition-colors duration-gentle ease-gentle hover:bg-sand">
+              <li class="group relative flex items-center gap-3 py-4">
                 <div class="min-w-0 flex-1">
                   <h3 class="font-medium text-ink">
                     <a class="after:absolute after:inset-0" href={path(`/help/category/${category.id}/`)}>{category.title}</a>

@@ -137,7 +137,7 @@ The scale has six roles (`--text-*`): `label` 0.75rem/1.5, `small` 0.875rem/1.55
 
 ## Layout
 
-The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Landing sections sit in a centred `max-w-5xl` column (`mx-auto`) on `bg-surface` and separate with one `--spacing-section` gap each (`pt-section`), not stacked `py-section` pairs and not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog and help keep the earlier desk look (centred columns, hairline chrome); do not copy the home’s open-canvas rules onto interiors.
+The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Landing sections sit in a centred `max-w-5xl` column (`mx-auto`) on `bg-surface` and separate with one `--spacing-section` gap each (`pt-section`), not stacked `py-section` pairs and not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog, Help and legal share the same `page mx-auto max-w-5xl` column as home — no outer `border-x` desk frames; interiors use stacked hairline lists and a quiet help nav instead of bordered card grids.
 
 Home order: hero (left-aligned headline, lead, dual CTAs, one inset product shot) → logos (title, body, marks) → how-it-works grid → cost-and-setup copy band → feature bands → FAQ → footer CTA. Sections use `pt-section` (`--spacing-section`, 4.5rem) so the gap between any two is one token; the hero may use `pt-section-wide` (7rem) for page top only; the footer adds `pb-section` for the page bottom.
 
@@ -179,7 +179,8 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 - **Setup**: Gui-style cost-and-setup copy — free/open source, bring your own agent, nothing to migrate.
 - **Bands**: open essays (git statement, draft branches + inset figure) separated by whitespace.
 - **FAQ**: stacked title, intro and hairline accordion inside `max-w-measure`, with FAQPage JSON-LD.
-- **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.
+- **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts are stacked hairline list rows (date, category, title, excerpt) — no bordered grid cells or cover thumbnails in the index. A post is a single `max-w-measure` column: back link, meta, title, lead, cover or proof-sheet artwork, inline TOC when needed, then prose. Keep-reading below uses the same list rows.
+- **Help**: `HelpShell` — sticky left nav (search + collapsible categories) beside a `max-w-measure` article column inside `max-w-5xl`; optional TOC rail on xl. Overview and category pages use stacked hairline lists, not card grids. Prev/next at the foot of an article are plain text links.
 - **Footer**: centred `max-w-5xl` column with no outer border frame. Wordmark, then stacked closing CTA (`#cta` / `#get-orso`: title, body, download + GitHub, platforms), then a four-column link grid (Product, Resources, More, Legal).
 
 ## Do's and Don'ts

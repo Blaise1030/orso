@@ -1,12 +1,8 @@
 ---
-// Documentation layout for every Help page: category sidebar | centred content | optional rail.
-// Desktop: the sidebar (search + every category and article) stays in view on the
-// left; the `rail` slot ("On this page") sits on the right from xl up. Mobile: search, then a
-// collapsible "Browse help" list, above the content.
+// Documentation layout for every Help page: quiet nav | centred content | optional rail.
 import type { BreadcrumbItem, NavigationMenuItem } from "@nuxt/ui";
 import UBreadcrumb from "@nuxt/ui/components/Breadcrumb.vue";
 import PagefindSearch from "./PagefindSearch.astro";
-import CtaBand from "./sections/CtaBand.astro";
 import HelpNav from "./vue/HelpNav.vue";
 import { getI18n } from "../i18n";
 import { loadHelp, type Doc } from "../lib/help";
@@ -42,20 +38,19 @@ const breadcrumb: BreadcrumbItem[] = crumbs.map((crumb) => ({ label: crumb.label
 
 <div
   class:list={[
-    "mx-auto w-full max-w-7xl border-x border-b border-line lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]",
-    hasRail && "xl:grid-cols-[16rem_minmax(0,1fr)_14rem]",
+    "page mx-auto w-full max-w-5xl gap-10 pb-section lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]",
+    hasRail && "xl:grid-cols-[14rem_minmax(0,1fr)_12rem]",
   ]}
 >
-  <aside class="border-b border-line lg:border-r lg:border-b-0" aria-label={t("help.navLabel")} data-pagefind-ignore>
-    <div class="flex flex-col gap-4 px-gutter py-4 lg:sticky lg:top-header lg:max-h-[calc(100dvh-var(--spacing-header))] lg:overflow-y-auto lg:px-4 lg:py-6">
+  <aside class="min-w-0" aria-label={t("help.navLabel")} data-pagefind-ignore>
+    <div class="flex flex-col gap-4 py-4 lg:sticky lg:top-header lg:max-h-[calc(100dvh-var(--spacing-header))] lg:overflow-y-auto lg:py-10">
       {docs.length > 0 && <PagefindSearch bundle="help" placeholder={t("help.search")} />}
-
       <HelpNav client:load items={navItems} labels={{ browse: t("help.browseHelp"), nav: t("help.title") }} />
     </div>
   </aside>
 
-  <div class="min-w-0 px-gutter py-10 md:px-gutter-wide md:py-14">
-    <div class="mx-auto max-w-3xl">
+  <div class="min-w-0 py-10 md:py-14">
+    <div class="mx-auto max-w-measure">
       {breadcrumb.length > 0 && (
         <UBreadcrumb
           items={breadcrumb}
@@ -69,13 +64,8 @@ const breadcrumb: BreadcrumbItem[] = crumbs.map((crumb) => ({ label: crumb.label
   </div>
 
   {hasRail && (
-    <div class="hidden border-l border-line xl:block">
-      <div class="sticky top-header px-5 py-14"><slot name="rail" /></div>
+    <div class="hidden xl:block">
+      <div class="sticky top-header py-14"><slot name="rail" /></div>
     </div>
   )}
-</div>
-
-<!-- Closing call to action under every Help page, framed like the docs layout above it. -->
-<div class="mx-auto w-full max-w-7xl border-x border-b border-line">
-  <CtaBand />
 </div>
