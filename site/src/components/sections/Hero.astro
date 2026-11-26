@@ -31,12 +31,12 @@ const words = locale === "zh" ? [headline] : headline.split(" ");
     </div>
 
     {/* Single product shot — Gui-style, inset, not a multi-tab grid. */}
-    <figure class="rise-3 m-0 mt-12 max-w-4xl md:mt-16">
+    <figure class="rise-3 m-0 mt-12 w-full md:mt-16">
       <AppShot
         client:load
         shot={shot}
         alt={t("home.hero.shotAlt")}
-        sizes="(min-width: 56rem) 56rem, 100vw"
+        sizes="(min-width: 64rem) 64rem, 100vw"
         eager
         play
       />

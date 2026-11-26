@@ -137,11 +137,11 @@ The scale has six roles (`--text-*`): `label` 0.75rem/1.5, `small` 0.875rem/1.55
 
 ## Layout
 
-The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Sections sit on `bg-surface` and separate with whitespace (`py-section` / `py-section-wide`), not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog, help, header and footer keep the earlier desk look (centred columns, hairline chrome); do not copy the home’s open-canvas rules onto interiors.
+The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Landing sections sit in a centred `max-w-5xl` column (`mx-auto`) on `bg-surface` and separate with whitespace (`py-section` / `py-section-wide`), not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog, help, header and footer keep the earlier desk look (centred columns, hairline chrome); do not copy the home’s open-canvas rules onto interiors.
 
 Home order: hero (left-aligned headline, lead, dual CTAs, one inset product shot) → quiet logo strip → how-it-works grid → feature bands → proof → FAQ → closing CTA. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
 
-The hero shows a single product capture (preview shot, with clip when available) in an inset figure capped around `max-w-4xl` — Gui-style, not a multi-tab grid. No sand plate and no `shadow-raised` on the shot.
+The hero shows a single product capture (preview shot, with clip when available) filling the `max-w-5xl` column — Gui-style, not a multi-tab grid. No sand plate and no `shadow-raised` on the shot.
 
 ## Elevation & Depth
 
@@ -149,7 +149,7 @@ Depth comes from tone (surface, sand, night), 1px hairlines, and a black-tinted 
 
 ## Art
 
-The home page does **not** use painting stages or raised shadows on product plates. Product shots are inset (not full page width): hero up to `max-w-4xl`, how-it-works cells up to `max-w-md`, band figures up to `max-w-xl`. Public-domain Renaissance landscapes remain available for unused section leftovers (`Ops`, `AgentBand`) and any future non-home surfaces — files, sources and licences in `public/paintings/CREDITS.md`; ids in `src/lib/paintings.ts` via `Painting.astro`. When a painting is used, crop to fill, add a flat `bg-night` scrim (20–30%), and never use it for meaning.
+The home page does **not** use painting stages or raised shadows on product plates. Product shots sit in the `max-w-5xl` column: hero fills that width; how-it-works cells up to `max-w-md`; band figures up to `max-w-xl`. Public-domain Renaissance landscapes remain available for unused section leftovers (`Ops`, `AgentBand`) and any future non-home surfaces — files, sources and licences in `public/paintings/CREDITS.md`; ids in `src/lib/paintings.ts` via `Painting.astro`. When a painting is used, crop to fill, add a flat `bg-night` scrim (20–30%), and never use it for meaning.
 
 
 ## Shapes

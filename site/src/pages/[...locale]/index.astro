@@ -15,11 +15,13 @@ const { t } = getI18n(Astro.url);
 ---
 
 <Base description={t("site.description")} jsonLd={[website(), organization()]} header={false}>
-  <Hero />
-  <Logos />
-  <HowItWorks />
-  <Bands />
-  <Proof />
-  <Faq />
-  <Cta />
+  <div class="mx-auto w-full max-w-5xl">
+    <Hero />
+    <Logos />
+    <HowItWorks />
+    <Bands />
+    <Proof />
+    <Faq />
+    <Cta />
+  </div>
 </Base>

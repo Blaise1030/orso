@@ -30,3 +30,9 @@ test("landing page hides the site header", () => {
   assert.match(base, /header\s*=\s*true/);
   assert.match(base, /\{header && \(/);
 });
+
+test("landing page content is centred at max-w-5xl", () => {
+  const home = read("src/pages/[...locale]/index.astro");
+  assert.match(home, /max-w-5xl/);
+  assert.match(home, /mx-auto/);
+});
