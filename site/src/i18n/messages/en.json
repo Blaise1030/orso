@@ -166,17 +166,21 @@
           }
         },
         "preview": {
-          "title": "Preview the change on a branch",
-          "body": "Each edit is a draft branch with a live preview of the real site — desktop and phone — so you see the page as visitors will.",
+          "title": "Ask the agent — pages update directly",
+          "body": "Describe a change in plain English. The agent edits the Markdown while you watch the real page update in the preview — desktop or phone.",
           "frame": {
             "desktopLabel": "Desktop",
             "mobileLabel": "Mobile",
-            "headline": "Your repository is already a CMS."
+            "headline": "Your repository is already a CMS.",
+            "chatUser": "Tighten the hero and add a how-it-works grid",
+            "chatStatus": "Worked through 3 steps",
+            "chatReply": "Updated the landing draft — check the preview.",
+            "chatPrompt": "Ask your assistant to change your site"
           }
         },
         "agent": {
-          "title": "Ask the agent for bigger changes",
-          "body": "Ask for a page, a section or a layout change in plain English. The agent edits the files; you still review the draft and own Publish.",
+          "title": "Keep editing beside the preview",
+          "body": "The chat stays open next to the live draft. Point at a section, ask for another pass, and the page updates again before anyone Publishes.",
           "composer": {
             "userMessage": "Add an FAQ section to the pricing page",
             "assistantMessage": "Added an FAQ section on the pricing draft — review the preview, then Publish when you are ready.",

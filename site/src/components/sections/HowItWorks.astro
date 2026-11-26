@@ -12,6 +12,10 @@ const preview = group<{
   desktopLabel: string;
   mobileLabel: string;
   headline: string;
+  chatUser: string;
+  chatStatus: string;
+  chatReply: string;
+  chatPrompt: string;
 }>("home.howItWorks.steps.preview.frame");
 const composer = group<{
   userMessage: string;
@@ -73,6 +77,10 @@ const steps = [
                   desktop-label={preview.desktopLabel}
                   mobile-label={preview.mobileLabel}
                   headline={preview.headline}
+                  chat-user={preview.chatUser}
+                  chat-status={preview.chatStatus}
+                  chat-reply={preview.chatReply}
+                  chat-prompt={preview.chatPrompt}
                 />
               </div>
             )}
