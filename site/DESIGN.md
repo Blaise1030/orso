@@ -139,7 +139,7 @@ The scale has six roles (`--text-*`): `label` 0.75rem/1.5, `small` 0.875rem/1.55
 
 The home page follows Medusa's section map with Orso copy and tokens. The `page` utility spans the full viewport with token gutters, so sections keep their side padding. Sections that look best at the edge omit `page` and keep their copy in a nested `page` wrapper; the hero's product rail and app window break out that way. Interiors cap themselves where the copy needs a measure (`max-w-prose`, `max-w-measure`, `max-w-3xl`). `--container-page` (80rem) stays available for sections that want a narrower centred column. Landing sections are full-bleed bands; interiors use the 12-column grid where needed.
 
-Order: hero (left-aligned headline, lead, dual CTAs, three product tabs switching one panel) → bordered logo grid → three feature cards → night proof → FAQ → centred closing CTA. Sections use `--spacing-section` (4.5rem); the proof band may use `--spacing-section-wide` (7rem).
+Order: hero (left-aligned headline, lead, dual CTAs, three product tabs switching one panel) → bordered logo grid → three feature cards → six-cell capability bento → night proof → FAQ → centred closing CTA. Sections use `--spacing-section` (4.5rem); the proof band may use `--spacing-section-wide` (7rem).
 
 The hero tab rail is three equal columns of title and one-line description (Content, Preview, Publish), hairline dividers, a 2px ink underline on the active tab, and one large product panel underneath. On narrow screens the rail scrolls horizontally.
 
@@ -175,7 +175,8 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 - **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons.
 - **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs (Content, Preview, Publish) that switch one large product panel underneath. The tab rail sits in a framed surface, and the panels float on a single painted stage that stays put while the tabs change.
 - **Logo grid**: bordered cells for Astro, Markdown, GitHub, Claude, Cursor, Codex, plus a short stack note.
-- **Feature cards**: three equal frames — An editor for your content, Drafts/previews/Publish, An agent for bigger changes — each holding a mini preview over a painting.
+- **Feature cards**: three equal frames — Markdown editor, Preview on a branch, Agent for bigger changes — each holding a mini preview over a painting.
+- **Capability bento**: six equal hairline cells (Git, Markdown editor, Live preview, Branching, Stack, Open source) with short copy and small monochrome accents (diff, field mock, status chips, logos). No product screenshots.
 - **Proof**: Lee Robinson's quote and a note from the maker.
 - **FAQ**: hairline `<details>` accordion with FAQPage JSON-LD.
 - **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.

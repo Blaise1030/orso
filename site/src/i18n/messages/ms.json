@@ -99,19 +99,61 @@
       "body": "Pasukan anda mendapat borang, pratonton langsung dan ejen. Repo anda mengekalkan Markdown, sejarah dan proses deploy.",
       "cards": {
         "drafts": {
-          "title": "Editor untuk kandungan anda",
-          "description": "Koleksi, medan dan teks kaya untuk Markdown yang sudah anda miliki. Tiada CMS kedua untuk disegerakkan.",
+          "title": "Editor Markdown untuk kandungan anda",
+          "description": "Koleksi, medan dan teks kaya — atau sumber itu sendiri — untuk Markdown yang sudah anda miliki. Tiada CMS kedua untuk disegerakkan.",
           "alt": "Sejarah Orso: garis masa titik semak, terbaharu dahulu, dengan pengarang, commit dan masa."
         },
         "review": {
-          "title": "Draf, pratonton dan Publish",
-          "description": "Setiap suntingan ialah pull request dengan pratonton langsung. Kongsi, semak, kemudian Publish apabila anda bersedia.",
+          "title": "Pratonton setiap perubahan pada cabang",
+          "description": "Setiap suntingan ialah cabang draf dengan pratonton langsung laman sebenar. Kongsi, semak pull request, kemudian Publish.",
           "alt": "Orso memaparkan pratonton draf, dengan panel butiran halaman menunjukkan tajuk, penerangan dan imej sosial."
         },
         "agent": {
           "title": "Ejen untuk perubahan lebih besar",
           "description": "Minta halaman, suntingan FAQ, atau bahagian baharu. Ejen menyunting repo; anda masih mengawal Publish.",
           "alt": "Panel ejen Orso di sebelah pratonton laman, sedia menerima permintaan."
+        }
+      }
+    },
+    "bento": {
+      "label": "Apa yang anda dapat",
+      "cells": {
+        "git": {
+          "title": "Semuanya kekal dalam Git",
+          "body": "Markdown, YAML dan JSON anda kekal dalam repositori. Setiap simpanan menjadi sejarah dalam aliran kerja yang sudah anda gunakan.",
+          "diffBefore": "title: Hello, world",
+          "diffAfter": "title: A fresh start",
+          "diffFile": "content/posts/welcome.md"
+        },
+        "editor": {
+          "title": "Editor Markdown",
+          "body": "Medan berstruktur, teks kaya dan paparan sumber untuk koleksi yang sudah ada dalam repo anda.",
+          "fieldTitle": "Tajuk",
+          "fieldTitleValue": "Permulaan baharu untuk laman web kami",
+          "fieldBody": "Badan",
+          "fieldBodyValue": "Perkara baik bermula dengan idea yang ringkas."
+        },
+        "preview": {
+          "title": "Pratonton langsung",
+          "body": "Lihat bagaimana perubahan kelihatan pada laman sebenar semasa anda menyunting — desktop dan mudah alih — sebelum orang lain.",
+          "desktop": "Desktop",
+          "mobile": "Mudah alih"
+        },
+        "branches": {
+          "title": "Percabangan yang terasa seperti draf",
+          "body": "Setiap perubahan ialah cabang dan pull request. Tiada apa-apa sampai ke main sehingga seseorang menekan Publish.",
+          "draft": "Draf",
+          "review": "Dalam semakan",
+          "live": "Langsung"
+        },
+        "stack": {
+          "title": "Kekalkan stack anda",
+          "body": "Tambah editor kepada laman Astro yang sudah anda deploy. Fail, sejarah dan hos yang sama."
+        },
+        "open": {
+          "title": "Percuma, sumber terbuka, milik anda",
+          "body": "Dilesenkan MIT dan tempatan. Jalankan pada mesin anda, kekalkan kandungan anda, dan pilih infrastruktur sendiri.",
+          "badge": "Lesen MIT"
         }
       }
     },

@@ -99,19 +99,61 @@
       "body": "团队获得表单、实时预览和智能体。仓库保留 Markdown、历史记录和部署方式。",
       "cards": {
         "drafts": {
-          "title": "为内容准备的编辑器",
-          "description": "用集合、字段和富文本编辑你已拥有的 Markdown。无需再维护第二套需要同步的 CMS。",
+          "title": "Markdown 编辑器，面向你的内容",
+          "description": "集合、字段和富文本——也可以直接编辑源码——针对你已拥有的 Markdown。无需再维护第二套需要同步的 CMS。",
           "alt": "Orso 的历史记录：检查点时间线，最新的在前，包含作者、提交和时间。"
         },
         "review": {
-          "title": "草稿、预览与 Publish",
-          "description": "每次编辑都是带实时预览的拉取请求。分享、审核，准备好后再 Publish。",
+          "title": "在分支上预览每一次改动",
+          "description": "每次编辑都是带真实网站实时预览的草稿分支。分享它，审核拉取请求，然后 Publish。",
           "alt": "Orso 正在预览草稿，页面详情面板中显示其标题、描述和社交图片。"
         },
         "agent": {
           "title": "更大改动交给智能体",
           "description": "让它新建页面、润色常见问题，或添加新版块。智能体改仓库；Publish 仍由你决定。",
           "alt": "Orso 的智能体面板位于网站预览旁，随时待命。"
+        }
+      }
+    },
+    "bento": {
+      "label": "你能得到什么",
+      "cells": {
+        "git": {
+          "title": "一切都留在 Git 里",
+          "body": "你的 Markdown、YAML 和 JSON 仍在仓库中。每次保存都会进入你现有工作流的历史记录。",
+          "diffBefore": "title: Hello, world",
+          "diffAfter": "title: A fresh start",
+          "diffFile": "content/posts/welcome.md"
+        },
+        "editor": {
+          "title": "Markdown 编辑器",
+          "body": "为仓库里已有的集合提供结构化字段、富文本和源码视图。",
+          "fieldTitle": "标题",
+          "fieldTitleValue": "网站的全新开始",
+          "fieldBody": "正文",
+          "fieldBodyValue": "好事往往从一个简单的想法开始。"
+        },
+        "preview": {
+          "title": "实时预览",
+          "body": "编辑时就能在真实网站上查看改动——桌面端和移动端——抢在其他人之前。",
+          "desktop": "桌面端",
+          "mobile": "移动端"
+        },
+        "branches": {
+          "title": "像草稿一样的分支",
+          "body": "每次修改都是一个分支和拉取请求。在有人点击 Publish 之前，不会进入 main。",
+          "draft": "草稿",
+          "review": "审核中",
+          "live": "已上线"
+        },
+        "stack": {
+          "title": "保留你的技术栈",
+          "body": "为你已在部署的 Astro 网站加上编辑器。同样的文件、历史和托管。"
+        },
+        "open": {
+          "title": "免费、开源、属于你",
+          "body": "MIT 许可，本地运行。在你自己的机器上使用，内容归你，基础设施自选。",
+          "badge": "MIT 许可"
         }
       }
     },

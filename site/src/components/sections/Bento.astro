@@ -1,0 +1,119 @@
+---
+import { getI18n } from "../../i18n";
+
+const { t } = getI18n(Astro.url);
+
+const stack = [
+  { name: "Astro", file: "astro" },
+  { name: "Markdown", file: "markdown" },
+  { name: "GitHub", file: "github" },
+];
+---
+
+<section class="mx-auto max-w-7xl border-x border-b border-line" id="capabilities" aria-label={t("home.bento.label")}>
+  <ul class="grid sm:grid-cols-2 lg:grid-cols-3">
+    <li class="flex flex-col border-b border-line p-6 sm:border-r lg:p-8">
+      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.git.title")}</h3>
+      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.git.body")}</p>
+      <div class="mt-auto pt-8">
+        <div class="overflow-hidden rounded-md border border-line bg-surface-raised font-mono text-label">
+          <p class="border-b border-line px-3 py-2 text-muted">{t("home.bento.cells.git.diffFile")}</p>
+          <pre class="space-y-1 px-3 py-3 text-small leading-5"><code><span class="block text-status-danger">- {t("home.bento.cells.git.diffBefore")}</span><span class="block text-status-live">+ {t("home.bento.cells.git.diffAfter")}</span></code></pre>
+        </div>
+      </div>
+    </li>
+
+    <li class="flex flex-col border-b border-line p-6 sm:border-r-0 lg:border-r lg:p-8">
+      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.editor.title")}</h3>
+      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.editor.body")}</p>
+      <div class="mt-auto pt-8">
+        <div class="space-y-3 rounded-md border border-line bg-surface-raised p-3">
+          <label class="block">
+            <span class="text-label text-muted">{t("home.bento.cells.editor.fieldTitle")}</span>
+            <span class="mt-1 block rounded-md border border-line bg-surface px-3 py-2 text-small text-ink">
+              {t("home.bento.cells.editor.fieldTitleValue")}
+            </span>
+          </label>
+          <label class="block">
+            <span class="text-label text-muted">{t("home.bento.cells.editor.fieldBody")}</span>
+            <span class="mt-1 block rounded-md border border-line bg-surface px-3 py-2 text-small text-ink">
+              {t("home.bento.cells.editor.fieldBodyValue")}
+            </span>
+          </label>
+        </div>
+      </div>
+    </li>
+
+    <li class="flex flex-col border-b border-line p-6 sm:border-r lg:border-r-0 lg:p-8">
+      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.preview.title")}</h3>
+      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.preview.body")}</p>
+      <div class="mt-auto flex gap-2 pt-8">
+        <span class="rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
+          {t("home.bento.cells.preview.desktop")}
+        </span>
+        <span class="rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
+          {t("home.bento.cells.preview.mobile")}
+        </span>
+      </div>
+    </li>
+
+    <li class="flex flex-col border-b border-line p-6 sm:border-r-0 lg:border-r lg:border-b-0 lg:p-8">
+      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.branches.title")}</h3>
+      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.branches.body")}</p>
+      <div class="mt-auto flex flex-wrap gap-2 pt-8">
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
+          <span class="size-1.5 rounded-full bg-status-draft" aria-hidden="true"></span>
+          {t("home.bento.cells.branches.draft")}
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
+          <span class="size-1.5 rounded-full bg-status-review" aria-hidden="true"></span>
+          {t("home.bento.cells.branches.review")}
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-raised px-3 py-1 text-label text-ink">
+          <span class="size-1.5 rounded-full bg-status-live" aria-hidden="true"></span>
+          {t("home.bento.cells.branches.live")}
+        </span>
+      </div>
+    </li>
+
+    <li class="flex flex-col border-b border-line p-6 sm:border-r lg:border-b-0 lg:p-8">
+      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.stack.title")}</h3>
+      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.stack.body")}</p>
+      <ul class="mt-auto flex items-center gap-4 pt-8">
+        {stack.map((logo) => (
+          <li class="inline-flex h-7 items-center">
+            <img
+              src={`/logos/${logo.file}.svg`}
+              alt={logo.name}
+              width="96"
+              height="28"
+              class="logo-on-light h-auto max-h-7 w-auto max-w-[5.5rem] object-contain"
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              src={`/logos/${logo.file}-on-dark.svg`}
+              alt=""
+              width="96"
+              height="28"
+              class="logo-on-dark h-auto max-h-7 w-auto max-w-[5.5rem] object-contain"
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
+            />
+          </li>
+        ))}
+      </ul>
+    </li>
+
+    <li class="flex flex-col border-b border-line p-6 last:border-b-0 sm:border-r-0 lg:border-b-0 lg:p-8">
+      <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.open.title")}</h3>
+      <p class="mt-2 text-small leading-6 text-muted">{t("home.bento.cells.open.body")}</p>
+      <div class="mt-auto pt-8">
+        <span class="inline-flex rounded-md border border-line bg-surface-raised px-3 py-1.5 text-label font-medium text-ink">
+          {t("home.bento.cells.open.badge")}
+        </span>
+      </div>
+    </li>
+  </ul>
+</section>

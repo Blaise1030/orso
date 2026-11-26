@@ -99,19 +99,61 @@
       "body": "Your team gets forms, live preview and an agent. Your repo keeps its Markdown, its history and its deploy.",
       "cards": {
         "drafts": {
-          "title": "An editor for your content",
-          "description": "Collections, fields and rich text for the Markdown you already own. No second CMS to keep in sync.",
+          "title": "A Markdown editor for your content",
+          "description": "Collections, fields and rich text — or the source itself — for the Markdown you already own. No second CMS to keep in sync.",
           "alt": "Orso's history: a timeline of checkpoints, newest first, with author, commit and time."
         },
         "review": {
-          "title": "Drafts, previews and Publish",
-          "description": "Every edit is a pull request with a live preview. Share it, review it, then Publish when you're ready.",
+          "title": "Preview every change on a branch",
+          "description": "Each edit is a draft branch with a live preview of the real site. Share it, review the pull request, then Publish.",
           "alt": "Orso previewing a draft, with the page details panel showing its title, description and social image."
         },
         "agent": {
           "title": "An agent for bigger changes",
           "description": "Ask for a page, a pass on the FAQ, or a new section. The agent edits the repo; you still own Publish.",
           "alt": "Orso's agent panel next to the site preview, ready for a request."
+        }
+      }
+    },
+    "bento": {
+      "label": "What you get",
+      "cells": {
+        "git": {
+          "title": "Everything stays in Git",
+          "body": "Your Markdown, YAML and JSON stay in the repository. Every save is history in the workflow you already use.",
+          "diffBefore": "title: Hello, world",
+          "diffAfter": "title: A fresh start",
+          "diffFile": "content/posts/welcome.md"
+        },
+        "editor": {
+          "title": "Markdown editor",
+          "body": "Structured fields, rich text and a source view for the collections already in your repo.",
+          "fieldTitle": "Title",
+          "fieldTitleValue": "A fresh start for our website",
+          "fieldBody": "Body",
+          "fieldBodyValue": "Good things start with a simple idea."
+        },
+        "preview": {
+          "title": "Live preview",
+          "body": "See how changes look on the real site while you edit — desktop and mobile — before anyone else.",
+          "desktop": "Desktop",
+          "mobile": "Mobile"
+        },
+        "branches": {
+          "title": "Branching that feels like drafts",
+          "body": "Every change is a branch and a pull request. Nothing reaches main until someone presses Publish.",
+          "draft": "Draft",
+          "review": "In review",
+          "live": "Live"
+        },
+        "stack": {
+          "title": "Keep your stack",
+          "body": "Add an editor to the Astro site you already deploy. Same files, same history, same host."
+        },
+        "open": {
+          "title": "Free, open source, yours",
+          "body": "MIT-licensed and local. Run it on your machine, keep your content, and choose your own infrastructure.",
+          "badge": "MIT licence"
         }
       }
     },
