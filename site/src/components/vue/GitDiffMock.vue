@@ -18,16 +18,16 @@ const lines = [
 </script>
 
 <template>
-  <div class="flex size-full flex-col justify-end p-4" aria-hidden="true">
-    <div class="overflow-hidden rounded-md border border-line bg-surface-raised shadow-raised">
-      <div class="flex items-center gap-2 border-b border-line px-3 py-2">
+  <div class="flex size-full flex-col p-4" aria-hidden="true">
+    <div class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-line bg-surface-raised shadow-raised">
+      <div class="flex shrink-0 items-center gap-2 border-b border-line px-3 py-2">
         <span class="size-2 rounded-full bg-status-danger/80" />
         <span class="size-2 rounded-full bg-status-draft/80" />
         <span class="size-2 rounded-full bg-status-live/80" />
         <p class="ml-1 truncate font-mono text-label text-muted">{{ file }}</p>
         <span class="ml-auto shrink-0 font-mono text-label text-muted">diff</span>
       </div>
-      <div class="overflow-hidden bg-surface py-1 font-mono text-label leading-5">
+      <div class="min-h-0 flex-1 overflow-hidden bg-surface py-1 font-mono text-label leading-5">
         <div
           v-for="(line, index) in lines"
           :key="index"
