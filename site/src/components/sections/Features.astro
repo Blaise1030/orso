@@ -2,30 +2,18 @@
 import UCard from "@nuxt/ui/components/Card.vue";
 import Painting from "../Painting.astro";
 import AgentComposerMock from "../vue/AgentComposerMock.vue";
-import HistoryTimelineMock from "../vue/HistoryTimelineMock.vue";
-import PageDetailsMock from "../vue/PageDetailsMock.vue";
+import BentoHeroEditor from "../vue/BentoHeroEditor.vue";
+import BentoPreviewTile from "../vue/BentoPreviewTile.vue";
 import { getI18n } from "../../i18n";
-import type { TimelineItem } from "../vue/HistoryTimelineMock.vue";
 
 const { t, group } = getI18n(Astro.url);
 
-const draftsTimeline = group<{ dayLabel: string; currentLabel: string; items: TimelineItem[] }>(
-  "home.features.cards.drafts.timeline",
-);
-const reviewDetails = group<{
-  tabMeta: string;
-  tabIssues: string;
-  scriptsLabel: string;
-  scriptsValue: string;
-  stylesLabel: string;
-  stylesValue: string;
-  titleLabel: string;
-  titleValue: string;
-  descriptionLabel: string;
-  descriptionValue: string;
-  pathLabel: string;
-  pathValue: string;
-}>("home.features.cards.review.details");
+const editor = group<{ demoTitle: string }>("home.features.cards.drafts.editor");
+const preview = group<{
+  desktopLabel: string;
+  mobileLabel: string;
+  pageTitle: string;
+}>("home.features.cards.review.frame");
 const composer = group<{
   userMessage: string;
   assistantMessage: string;
@@ -58,12 +46,11 @@ const cardUi = { header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:
         <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
           <Painting id="bridge" />
           <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-          <div class="relative flex size-full p-2 md:p-3">
-            <HistoryTimelineMock
+          <div class="relative size-full">
+            <BentoHeroEditor
               client:visible
-              day-label={draftsTimeline.dayLabel}
-              current-label={draftsTimeline.currentLabel}
-              items={draftsTimeline.items}
+              title={editor.demoTitle}
+              slash-hint="/"
             />
           </div>
         </div>
@@ -77,21 +64,12 @@ const cardUi = { header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:
         <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
           <Painting id="toledo" />
           <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-          <div class="relative flex size-full p-2 md:p-3">
-            <PageDetailsMock
+          <div class="relative size-full">
+            <BentoPreviewTile
               client:visible
-              tab-meta={reviewDetails.tabMeta}
-              tab-issues={reviewDetails.tabIssues}
-              scripts-label={reviewDetails.scriptsLabel}
-              scripts-value={reviewDetails.scriptsValue}
-              styles-label={reviewDetails.stylesLabel}
-              styles-value={reviewDetails.stylesValue}
-              title-label={reviewDetails.titleLabel}
-              title-value={reviewDetails.titleValue}
-              description-label={reviewDetails.descriptionLabel}
-              description-value={reviewDetails.descriptionValue}
-              path-label={reviewDetails.pathLabel}
-              path-value={reviewDetails.pathValue}
+              desktop-label={preview.desktopLabel}
+              mobile-label={preview.mobileLabel}
+              page-title={preview.pageTitle}
             />
           </div>
         </div>

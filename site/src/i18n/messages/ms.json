@@ -101,50 +101,19 @@
         "drafts": {
           "title": "Editor Markdown untuk kandungan anda",
           "description": "Koleksi, medan dan teks kaya — atau sumber itu sendiri — untuk Markdown yang sudah anda miliki. Tiada CMS kedua untuk disegerakkan.",
-          "alt": "Sejarah Orso: garis masa titik semak, terbaharu dahulu, dengan pengarang, commit dan masa.",
-          "timeline": {
-            "dayLabel": "Hari ini",
-            "currentLabel": "Semasa",
-            "items": [
-              {
-                "summary": "Tambah bahagian FAQ pada harga",
-                "author": "Alex",
-                "sha": "a3f81d2",
-                "time": "Baru sahaja",
-                "current": true
-              },
-              {
-                "summary": "Kemas kini tajuk harga",
-                "author": "Alex",
-                "sha": "9c2e1ab",
-                "time": "1j lalu"
-              },
-              {
-                "summary": "Draf catatan selamat datang",
-                "author": "Jordan",
-                "sha": "4b7d0ee",
-                "time": "Semalam"
-              }
-            ]
+          "alt": "Editor Markdown Orso membuka catatan, dengan menu slash untuk tajuk dan senarai.",
+          "editor": {
+            "demoTitle": "Permulaan baharu untuk laman web kami"
           }
         },
         "review": {
           "title": "Pratonton setiap perubahan pada cabang",
           "description": "Setiap suntingan ialah cabang draf dengan pratonton langsung laman sebenar. Kongsi, semak pull request, kemudian Publish.",
-          "alt": "Orso memaparkan pratonton draf, dengan panel butiran halaman menunjukkan tajuk, penerangan dan imej sosial.",
-          "details": {
-            "tabMeta": "Meta",
-            "tabIssues": "Isu",
-            "scriptsLabel": "skrip",
-            "scriptsValue": "4",
-            "stylesLabel": "gaya",
-            "stylesValue": "2",
-            "titleLabel": "Tajuk",
-            "titleValue": "Harga — Project Orso",
-            "descriptionLabel": "Penerangan",
-            "descriptionValue": "Pelan untuk pasukan yang mahu editor pada repo yang sudah mereka miliki.",
-            "pathLabel": "Laluan",
-            "pathValue": "/pricing/"
+          "alt": "Orso memaparkan pratonton draf laman sebenar, dengan togol desktop dan mudah alih.",
+          "frame": {
+            "desktopLabel": "Desktop",
+            "mobileLabel": "Mudah alih",
+            "pageTitle": "Harga"
           }
         },
         "agent": {

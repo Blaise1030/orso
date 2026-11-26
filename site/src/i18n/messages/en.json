@@ -101,34 +101,19 @@
         "drafts": {
           "title": "A Markdown editor for your content",
           "description": "Collections, fields and rich text — or the source itself — for the Markdown you already own. No second CMS to keep in sync.",
-          "alt": "Orso's history: a timeline of checkpoints, newest first, with author, commit and time.",
-          "timeline": {
-            "dayLabel": "Today",
-            "currentLabel": "Current",
-            "items": [
-              { "summary": "Add FAQ section to pricing", "author": "Alex", "sha": "a3f81d2", "time": "Just now", "current": true },
-              { "summary": "Update pricing headline", "author": "Alex", "sha": "9c2e1ab", "time": "1h ago" },
-              { "summary": "Draft welcome post", "author": "Jordan", "sha": "4b7d0ee", "time": "Yesterday" }
-            ]
+          "alt": "Orso's Markdown editor open on a post, with the slash menu for headings and lists.",
+          "editor": {
+            "demoTitle": "A fresh start for our website"
           }
         },
         "review": {
           "title": "Preview every change on a branch",
           "description": "Each edit is a draft branch with a live preview of the real site. Share it, review the pull request, then Publish.",
-          "alt": "Orso previewing a draft, with the page details panel showing its title, description and social image.",
-          "details": {
-            "tabMeta": "Meta",
-            "tabIssues": "Issues",
-            "scriptsLabel": "scripts",
-            "scriptsValue": "4",
-            "stylesLabel": "styles",
-            "stylesValue": "2",
-            "titleLabel": "Title",
-            "titleValue": "Pricing — Project Orso",
-            "descriptionLabel": "Description",
-            "descriptionValue": "Plans for teams that want editors on the repo they already own.",
-            "pathLabel": "Path",
-            "pathValue": "/pricing/"
+          "alt": "Orso previewing a draft of the real site, with desktop and mobile toggles.",
+          "frame": {
+            "desktopLabel": "Desktop",
+            "mobileLabel": "Mobile",
+            "pageTitle": "Pricing"
           }
         },
         "agent": {

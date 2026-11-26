@@ -175,7 +175,7 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 - **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons.
 - **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs (Content, Preview, Publish) that switch one large product panel underneath. The tab rail sits in a framed surface, and the panels float on a single painted stage that stays put while the tabs change.
 - **Logo grid**: bordered cells for Astro, Markdown, GitHub, Claude, Cursor, Codex, plus a short stack note.
-- **Feature cards**: three equal frames over paintings — checkpoint timeline, page-details panel, and live `UChatPrompt` composer (Nuxt UI mocks, not screenshots).
+- **Feature cards**: three equal frames over paintings — Markdown editor + slash menu, live preview (desktop/mobile), and `UChatPrompt` composer (Nuxt UI mocks, not screenshots).
 - **Capability bento**: stageshow-style mix — hero Markdown editor (2×1) with slash menu, dark MIT stat, live preview frame, draft-branch picker, stack logos, and a Git statement. Short copy under each tile; no equal-card grid of the same kind.
 - **Proof**: Lee Robinson's quote and a note from the maker.
 - **FAQ**: hairline `<details>` accordion with FAQPage JSON-LD.

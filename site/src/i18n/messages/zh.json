@@ -101,50 +101,19 @@
         "drafts": {
           "title": "Markdown 编辑器，面向你的内容",
           "description": "集合、字段和富文本——也可以直接编辑源码——针对你已拥有的 Markdown。无需再维护第二套需要同步的 CMS。",
-          "alt": "Orso 的历史记录：检查点时间线，最新的在前，包含作者、提交和时间。",
-          "timeline": {
-            "dayLabel": "今天",
-            "currentLabel": "当前",
-            "items": [
-              {
-                "summary": "给定价页加常见问题版块",
-                "author": "Alex",
-                "sha": "a3f81d2",
-                "time": "刚刚",
-                "current": true
-              },
-              {
-                "summary": "更新定价页标题",
-                "author": "Alex",
-                "sha": "9c2e1ab",
-                "time": "1 小时前"
-              },
-              {
-                "summary": "起草欢迎文章",
-                "author": "Jordan",
-                "sha": "4b7d0ee",
-                "time": "昨天"
-              }
-            ]
+          "alt": "Orso 的 Markdown 编辑器打开一篇文章，斜杠菜单显示标题和列表。",
+          "editor": {
+            "demoTitle": "网站的全新开始"
           }
         },
         "review": {
           "title": "在分支上预览每一次改动",
           "description": "每次编辑都是带真实网站实时预览的草稿分支。分享它，审核拉取请求，然后 Publish。",
-          "alt": "Orso 正在预览草稿，页面详情面板中显示其标题、描述和社交图片。",
-          "details": {
-            "tabMeta": "元数据",
-            "tabIssues": "问题",
-            "scriptsLabel": "脚本",
-            "scriptsValue": "4",
-            "stylesLabel": "样式",
-            "stylesValue": "2",
-            "titleLabel": "标题",
-            "titleValue": "定价 — Project Orso",
-            "descriptionLabel": "描述",
-            "descriptionValue": "面向希望在已有仓库上使用编辑器的团队的方案。",
-            "pathLabel": "路径",
-            "pathValue": "/pricing/"
+          "alt": "Orso 正在预览真实网站的草稿，可切换桌面端和移动端。",
+          "frame": {
+            "desktopLabel": "桌面端",
+            "mobileLabel": "移动端",
+            "pageTitle": "定价"
           }
         },
         "agent": {
