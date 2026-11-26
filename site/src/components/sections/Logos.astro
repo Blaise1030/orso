@@ -33,77 +33,71 @@ const comingSoon = [
     <p class="mt-3 max-w-measure text-small leading-6 text-muted">{t("home.logos.body")}</p>
 
     <div class="mt-10 space-y-8">
-      <div>
-        <p class="text-label font-medium text-muted">{t("home.logos.stack")}</p>
-        <ul class="mt-4 grid list-none grid-cols-2 gap-x-8 gap-y-6 p-0 sm:grid-cols-4">
-          {stack.map((logo) => (
-            <li class="flex h-10 min-w-0 items-center">
-              <picture class="min-w-0">
-                <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
-                <img
-                  src={`/logos/${logo.file}.svg`}
-                  alt={logo.name}
-                  width="160"
-                  height="40"
-                  class:list={[logo.heightClass, "w-auto max-w-full object-contain object-left"]}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
-            </li>
-          ))}
-          <li class="flex min-w-0 flex-wrap items-center gap-3">
-            <div class="flex items-center -space-x-2" aria-hidden="true">
-              {comingSoon.map((logo) => (
-                <span class="relative flex size-9 items-center justify-center rounded-md border border-line bg-surface-raised shadow-soft">
-                  <picture>
-                    <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
-                    <img
-                      src={`/logos/${logo.file}.svg`}
-                      alt=""
-                      width="24"
-                      height="24"
-                      class="size-5 object-contain"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </picture>
-                </span>
-              ))}
-            </div>
-            <span class="sr-only">{comingSoon.map((logo) => logo.name).join(", ")}</span>
-            <UBadge color="neutral" variant="outline" size="sm" class="rounded-full" label={t("home.logos.comingSoon")} />
+      <ul class="grid list-none grid-cols-2 justify-items-center gap-x-8 gap-y-6 p-0 sm:grid-cols-4">
+        {stack.map((logo) => (
+          <li class="flex h-10 min-w-0 items-center justify-center">
+            <picture class="min-w-0">
+              <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
+              <img
+                src={`/logos/${logo.file}.svg`}
+                alt={logo.name}
+                width="160"
+                height="40"
+                class:list={[logo.heightClass, "w-auto max-w-full object-contain object-center"]}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
           </li>
-        </ul>
-      </div>
+        ))}
+        <li class="flex min-w-0 flex-wrap items-center justify-center gap-3">
+          <div class="flex items-center -space-x-2" aria-hidden="true">
+            {comingSoon.map((logo) => (
+              <span class="relative flex size-9 items-center justify-center rounded-md border border-line bg-surface-raised shadow-soft">
+                <picture>
+                  <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
+                  <img
+                    src={`/logos/${logo.file}.svg`}
+                    alt=""
+                    width="24"
+                    height="24"
+                    class="size-5 object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+              </span>
+            ))}
+          </div>
+          <span class="sr-only">{comingSoon.map((logo) => logo.name).join(", ")}</span>
+          <UBadge color="neutral" variant="outline" size="sm" class="rounded-full" label={t("home.logos.comingSoon")} />
+        </li>
+      </ul>
 
-      <div>
-        <p class="text-label font-medium text-muted">{t("home.logos.agents")}</p>
-        <ul class="mt-4 grid list-none grid-cols-2 gap-x-8 gap-y-6 p-0 sm:grid-cols-4">
-          {agents.map((logo) => (
-            <li class="flex h-10 min-w-0 items-center gap-2.5">
-              <picture class="min-w-0">
-                <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
-                <img
-                  src={`/logos/${logo.file}.svg`}
-                  alt={logo.caption ? "" : logo.name}
-                  width="160"
-                  height="40"
-                  class:list={[
-                    "h-8 w-auto object-contain object-left",
-                    logo.caption ? "max-h-8 max-w-8" : "max-w-full",
-                  ]}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
-              {logo.caption && (
-                <span class="truncate text-body font-medium text-ink">{logo.caption}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ul class="grid list-none grid-cols-2 justify-items-center gap-x-8 gap-y-6 p-0 sm:grid-cols-4">
+        {agents.map((logo) => (
+          <li class="flex h-10 min-w-0 items-center justify-center gap-2.5">
+            <picture class="min-w-0">
+              <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
+              <img
+                src={`/logos/${logo.file}.svg`}
+                alt={logo.caption ? "" : logo.name}
+                width="160"
+                height="40"
+                class:list={[
+                  "h-8 w-auto object-contain object-center",
+                  logo.caption ? "max-h-8 max-w-8" : "max-w-full",
+                ]}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+            {logo.caption && (
+              <span class="truncate text-body font-medium text-ink">{logo.caption}</span>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   </div>
 </section>

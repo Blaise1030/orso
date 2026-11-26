@@ -49,8 +49,9 @@ test("landing page includes a setup copy band", () => {
 
 test("logos split stack and agents, include OpenCode and Codex caption", () => {
   const logos = read("src/components/sections/Logos.astro");
-  assert.match(logos, /home\.logos\.stack/);
-  assert.match(logos, /home\.logos\.agents/);
+  assert.doesNotMatch(logos, /home\.logos\.stack/);
+  assert.doesNotMatch(logos, /home\.logos\.agents/);
+  assert.match(logos, /justify-items-center/);
   assert.match(logos, /opencode/);
   assert.match(logos, /caption: "Codex"/);
   assert.match(logos, /comingSoon/);
