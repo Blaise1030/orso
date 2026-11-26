@@ -1,16 +1,11 @@
 ---
 import UButton from "@nuxt/ui/components/Button.vue";
-import ProductTabs from "../vue/ProductTabs.vue";
+import AppShot from "../vue/AppShot.vue";
 import DownloadButton from "../vue/DownloadButton.vue";
 import { getI18n } from "../../i18n";
 import { appShot } from "../../lib/appShots";
 
-const shots = {
-  content: await appShot("hero-content"),
-  preview: await appShot("hero-preview"),
-  publish: await appShot("hero-publish"),
-};
-
+const shot = await appShot("hero-preview");
 const { t, group, path, locale } = getI18n(Astro.url);
 const headline = t("home.hero.headline");
 // Chinese has no spaces between words, so it animates as one phrase.
@@ -34,9 +29,17 @@ const words = locale === "zh" ? [headline] : headline.split(" ");
       </div>
       <p class="rise-3 mt-4 text-small text-muted">{t("home.hero.note")}</p>
     </div>
-  </div>
 
-  <div class="page rise-3 mt-12 md:mt-16">
-    <ProductTabs client:load shots={shots} copy={group("home.hero.tabs")} />
+    {/* Single product shot — Gui-style, inset, not a multi-tab grid. */}
+    <figure class="rise-3 m-0 mt-12 max-w-4xl md:mt-16">
+      <AppShot
+        client:load
+        shot={shot}
+        alt={t("home.hero.shotAlt")}
+        sizes="(min-width: 56rem) 56rem, 100vw"
+        eager
+        play
+      />
+    </figure>
   </div>
 </section>

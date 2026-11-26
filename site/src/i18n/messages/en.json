@@ -70,23 +70,7 @@
       "body": "Give marketers and writers an editor for the Markdown you already have. Every change is a pull request you review. Nothing goes live until you Publish.",
       "secondary": "See what it does",
       "note": "Free and open source. Runs on your machine. Content stays in your repo.",
-      "tabs": {
-        "content": {
-          "label": "Content",
-          "description": "Forms for the collections already in your repo.",
-          "alt": "Orso's editor open on a blog post: the markdown body beside its title, slug, date and tags."
-        },
-        "preview": {
-          "label": "Preview",
-          "description": "See the real site on desktop and mobile.",
-          "alt": "Orso previewing the same blog post rendered on the draft site, with the agent panel open beside it."
-        },
-        "publish": {
-          "label": "Publish",
-          "description": "Review the pull request, then one button goes live.",
-          "alt": "Orso's changes menu over the preview, listing the live site and open drafts, next to Review and Publish."
-        }
-      }
+      "shotAlt": "Orso previewing a blog post on the draft site, with the agent panel open beside it."
     },
     "logos": {
       "label": "Works with your stack",

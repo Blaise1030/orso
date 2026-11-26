@@ -139,17 +139,17 @@ The scale has six roles (`--text-*`): `label` 0.75rem/1.5, `small` 0.875rem/1.55
 
 The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Sections sit on `bg-surface` and separate with whitespace (`py-section` / `py-section-wide`), not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog, help, header and footer keep the earlier desk look (centred columns, hairline chrome); do not copy the home’s open-canvas rules onto interiors.
 
-Home order: hero (left-aligned headline, lead, dual CTAs, three product tabs) → quiet logo strip → numbered how-it-works steps → feature bands → proof → FAQ → closing CTA. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
+Home order: hero (left-aligned headline, lead, dual CTAs, one inset product shot) → quiet logo strip → how-it-works grid → feature bands → proof → FAQ → closing CTA. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
 
-The hero tab rail is three equal columns of title and one-line description (Content, Preview, Publish) with a 2px ink underline on the active tab. The product shot sits on its own line below as a flat `border-line` figure — like a Markdown image — with no sand plate and no `shadow-raised`. On narrow screens the rail scrolls horizontally.
+The hero shows a single product capture (preview shot, with clip when available) in an inset figure capped around `max-w-4xl` — Gui-style, not a multi-tab grid. No sand plate and no `shadow-raised` on the shot.
 
 ## Elevation & Depth
 
-Depth comes from tone (surface, sand, night), 1px hairlines, and a black-tinted raised shadow. `--shadow-soft` is a light lift; `--shadow-raised` is the stronger lift used on the hero product frame and the agent window. Carousel cards stay flat with a hairline ring, and shadows never tint with the text colour so dark mode shows a shadow rather than a glow.
+Depth comes from tone (surface, sand, night), 1px hairlines, and a black-tinted raised shadow. `--shadow-soft` is a light lift; `--shadow-raised` is the stronger lift used on agent windows and raised chrome, not on home product figures. Carousel cards stay flat with a hairline ring, and shadows never tint with the text colour so dark mode shows a shadow rather than a glow.
 
 ## Art
 
-The home page does **not** use painting stages or raised shadows on product plates. Product shots read like a Markdown file: copy first, then a flat hairline figure on its own line. Public-domain Renaissance landscapes remain available for unused section leftovers (`Ops`, `AgentBand`) and any future non-home surfaces — files, sources and licences in `public/paintings/CREDITS.md`; ids in `src/lib/paintings.ts` via `Painting.astro`. When a painting is used, crop to fill, add a flat `bg-night` scrim (20–30%), and never use it for meaning.
+The home page does **not** use painting stages or raised shadows on product plates. Product shots are inset (not full page width): hero up to `max-w-4xl`, how-it-works cells up to `max-w-md`, band figures up to `max-w-xl`. Public-domain Renaissance landscapes remain available for unused section leftovers (`Ops`, `AgentBand`) and any future non-home surfaces — files, sources and licences in `public/paintings/CREDITS.md`; ids in `src/lib/paintings.ts` via `Painting.astro`. When a painting is used, crop to fill, add a flat `bg-night` scrim (20–30%), and never use it for meaning.
 
 
 ## Shapes
@@ -173,10 +173,10 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 ## Components
 
 - **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons.
-- **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs; the active shot is a flat block figure on the next line.
+- **Hero**: left-aligned display headline, lead, dual CTAs, then one inset product shot.
 - **Logo strip**: one muted intro line and inline marks (Astro, Markdown, GitHub, Claude, Cursor, Codex); no bordered cells.
-- **How it works**: numbered steps (edit → preview → agent); each step is copy, then a flat hairline figure on its own line.
-- **Bands**: open essays (git statement, draft branches + flat figure, stack logos) separated by whitespace.
+- **How it works**: two-column grid on desktop (edit → preview → agent); each cell is an inset hairline figure (`max-w-md`), then a step number, title and body — usegui.com rhythm.
+- **Bands**: open essays (git statement, draft branches + inset figure, stack logos) separated by whitespace.
 - **Proof**: Lee Robinson's quote and a note from the maker on open paper.
 - **FAQ**: hairline accordion with FAQPage JSON-LD on open paper.
 - **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.
