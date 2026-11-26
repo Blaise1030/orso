@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.18
+
+[compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.16...v0.1.18)
+
+### Features
+
+- Ask-first project setup, assistant auth, and content toolkit help ([d03ac2b](https://github.com/Blaise1030/CMS/commit/d03ac2b))
+
+### Fixes
+
+- **assistant:** Drop unused provider binding that broke the release build ([415f60c](https://github.com/Blaise1030/CMS/commit/415f60c))
+
 ## v0.1.17
 
 [compare changes](https://github.com/Blaise1030/CMS/compare/v0.1.16...v0.1.17)
