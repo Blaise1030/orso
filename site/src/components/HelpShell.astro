@@ -1,5 +1,5 @@
 ---
-// Documentation layout for every Help page: quiet nav | centred content | optional rail.
+// Documentation layout for every Help page: quiet nav | centred content.
 import type { BreadcrumbItem, NavigationMenuItem } from "@nuxt/ui";
 import UBreadcrumb from "@nuxt/ui/components/Breadcrumb.vue";
 import PagefindSearch from "./PagefindSearch.astro";
@@ -17,7 +17,6 @@ const { current, crumbs = [] } = Astro.props;
 const { t, path, locale } = getI18n(Astro.url);
 const { categories, docs } = await loadHelp(locale);
 const shown = categories.filter((category) => category.docs.length > 0);
-const hasRail = Astro.slots.has("rail");
 
 const docPath = (doc: Doc) => `/help/${doc.id}/`;
 const link = (label: string, target: string): NavigationMenuItem => ({ label, to: path(target), active: target === current });
@@ -36,12 +35,7 @@ const navItems: NavigationMenuItem[] = [
 const breadcrumb: BreadcrumbItem[] = crumbs.map((crumb) => ({ label: crumb.label, to: crumb.href ? path(crumb.href) : undefined }));
 ---
 
-<div
-  class:list={[
-    "page mx-auto w-full max-w-5xl gap-10 pb-section lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]",
-    hasRail && "xl:grid-cols-[14rem_minmax(0,1fr)_12rem]",
-  ]}
->
+<div class="page mx-auto w-full max-w-5xl gap-10 pb-section lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]">
   <aside class="min-w-0" aria-label={t("help.navLabel")} data-pagefind-ignore>
     <div class="flex flex-col gap-4 py-4 lg:sticky lg:top-header lg:max-h-[calc(100dvh-var(--spacing-header))] lg:overflow-y-auto lg:py-10">
       {docs.length > 0 && <PagefindSearch bundle="help" placeholder={t("help.search")} />}
@@ -62,10 +56,4 @@ const breadcrumb: BreadcrumbItem[] = crumbs.map((crumb) => ({ label: crumb.label
       <slot />
     </div>
   </div>
-
-  {hasRail && (
-    <div class="hidden xl:block">
-      <div class="sticky top-header py-14"><slot name="rail" /></div>
-    </div>
-  )}
 </div>

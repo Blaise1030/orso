@@ -5,9 +5,9 @@ import { getI18n } from "../i18n";
 
 interface Props {
   headings: MarkdownHeading[];
-  /** `rail` is the sticky desktop column; `inline` is the collapsible mobile block. */
+  /** `inline` is the collapsible under the lead; `rail` remains for any sticky column use. */
   variant: "rail" | "inline";
-  /** Extra classes: placement for the rail; for `inline`, the breakpoint it hides from (default lg:hidden). */
+  /** Extra classes on the wrapper. */
   class?: string;
 }
 const { headings, variant, class: className } = Astro.props;
@@ -30,5 +30,5 @@ const railLink =
     </nav>
   </aside>
 ) : (
-  <TocCollapsible client:idle class={className ?? "lg:hidden"} title={t("toc.title")} headings={headings.map(({ depth, slug, text }) => ({ depth, slug, text }))} />
+  <TocCollapsible client:idle class={className} title={t("toc.title")} headings={headings.map(({ depth, slug, text }) => ({ depth, slug, text }))} />
 )}

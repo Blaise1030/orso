@@ -2,7 +2,7 @@
 import UButton from "@nuxt/ui/components/Button.vue";
 import UCollapsible from "@nuxt/ui/components/Collapsible.vue";
 
-/** The collapsible "On this page" list above a post or article on smaller screens. */
+/** The collapsible "On this page" list under the lead of a post or help article. */
 defineProps<{ headings: { depth: number; slug: string; text: string }[]; title: string }>();
 </script>
 
