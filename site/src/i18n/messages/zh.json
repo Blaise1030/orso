@@ -118,7 +118,10 @@
             "pageContext": "pricing",
             "modelLabel": "Claude",
             "sendLabel": "发送",
-            "attachLabel": "附加图片或文件"
+            "attachLabel": "附加图片或文件",
+            "userMessage": "能帮忙改一下定价页吗？",
+            "assistantMessage": "可以——想改什么？我可以改文案、加版块，或调整布局。",
+            "askLabel": "询问"
           }
         }
       }

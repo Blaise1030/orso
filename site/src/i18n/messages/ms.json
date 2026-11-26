@@ -118,7 +118,10 @@
             "pageContext": "pricing",
             "modelLabel": "Claude",
             "sendLabel": "Hantar",
-            "attachLabel": "Lampirkan imej atau fail"
+            "attachLabel": "Lampirkan imej atau fail",
+            "userMessage": "Boleh kemas kini halaman harga?",
+            "assistantMessage": "Baik — apa yang perlu diubah? Saya boleh tulis semula salinan, tambah bahagian, atau laraskan susun atur.",
+            "askLabel": "Tanya"
           }
         }
       }

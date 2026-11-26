@@ -8,10 +8,13 @@ import { getI18n } from "../../i18n";
 
 const { t, group } = getI18n(Astro.url);
 const composer = group<{
+  userMessage: string;
+  assistantMessage: string;
   prompt: string;
   placeholder: string;
   pageContext: string;
   modelLabel: string;
+  askLabel: string;
   sendLabel: string;
   attachLabel: string;
 }>("home.features.cards.agent.composer");
@@ -77,13 +80,16 @@ const shotCards = [
         class="h-full rounded-none bg-transparent p-2"
         ui={{ header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" }}
       >
-        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line bg-sand p-3 md:p-4">
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line bg-sand p-2 md:p-3">
           <AgentComposerMock
             client:visible
+            user-message={composer.userMessage}
+            assistant-message={composer.assistantMessage}
             prompt={composer.prompt}
             placeholder={composer.placeholder}
             page-context={composer.pageContext}
             model-label={composer.modelLabel}
+            ask-label={composer.askLabel}
             send-label={composer.sendLabel}
             attach-label={composer.attachLabel}
           />

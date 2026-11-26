@@ -113,10 +113,13 @@
           "description": "Ask for a page, a pass on the FAQ, or a new section. The agent edits the repo; you still own Publish.",
           "alt": "Orso's agent panel next to the site preview, ready for a request.",
           "composer": {
+            "userMessage": "Can you update the pricing page?",
+            "assistantMessage": "Sure — what should change? I can rewrite copy, add a section, or adjust the layout.",
             "prompt": "Add an FAQ section to the pricing page",
             "placeholder": "Ask your assistant to change your site",
             "pageContext": "pricing",
             "modelLabel": "Claude",
+            "askLabel": "Ask",
             "sendLabel": "Send",
             "attachLabel": "Attach image or file"
           }
