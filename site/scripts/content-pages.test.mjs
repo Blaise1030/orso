@@ -35,6 +35,8 @@ test("built sample Blog and Help articles render Markdown and navigation", () =>
   assert.match(home, /id="how-it-works"[\s\S]*?<ol\b/);
   assert.match(home, /id="bands"/);
   assert.doesNotMatch(home, /id="capabilities"/);
+  // Open-canvas home: no painting stages behind hero / how-it-works mocks.
+  assert.doesNotMatch(home, /\/paintings\/[^"'\s]*(?:danube|bridge|toledo|rocks)/);
 });
 
 test("built sample blog categories link their posts", () => {

@@ -17,7 +17,7 @@ const headline = t("home.hero.headline");
 const words = locale === "zh" ? [headline] : headline.split(" ");
 ---
 
-<section class="mx-auto max-w-7xl border-x border-line pt-14 md:pt-20" id="product">
+<section class="pt-section md:pt-section-wide" id="product">
   <div class="page">
     <div class="w-full md:max-w-3/4">
       <h1 class="text-display font-medium tracking-display text-ink">
@@ -36,7 +36,7 @@ const words = locale === "zh" ? [headline] : headline.split(" ");
     </div>
   </div>
 
-  <div class="rise-3 mt-12 md:mt-16">
+  <div class="page rise-3 mt-12 md:mt-16">
     <ProductTabs client:load shots={shots} copy={group("home.hero.tabs")} />
   </div>
 </section>

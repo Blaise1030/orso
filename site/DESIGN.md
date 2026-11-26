@@ -137,11 +137,11 @@ The scale has six roles (`--text-*`): `label` 0.75rem/1.5, `small` 0.875rem/1.55
 
 ## Layout
 
-The home page follows Medusa's section map with Orso copy and tokens. The `page` utility spans the full viewport with token gutters, so sections keep their side padding. Sections that look best at the edge omit `page` and keep their copy in a nested `page` wrapper; the hero's product rail and app window break out that way. Interiors cap themselves where the copy needs a measure (`max-w-prose`, `max-w-measure`, `max-w-3xl`). `--container-page` (80rem) stays available for sections that want a narrower centred column. Landing sections are full-bleed bands; interiors use the 12-column grid where needed.
+The home page is an **open canvas**: product-first, airy, Gui-inspired craft on Orso tokens. Sections sit on `bg-surface` and separate with whitespace (`py-section` / `py-section-wide`), not `max-w-7xl border-x` document frames. The `page` utility supplies gutters for copy and product panels. Blog, help, header and footer keep the earlier desk look (centred columns, hairline chrome); do not copy the home’s open-canvas rules onto interiors.
 
-Order: hero (left-aligned headline, lead, dual CTAs, three product tabs switching one panel) → bordered logo grid → three feature cards → six-cell capability bento → night proof → FAQ → centred closing CTA. Sections use `--spacing-section` (4.5rem); the proof band may use `--spacing-section-wide` (7rem).
+Home order: hero (left-aligned headline, lead, dual CTAs, three product tabs) → quiet logo strip → numbered how-it-works steps → feature bands → proof → FAQ → closing CTA. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
 
-The hero tab rail is three equal columns of title and one-line description (Content, Preview, Publish), hairline dividers, a 2px ink underline on the active tab, and one large product panel underneath. On narrow screens the rail scrolls horizontally.
+The hero tab rail is three equal columns of title and one-line description (Content, Preview, Publish), hairline dividers, a 2px ink underline on the active tab, and one large product panel underneath on a light `sand` plate inside a `shadow-raised` + `border-line` frame. On narrow screens the rail scrolls horizontally.
 
 ## Elevation & Depth
 
@@ -149,7 +149,7 @@ Depth comes from tone (surface, sand, night), 1px hairlines, and a black-tinted 
 
 ## Art
 
-Public-domain Renaissance landscapes sit behind the product previews, so the app windows read as objects in front of a picture. The hero uses Altdorfer's *Danube Landscape with Wörth Castle* as the stage behind the tab panels, not as a band around the tabs. The three feature cards use Altdorfer's *Landscape with a Footbridge*, El Greco's *View of Toledo* and Valckenborch's *Mountainous Landscape*; the ops carousel cycles all five; the agent band uses Verhaecht's *Alpine Landscape*. Every image is a landscape with no figures (some are cropped details), cropped to fill its frame, covered by a flat `bg-night` scrim (20–30%) so the interface keeps contrast, and never used for meaning. Files, sources and licences are in `public/paintings/CREDITS.md`; the ids live in `src/lib/paintings.ts` and render through `Painting.astro`.
+The home page does **not** use painting stages: product mocks sit on `surface` / `sand` with `shadow-raised` and a hairline. Public-domain Renaissance landscapes remain available for unused section leftovers (`Ops`, `AgentBand`) and any future non-home surfaces — files, sources and licences in `public/paintings/CREDITS.md`; ids in `src/lib/paintings.ts` via `Painting.astro`. When a painting is used, crop to fill, add a flat `bg-night` scrim (20–30%), and never use it for meaning.
 
 
 ## Shapes
@@ -173,19 +173,19 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 ## Components
 
 - **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons.
-- **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs (Content, Preview, Publish) that switch one large product panel underneath. The tab rail sits in a framed surface, and the panels float on a single painted stage that stays put while the tabs change.
-- **Logo grid**: bordered cells for Astro, Markdown, GitHub, Claude, Cursor, Codex, plus a short stack note.
-- **Feature cards**: three equal frames over paintings — Markdown editor + slash menu, live preview (desktop/mobile), and `UChatPrompt` composer (Nuxt UI mocks, not screenshots).
-- **Capability bento**: stageshow-style mix — hero Markdown editor (2×1) with slash menu, dark MIT stat, live preview frame, draft-branch picker, stack logos, and a Git statement. Short copy under each tile; no equal-card grid of the same kind.
-- **Proof**: Lee Robinson's quote and a note from the maker.
-- **FAQ**: hairline `<details>` accordion with FAQPage JSON-LD.
+- **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs (Content, Preview, Publish) that switch one large product panel on a sand plate inside a raised hairline frame — no painted stage.
+- **Logo strip**: one muted intro line and inline marks (Astro, Markdown, GitHub, Claude, Cursor, Codex); no bordered cells.
+- **How it works**: numbered open rows (edit → preview → agent) with short copy and the existing Vue mocks in raised sand plates.
+- **Bands**: three open essays (git statement, draft branches + mock, stack logos) separated by whitespace.
+- **Proof**: Lee Robinson's quote and a note from the maker on open paper.
+- **FAQ**: hairline accordion with FAQPage JSON-LD on open paper.
 - **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.
-- **Closing CTA**: left-aligned headline and supporting copy on a 12-column split, one action, and three plain facts in a hairline-divided strip, each led by a small monochrome icon in a hairline tile.
+- **Closing CTA**: open-paper split (headline | body + actions) with a hairline facts strip below; no outer raised cage.
 - **Footer**: an inset sand panel with a large corner radius. The bear lockup and a two-line statement (the offer in ink, the detail in muted) sit on the left with one outline action; three link columns (Product, Resources, More) sit on the right; a hairline row underneath holds the copyright and the legal links.
 
 ## Do's and Don'ts
 
-Do use the tokens and shared utilities (`page`, `label`, `link`, `button`, `button-quiet`, `chip`). Keep every new product mock monochrome apart from the four status colours. Don't add hex values, Tailwind palette classes, arbitrary colour values or `dark:` colour variants outside the token file. Don't add decorative gradients, stock photography, rounded feature cards, shadows on every card, or scroll-triggered reveals.
+Do use the tokens and shared utilities (`page`, `label`, `link`, `button`, `button-quiet`, `chip`). Keep every new product mock monochrome apart from the four status colours. Don't add hex values, Tailwind palette classes, arbitrary colour values or `dark:` colour variants outside the token file. Don't add decorative gradients, stock photography, rounded feature cards, or scroll-triggered reveals. Home product plates may use `shadow-raised`; don't sprinkle shadows on every decorative card.
 
 ## Voice & Tone
 

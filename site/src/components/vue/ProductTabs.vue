@@ -2,7 +2,6 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import UTabs from "@nuxt/ui/components/Tabs.vue";
 import type { AppShotData } from "../../lib/appShotTypes";
-import { paintingSize, paintingUrl } from "../../lib/paintings";
 import AppShot from "./AppShot.vue";
 
 const order = ["content", "preview", "publish"] as const;
@@ -19,8 +18,6 @@ const progress = ref(0);
 const paused = ref(false);
 const reducedMotion = ref(false);
 const activeIndex = computed(() => tabs.findIndex((tab) => tab.value === value.value));
-const stage = paintingUrl("danube");
-const stageSize = paintingSize("danube");
 
 let media: MediaQueryList | undefined;
 const syncMotion = () => (reducedMotion.value = !!media?.matches);
@@ -77,7 +74,7 @@ function onFocusOut(event: FocusEvent) {
     variant="link"
     color="neutral"
     :unmount-on-hide="false"
-    class="gap-0 overflow-hidden border border-line bg-surface"
+    class="gap-0 overflow-hidden rounded-md border border-line bg-surface shadow-raised"
     :ui="{
       list: 'relative z-10 w-full items-stretch gap-0 overflow-x-auto rounded-none border-b border-line p-0 lg:overflow-visible',
       indicator: 'hidden',
@@ -100,28 +97,15 @@ function onFocusOut(event: FocusEvent) {
       </span>
     </template>
     <template #content="{ item, index }">
-      <div class="relative aspect-video w-full overflow-hidden">
-        <img
-          :src="stage"
-          :width="stageSize.width"
-          :height="stageSize.height"
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          decoding="async"
-          class="absolute inset-0 size-full object-cover"
+      <div class="relative flex aspect-video w-full items-center justify-center overflow-hidden bg-sand p-1.5 sm:p-4 md:p-6">
+        <AppShot
+          :shot="props.shots[item.value]"
+          :alt="item.alt"
+          sizes="(min-width: 80rem) 76rem, 100vw"
+          :eager="index === 0"
+          :play="item.value === 'preview'"
+          class="h-full max-h-full w-auto max-w-full"
         />
-        <div class="absolute inset-0 bg-night/25" aria-hidden="true" />
-        <div class="relative flex size-full flex-col items-center justify-center p-1.5 sm:p-4 md:p-6">
-          <AppShot
-            :shot="props.shots[item.value]"
-            :alt="item.alt"
-            sizes="(min-width: 80rem) 76rem, 100vw"
-            :eager="index === 0"
-            :play="item.value === 'preview'"
-            class="h-full max-h-full w-auto max-w-full"
-          />
-        </div>
       </div>
     </template>
   </UTabs>
