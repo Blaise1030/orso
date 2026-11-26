@@ -1,0 +1,22 @@
+---
+/**
+ * Orso’s ASCII bear mascot — terminal-style side profile for the home hero.
+ * Decorative; keep aria-hidden when a nearby heading names the product.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const art = [
+  "      .--.  /",
+  "     /  oo\\/",
+  "    |  (__/",
+  "     \\_  /",
+  "       ||",
+].join("\n");
+---
+
+<pre
+  class:list={["m-0 overflow-visible font-mono text-small leading-snug text-muted select-none", className]}
+  aria-hidden="true">{art}</pre>
