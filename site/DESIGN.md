@@ -175,7 +175,8 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 - **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons.
 - **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs (Content, Preview, Publish) that switch one large product panel underneath. The tab rail sits in a framed surface, and the panels float on a single painted stage that stays put while the tabs change.
 - **Logo grid**: bordered cells for Astro, Markdown, GitHub, Claude, Cursor, Codex, plus a short stack note.
-- **Feature cards**: three equal frames — Markdown editor, Preview on a branch, Agent for bigger changes — each holding a mini preview over a painting.
+- **Feature cards**: three equal frames — Markdown editor, Preview on a branch, Agent for bigger changes — each holding a mini preview over a painting. The agent card overlays a decorative `UChatPrompt` composer (same Nuxt UI pieces as the app) on the shot.
+- **Bento slash menu**: the Markdown editor cell overlays a decorative slash-command list (same Hugeicons/labels as the TipTap slash menu) on the TipTap shot.
 - **Capability bento**: six equal `UCard` cells in a hairline grid. Four use real app shots over paintings (history, TipTap editor, live preview, changes/Publish); Keep your stack and Open source use the same card shell with logos or a MIT `UBadge`.
 - **Proof**: Lee Robinson's quote and a note from the maker.
 - **FAQ**: hairline `<details>` accordion with FAQPage JSON-LD.

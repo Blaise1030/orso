@@ -111,7 +111,14 @@
         "agent": {
           "title": "An agent for bigger changes",
           "description": "Ask for a page, a pass on the FAQ, or a new section. The agent edits the repo; you still own Publish.",
-          "alt": "Orso's agent panel next to the site preview, ready for a request."
+          "alt": "Orso's agent panel next to the site preview, ready for a request.",
+          "composer": {
+            "prompt": "Add an FAQ section to the pricing page",
+            "placeholder": "Ask your assistant to change your site",
+            "pageContext": "pricing",
+            "modelLabel": "Claude",
+            "sendLabel": "Send"
+          }
         }
       }
     },

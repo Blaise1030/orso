@@ -3,6 +3,7 @@ import UBadge from "@nuxt/ui/components/Badge.vue";
 import UCard from "@nuxt/ui/components/Card.vue";
 import Painting from "../Painting.astro";
 import AppShot from "../vue/AppShot.vue";
+import SlashMenuMock from "../vue/SlashMenuMock.vue";
 import { appShot } from "../../lib/appShots";
 import { getI18n } from "../../i18n";
 import type { PaintingId } from "../../lib/paintings";
@@ -19,6 +20,7 @@ const shotCells = [
     key: "editor" as const,
     painting: "toledo" as PaintingId,
     shot: await appShot("ops-content"),
+    slash: true,
   },
   {
     key: "preview" as const,
@@ -39,12 +41,14 @@ const stack = [
 ];
 
 const cardUi = { header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" };
+const cellBorder =
+  "border-b border-line sm:odd:border-r lg:border-r lg:border-b-0 lg:[&:nth-child(-n+3)]:border-b lg:[&:nth-child(3n)]:border-r-0";
 ---
 
 <section class="mx-auto max-w-7xl border-x border-b border-line" id="capabilities" aria-label={t("home.bento.label")}>
   <ul class="grid border-t border-line sm:grid-cols-2 lg:grid-cols-3">
     {shotCells.map((cell) => (
-      <li class="border-b border-line sm:odd:border-r lg:border-r lg:border-b-0 lg:[&:nth-child(-n+3)]:border-b lg:[&:nth-child(3n)]:border-r-0">
+      <li class={cellBorder}>
         <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
           <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
             <Painting id={cell.painting} />
@@ -56,6 +60,13 @@ const cardUi = { header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:
                 sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 50vw, 100vw"
                 class="h-full max-h-full w-auto max-w-full"
               />
+              {cell.slash && (
+                <div class="pointer-events-none absolute inset-0 flex items-center justify-center p-4 md:justify-end md:p-6">
+                  <div class="md:translate-x-1 md:translate-y-2">
+                    <SlashMenuMock client:visible />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           <h3 class="text-heading tracking-normal text-ink">{t(`home.bento.cells.${cell.key}.title`)}</h3>
@@ -64,7 +75,7 @@ const cardUi = { header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:
       </li>
     ))}
 
-    <li class="border-b border-line sm:odd:border-r lg:border-r lg:border-b-0 lg:[&:nth-child(-n+3)]:border-b lg:[&:nth-child(3n)]:border-r-0">
+    <li class={cellBorder}>
       <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
         <div slot="header" class="relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-md border border-line bg-sand">
           <ul class="flex flex-wrap items-center justify-center gap-5 px-4">

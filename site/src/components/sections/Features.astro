@@ -1,14 +1,23 @@
 ---
 import UCard from "@nuxt/ui/components/Card.vue";
 import Painting from "../Painting.astro";
+import AgentComposerMock from "../vue/AgentComposerMock.vue";
 import AppShot from "../vue/AppShot.vue";
 import { appShot } from "../../lib/appShots";
 import { getI18n } from "../../i18n";
 
-const { t } = getI18n(Astro.url);
+const { t, group } = getI18n(Astro.url);
+const composer = group<{
+  prompt: string;
+  placeholder: string;
+  pageContext: string;
+  modelLabel: string;
+  sendLabel: string;
+}>("home.features.cards.agent.composer");
 
 const cards = [
   {
+    key: "drafts" as const,
     title: t("home.features.cards.drafts.title"),
     description: t("home.features.cards.drafts.description"),
     painting: "bridge" as const,
@@ -16,6 +25,7 @@ const cards = [
     alt: t("home.features.cards.drafts.alt"),
   },
   {
+    key: "review" as const,
     title: t("home.features.cards.review.title"),
     description: t("home.features.cards.review.description"),
     painting: "toledo" as const,
@@ -23,6 +33,7 @@ const cards = [
     alt: t("home.features.cards.review.alt"),
   },
   {
+    key: "agent" as const,
     title: t("home.features.cards.agent.title"),
     description: t("home.features.cards.agent.description"),
     painting: "rocks" as const,
@@ -61,6 +72,18 @@ const cards = [
                 sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 33vw, 100vw"
                 class="h-full max-h-full w-auto max-w-full"
               />
+              {card.key === "agent" && (
+                <div class="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center bg-linear-to-t from-night/50 to-transparent p-3 pt-10 md:p-4">
+                  <AgentComposerMock
+                    client:visible
+                    prompt={composer.prompt}
+                    placeholder={composer.placeholder}
+                    page-context={composer.pageContext}
+                    model-label={composer.modelLabel}
+                    send-label={composer.sendLabel}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <h3 class="text-heading tracking-normal text-ink">{card.title}</h3>

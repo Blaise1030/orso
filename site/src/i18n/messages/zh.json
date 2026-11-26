@@ -111,7 +111,14 @@
         "agent": {
           "title": "更大改动交给智能体",
           "description": "让它新建页面、润色常见问题，或添加新版块。智能体改仓库；Publish 仍由你决定。",
-          "alt": "Orso 的智能体面板位于网站预览旁，随时待命。"
+          "alt": "Orso 的智能体面板位于网站预览旁，随时待命。",
+          "composer": {
+            "prompt": "给定价页加一个常见问题版块",
+            "placeholder": "让助手修改你的网站",
+            "pageContext": "pricing",
+            "modelLabel": "Claude",
+            "sendLabel": "发送"
+          }
         }
       }
     },

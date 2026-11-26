@@ -111,7 +111,14 @@
         "agent": {
           "title": "Ejen untuk perubahan lebih besar",
           "description": "Minta halaman, suntingan FAQ, atau bahagian baharu. Ejen menyunting repo; anda masih mengawal Publish.",
-          "alt": "Panel ejen Orso di sebelah pratonton laman, sedia menerima permintaan."
+          "alt": "Panel ejen Orso di sebelah pratonton laman, sedia menerima permintaan.",
+          "composer": {
+            "prompt": "Tambah bahagian FAQ pada halaman harga",
+            "placeholder": "Minta pembantu anda mengubah laman anda",
+            "pageContext": "pricing",
+            "modelLabel": "Claude",
+            "sendLabel": "Hantar"
+          }
         }
       }
     },
