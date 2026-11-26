@@ -149,7 +149,19 @@
         "branches": {
           "title": "Percabangan yang terasa seperti draf",
           "body": "Setiap perubahan ialah cabang dan pull request. Tiada apa-apa sampai ke main sehingga seseorang menekan Publish.",
-          "alt": "Menu perubahan Orso menyenaraikan laman langsung dan draf terbuka, di sebelah Review dan Publish."
+          "alt": "Menu perubahan Orso menyenaraikan laman langsung dan draf terbuka, di sebelah Review dan Publish.",
+          "picker": {
+            "trigger": "FAQ pada harga",
+            "searchPlaceholder": "Cari perubahan…",
+            "liveLabel": "Laman langsung",
+            "liveDescription": "main",
+            "draftLabel": "FAQ pada harga",
+            "draftDescription": "change/faq-pricing · 2j lalu",
+            "reviewLabel": "Semakan hero laman utama",
+            "reviewDescription": "change/homepage-hero · semalam",
+            "reviewBadge": "Dalam semakan",
+            "newChangeLabel": "Perubahan baharu"
+          }
         },
         "stack": {
           "title": "Kekalkan stack anda",

@@ -149,7 +149,19 @@
         "branches": {
           "title": "Branching that feels like drafts",
           "body": "Every change is a branch and a pull request. Nothing reaches main until someone presses Publish.",
-          "alt": "Orso's changes menu listing the live site and open drafts, next to Review and Publish."
+          "alt": "Orso's changes menu listing the live site and open drafts, next to Review and Publish.",
+          "picker": {
+            "trigger": "FAQ on pricing",
+            "searchPlaceholder": "Search changes…",
+            "liveLabel": "Live site",
+            "liveDescription": "main",
+            "draftLabel": "FAQ on pricing",
+            "draftDescription": "change/faq-pricing · 2h ago",
+            "reviewLabel": "Homepage hero pass",
+            "reviewDescription": "change/homepage-hero · yesterday",
+            "reviewBadge": "In review",
+            "newChangeLabel": "New change"
+          }
         },
         "stack": {
           "title": "Keep your stack",

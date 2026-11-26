@@ -149,7 +149,19 @@
         "branches": {
           "title": "像草稿一样的分支",
           "body": "每次修改都是一个分支和拉取请求。在有人点击 Publish 之前，不会进入 main。",
-          "alt": "Orso 的更改菜单列出线上网站和未完成的草稿，旁边是 Review 和 Publish。"
+          "alt": "Orso 的更改菜单列出线上网站和未完成的草稿，旁边是 Review 和 Publish。",
+          "picker": {
+            "trigger": "定价页常见问题",
+            "searchPlaceholder": "搜索更改…",
+            "liveLabel": "线上网站",
+            "liveDescription": "main",
+            "draftLabel": "定价页常见问题",
+            "draftDescription": "change/faq-pricing · 2 小时前",
+            "reviewLabel": "首页主视觉润色",
+            "reviewDescription": "change/homepage-hero · 昨天",
+            "reviewBadge": "审核中",
+            "newChangeLabel": "新建更改"
+          }
         },
         "stack": {
           "title": "保留你的技术栈",

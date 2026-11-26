@@ -3,15 +3,28 @@ import UBadge from "@nuxt/ui/components/Badge.vue";
 import UCard from "@nuxt/ui/components/Card.vue";
 import Painting from "../Painting.astro";
 import AppShot from "../vue/AppShot.vue";
+import BranchPickerMock from "../vue/BranchPickerMock.vue";
 import SlashMenuMock from "../vue/SlashMenuMock.vue";
 import { appShot } from "../../lib/appShots";
 import { getI18n } from "../../i18n";
 import type { PaintingId } from "../../lib/paintings";
 
-const { t } = getI18n(Astro.url);
+const { t, group } = getI18n(Astro.url);
+const branchPicker = group<{
+  trigger: string;
+  searchPlaceholder: string;
+  liveLabel: string;
+  liveDescription: string;
+  draftLabel: string;
+  draftDescription: string;
+  reviewLabel: string;
+  reviewDescription: string;
+  reviewBadge: string;
+  newChangeLabel: string;
+}>("home.bento.cells.branches.picker");
 
 type ShotCell = {
-  key: "git" | "preview" | "branches";
+  key: "git" | "preview";
   painting: PaintingId;
   shot: Awaited<ReturnType<typeof appShot>>;
 };
@@ -19,7 +32,6 @@ type ShotCell = {
 const shotCells: ShotCell[] = [
   { key: "git", painting: "bridge", shot: await appShot("ops-history") },
   { key: "preview", painting: "rocks", shot: await appShot("ops-preview") },
-  { key: "branches", painting: "alps", shot: await appShot("ops-publish") },
 ];
 
 const stack = [
@@ -89,17 +101,20 @@ const cellBorder =
 
     <li class={cellBorder}>
       <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
-        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
-          <Painting id={shotCells[2].painting} />
-          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-          <div class="relative flex size-full items-center justify-center p-3 md:p-4">
-            <AppShot
-              shot={shotCells[2].shot}
-              alt={t("home.bento.cells.branches.alt")}
-              sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 50vw, 100vw"
-              class="h-full max-h-full w-auto max-w-full"
-            />
-          </div>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line bg-sand p-2 md:p-3">
+          <BranchPickerMock
+            client:visible
+            trigger={branchPicker.trigger}
+            search-placeholder={branchPicker.searchPlaceholder}
+            live-label={branchPicker.liveLabel}
+            live-description={branchPicker.liveDescription}
+            draft-label={branchPicker.draftLabel}
+            draft-description={branchPicker.draftDescription}
+            review-label={branchPicker.reviewLabel}
+            review-description={branchPicker.reviewDescription}
+            review-badge={branchPicker.reviewBadge}
+            new-change-label={branchPicker.newChangeLabel}
+          />
         </div>
         <h3 class="text-heading tracking-normal text-ink">{t("home.bento.cells.branches.title")}</h3>
         <p class="mt-1 text-small leading-6 text-muted">{t("home.bento.cells.branches.body")}</p>
