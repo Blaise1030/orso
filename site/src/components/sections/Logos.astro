@@ -6,9 +6,9 @@ const { t } = getI18n(Astro.url);
 
 /** Stack marks are full lockups; Codex is icon-only (OpenAI monoblossom) so it gets a caption. */
 const stack = [
-  { name: "Astro", file: "astro" },
-  { name: "Markdown", file: "markdown" },
-  { name: "GitHub", file: "github" },
+  { name: "Astro", file: "astro", heightClass: "h-10" },
+  { name: "Markdown", file: "markdown", heightClass: "h-8" },
+  { name: "GitHub", file: "github", heightClass: "h-8" },
 ];
 const agents = [
   { name: "Claude", file: "claude" },
@@ -45,7 +45,7 @@ const comingSoon = [
                   alt={logo.name}
                   width="160"
                   height="40"
-                  class="h-8 w-auto max-w-full object-contain object-left"
+                  class:list={[logo.heightClass, "w-auto max-w-full object-contain object-left"]}
                   loading="lazy"
                   decoding="async"
                 />
