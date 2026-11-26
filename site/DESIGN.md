@@ -179,7 +179,7 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 - **Setup**: Gui-style cost-and-setup copy — free/open source, bring your own agent, nothing to migrate.
 - **Bands**: open essays (git statement, draft branches + inset figure, stack logos) separated by whitespace.
 - **Proof**: Lee Robinson's quote and a note from the maker on open paper.
-- **FAQ**: hairline accordion with FAQPage JSON-LD on open paper.
+- **FAQ**: stacked title and intro, then a full-width hairline accordion with FAQPage JSON-LD.
 - **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.
 - **Closing CTA**: stacked title, body, dual actions and platforms note; no split columns or facts strip.
 - **Footer**: an inset sand panel with a large corner radius. The bear lockup and a two-line statement (the offer in ink, the detail in muted) sit on the left with one outline action; three link columns (Product, Resources, More) sit on the right; a hairline row underneath holds the copyright and the legal links.
