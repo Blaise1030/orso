@@ -69,6 +69,33 @@ describe("ProjectPage", () => {
     expect(router.currentRoute.value.path).toBe("/p/a/preview");
   });
 
+  it("asks before setup when the project needs orso.json", async () => {
+    h.daemon = createFakeDaemon({
+      listProjects: vi.fn(async () => [{ ...project("a"), devserver: "needsSetup" as const }]),
+    });
+    setActivePinia(createPinia());
+    router = createRouter({ history: createMemoryHistory(), routes });
+    await router.push("/p/a");
+    const w = mount(ProjectPage, {
+      props: { id: "a" },
+      global: {
+        plugins: [router],
+        stubs: {
+          ...stubs,
+          ProjectSetupPrompt: {
+            props: ["projectId"],
+            template: "<div data-testid='project-setup-prompt'>{{ projectId }}</div>",
+          },
+        },
+      },
+    });
+    await useProjectsStore().load();
+    await flushPromises();
+    expect(w.find("[data-testid='project-setup-prompt']").text()).toBe("a");
+    expect(w.find("[data-testid='workspace']").exists()).toBe(false);
+    expect(w.find("[data-testid='chat']").exists()).toBe(false);
+  });
+
   it("shows the agent beside the design editor", async () => {
     const w = await mountAt("/p/a/design");
     expect(w.find("[data-testid='shell']").attributes("data-show-chat")).toBe("true");

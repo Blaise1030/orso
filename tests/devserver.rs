@@ -141,6 +141,14 @@ impl Env {
             .call("POST", "/api/projects", Some(json!({ "name": name })))
             .await;
         assert_eq!(s, StatusCode::CREATED, "{v}");
+        // Template ships without orso.json (ask-first). Supervision tests need a
+        // config file so start actually spawns the stand-in script.
+        let id = v["id"].as_str().unwrap();
+        std::fs::write(self.root.join(id).join("orso.json"), "{}\n").unwrap();
+        let (s, v) = self
+            .call("POST", &format!("/api/projects/{id}/devserver/restart"), None)
+            .await;
+        assert_eq!(s, StatusCode::OK, "{v}");
         v
     }
 
@@ -335,8 +343,17 @@ async fn startup_crashes_only_publish_the_terminal_state_with_the_output_tail() 
     let info = env.create("Site").await;
     assert_eq!(info["devserver"], "starting");
     let crashed = events.status("site", "crashed").await;
-    // The project never left `starting` while retrying, so nothing else was published.
-    assert_eq!(events.seen.len(), 1, "{:?}", events.seen);
+    // Ask-first create may publish needsSetup before restart; once supervision
+    // begins, retries stay on `starting` and only the terminal crash is published.
+    let after_setup: Vec<_> = events
+        .seen
+        .iter()
+        .skip_while(|e| e["state"] == "needsSetup")
+        .cloned()
+        .collect();
+    assert_eq!(after_setup.len(), 2, "{after_setup:?}");
+    assert_eq!(after_setup[0]["state"], "starting");
+    assert_eq!(after_setup[1]["state"], "crashed");
     assert!(crashed["message"].as_str().unwrap().contains("boom-output"));
 }
 
@@ -381,6 +398,7 @@ exec sleep 300
 async fn unrecordable_reported_port_is_never_announced_ready() {
     let env = env_with(script(WRONG_PORT));
     let info = env.state.projects.create("Site").await.unwrap();
+    std::fs::write(env.file("site", "orso.json"), "{}\n").unwrap();
     let mut events = env.events();
     break_registry_persistence(&env.root);
     env.state.devservers.start("site").await.unwrap();
@@ -413,6 +431,7 @@ async fn unrecordable_reported_port_is_never_announced_ready() {
 async fn start_failure_marks_project_crashed_and_restart_recovers() {
     let env = env_with(script(READY));
     let info = env.state.projects.create("Site").await.unwrap();
+    std::fs::write(env.file("site", "orso.json"), "{}\n").unwrap();
     let mut events = env.events();
     // Port taken + registry unwritable => no usable port can be assigned.
     let squatter = std::net::TcpListener::bind(("127.0.0.1", info.port)).unwrap();
@@ -563,6 +582,10 @@ async fn daemon_restart_resumes_projects_and_reallocates_a_busy_port() {
         let first = AppState::with_options(config(&root), false, script(READY));
         let a = first.projects.create("Alpha").await.unwrap();
         let b = first.projects.create("Beta").await.unwrap();
+        // Template ships without orso.json; resume needs one to spawn.
+        for id in [&a.id, &b.id] {
+            std::fs::write(root.join(id).join("orso.json"), "{}\n").unwrap();
+        }
         (a.port, b.port)
     };
     // Something else grabbed Alpha's port while the daemon was down.
@@ -758,6 +781,8 @@ async fn disabled_supervision_leaves_projects_starting_and_restart_is_a_noop() {
     let state = AppState::with_scaffold_install(config(tmp.path()), false);
     let app = http::router(state.clone());
     let info = state.projects.create("Site").await.unwrap();
+    // Gate needs orso.json; with the launcher disabled, start still leaves `starting`.
+    std::fs::write(tmp.path().join("site/orso.json"), "{}\n").unwrap();
     assert!(!state.devservers.enabled());
     let res = app
         .oneshot(

@@ -158,7 +158,7 @@ describe("onboarding step 1: assistant", () => {
     expect(guide.text()).toContain("Install OpenCode");
     expect(guide.text()).toContain("curl -fsSL https://opencode.ai/v2/install | bash");
     expect(guide.find("[data-testid='assistant-guide-copy-install-opencode']").exists()).toBe(true);
-    expect(guide.text()).toContain("No account needed");
+    expect(guide.text()).toContain("opencode auth login");
 
     expect(w.find("[data-testid^='onboarding-setup-']").exists()).toBe(false);
     expect(w.find("[data-testid='onboarding-existing']").exists()).toBe(false);

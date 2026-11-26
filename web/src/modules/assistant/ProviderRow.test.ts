@@ -51,7 +51,7 @@ describe("ProviderRow phases", () => {
     );
 
     expect(w.text()).toContain("OpenCode");
-    expect(w.text()).toContain("Free models, no account needed.");
+    expect(w.text()).toContain("Free models after you sign in.");
     expect(w.text()).toContain("Recommended");
     expect(action(w).text()).toBe(LABELS.setUp);
     expect(w.find("[data-testid='assistant-status-opencode']").exists()).toBe(false);
@@ -82,11 +82,10 @@ describe("ProviderRow phases", () => {
     expect(w.emitted("action")).toEqual([["signIn"]]);
   });
 
-  it("keeps OpenCode connected on free models without a sign-in", () => {
-    const w = render(provider("opencode", { signedIn: null, chatReady: true, freeModels: true }));
+  it("asks OpenCode to sign in even when free models are available", () => {
+    const w = render(provider("opencode", { signedIn: false, chatReady: false, freeModels: true }));
 
-    expect(w.get("[data-testid='assistant-status-opencode']").text()).toBe(LABELS.connected);
-    expect(w.text()).not.toContain(LABELS.signInRequired);
+    expect(w.get("[data-testid='assistant-status-opencode']").text()).toBe(LABELS.signInRequired);
     expect(action(w).text()).toBe(LABELS.connect);
   });
 

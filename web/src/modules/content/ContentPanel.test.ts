@@ -11,7 +11,10 @@ import { useProjectsStore } from "@/modules/projects/store";
 import type { Project } from "@/core/types";
 const h = vi.hoisted(() => ({ daemon: null as unknown as FakeDaemon, toastError: vi.fn() }));
 vi.mock("@/core/daemon", () => ({ useDaemon: () => h.daemon }));
-vi.mock("@/lib/toast", () => ({ toast: { warning: vi.fn(), success: vi.fn(), error: h.toastError } }));
+vi.mock("@/lib/toast", () => ({ toast: { warning: vi.fn(), success: vi.fn(), info: vi.fn(), error: h.toastError } }));
+import { toast } from "@/lib/toast";
+import { useAgentOutboxStore } from "@/modules/chat/outbox";
+import { SETUP_TOOLKIT_PROMPT } from "./agentRequests";
 import { REFRESH_DELAY_MS, useContentStore } from "./store";
 /** A Nuxt UI component wrapper; its generic props type does not survive `findComponent`. */
 type AnyWrapper = Omit<VueWrapper, "props"> & { props(key: string): unknown };
@@ -296,11 +299,24 @@ it("explains an empty catalog: the site needs the orso-astro integration", async
  const w = await setup({ listContentCollections: async () => [] }); await flushPromises();
  const empty = w.get('[data-testid="content-empty-catalog"]').text();
  for (const part of ["orso-astro", "orso()", "astro.config", "orsoGlob", "src/content.config.ts", "preview starts"]) expect(empty).toContain(part);
+ expect(w.get('[data-testid="content-setup-toolkit"]').text()).toMatch(/Set up with assistant/i);
  expect(w.text()).not.toContain("Select a collection and entry");
  w.unmount();
  const listed = await setup(); await flushPromises();
  expect(listed.find('[data-testid="content-empty-catalog"]').exists()).toBe(false);
  listed.unmount();
+});
+
+it("asks the agent to set up the toolkit from the empty catalog", async () => {
+ const w = await setup({ listContentCollections: async () => [] }); await flushPromises();
+ await w.get('[data-testid="content-setup-toolkit"]').trigger("click");
+ expect(useAgentOutboxStore().messages[0]).toEqual({
+  kind: "text",
+  text: SETUP_TOOLKIT_PROMPT,
+  submit: true,
+ });
+ expect(toast.info).toHaveBeenCalledWith("Asked the agent to set up the toolkit");
+ w.unmount();
 });
 const blogPreview = { ...blog, hasPreviewPath: true };
 function withDevserver(devserver: Project["devserver"]) {

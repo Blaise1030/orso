@@ -3,7 +3,7 @@
 // vendor's Terminal commands, polled until done) and the site-builder download. It works embedded (SetupCheck) and inside a dialog:
 // the data comes from the assistant store, `initial` is a read-only fallback
 // for previews and tests, and the caller owns Continue / dismissal.
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import UButton from "@nuxt/ui/components/Button.vue";
 import UIcon from "@nuxt/ui/components/Icon.vue";
 import ProviderRow from "./ProviderRow.vue";
@@ -48,6 +48,22 @@ onMounted(() => {
   void store.load();
 });
 
+/** In the setup dialog, open the first assistant that still needs install/sign-in. */
+const openedInitialGuide = ref(false);
+watch(
+  rows,
+  (next) => {
+    if (!props.showContinue || openedInitialGuide.value || props.initial || !next.length) return;
+    const needs = next.find(
+      (row) => row.signInRequired || row.action === "setup" || row.action === "signIn",
+    );
+    if (!needs) return;
+    openedInitialGuide.value = true;
+    store.openGuide(needs.id);
+  },
+  { immediate: true },
+);
+
 const rechecking = ref(false);
 
 async function recheck() {
@@ -59,9 +75,9 @@ async function recheck() {
   }
 }
 
-/** An assistant's install guide shows under its row until it can chat. */
+/** An assistant's install guide shows until it can chat (incl. OpenCode Console). */
 function showGuide(row: AssistantRow): boolean {
-  return !row.chatReady && store.guideOpen(row.id);
+  return (!row.chatReady || row.signInRequired) && store.guideOpen(row.id);
 }
 
 function toggleGuide(id: string) {

@@ -1,9 +1,18 @@
 import type { DynamicToolUIPart, UIMessage } from "ai";
 import type { UiChunk } from "@/core/types";
-import type { CheckpointData, ToolInput } from "./parts";
+import type { AgentErrorData, CheckpointData, ToolInput } from "./parts";
+import { spawnRecovery } from "./recovery";
 
 type Part = UIMessage["parts"][number];
 type ToolCall = Record<string, unknown>;
+
+/** Map a stream error message to the same recovery codes the sign-in / setup cards use. */
+function agentErrorCode(message: string): AgentErrorData["code"] {
+  const recovery = spawnRecovery(message);
+  if (recovery === "signIn") return "login";
+  if (recovery === "setup") return "not_installed";
+  return "failed";
+}
 
 /** ACP tool kinds → the labels ChatMessage knows. */
 const TOOL_NAMES: Record<string, string> = {
@@ -168,7 +177,7 @@ export function createTranscript(opts: TranscriptOptions = {}): Transcript {
         if (hideSteps) break;
         assistantMessage().parts.push({
           type: "data-agent-error",
-          data: { code: "failed", message: chunk.message },
+          data: { code: agentErrorCode(chunk.message), message: chunk.message },
         } as Part);
         break;
       default:

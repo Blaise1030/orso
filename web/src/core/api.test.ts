@@ -68,6 +68,20 @@ describe("createApi", () => {
     expect(fetchMock.mock.calls[0]![1]!.method).toBe("DELETE");
   });
 
+  it("posts init to set up orso.json", async () => {
+    const fetchMock = vi.fn<FetchLike>(async () => json({ id: "p1", devserver: "starting" }));
+    await api(fetchMock).initProject("p1");
+    expect(fetchMock.mock.calls[0]![0]).toBe("http://127.0.0.1:7800/api/projects/p1/init");
+    expect(fetchMock.mock.calls[0]![1]!.method).toBe("POST");
+  });
+
+  it("posts init to set up orso.json", async () => {
+    const fetchMock = vi.fn<FetchLike>(async () => json({ id: "p1", devserver: "starting" }));
+    await api(fetchMock).initProject("p1");
+    expect(fetchMock.mock.calls[0]![0]).toBe("http://127.0.0.1:7800/api/projects/p1/init");
+    expect(fetchMock.mock.calls[0]![1]!.method).toBe("POST");
+  });
+
   it("reads diffs as text", async () => {
     const fetchMock = vi.fn<FetchLike>(async () => new Response("diff --git a b"));
     expect(await api(fetchMock).checkpointDiff("p", "abc")).toBe("diff --git a b");

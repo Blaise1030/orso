@@ -401,6 +401,9 @@ impl AcpClient {
     }
 
     pub async fn session_new(&self, cwd: &Path) -> Result<SessionNew> {
+        // `mcpServers` must be an array (ACP adapters reject omitted/undefined with -32602).
+        // `[]` means no *client-provided* servers; MCP the agent loads from its own user
+        // config is unaffected. Do not omit the field.
         let result = self
             .request(
                 "session/new",

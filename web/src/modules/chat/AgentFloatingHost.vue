@@ -129,7 +129,7 @@ async function confirmDelete() {
     try {
       await store.remove(props.projectId, target.id);
     } catch {
-      // Daemon refuses (e.g. still running).
+      // Daemon refused (missing chat, network, …).
       return;
     }
   } else if (activeId.value === target.id) {
@@ -229,7 +229,7 @@ defineExpose({ expand, minimize, close: closePanel });
             cn(
               'group relative flex h-7 max-w-48 shrink-0 items-center gap-1.5 rounded-full py-0 pl-3 pr-3 text-left text-xs font-normal transition-all active:translate-y-px',
               // Close control is absolutely positioned so it does not reserve width when hidden.
-              !tab.running && 'hover:pr-6 focus-within:pr-6',
+              'hover:pr-6 focus-within:pr-6',
               tab.active
                 ? 'bg-elevated text-highlighted font-medium'
                 : 'text-muted hover:bg-elevated hover:text-highlighted',
@@ -261,7 +261,6 @@ defineExpose({ expand, minimize, close: closePanel });
           <!-- A picked element or selection shows as its tag, like in the chat, not raw markup. -->
           <ChatTitle class="min-w-0 flex-1" :title="tab.title" />
           <UButton
-            v-if="!tab.running"
             type="button"
             color="neutral"
             variant="ghost"

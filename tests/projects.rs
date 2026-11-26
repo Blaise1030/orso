@@ -84,7 +84,8 @@ async fn create_copies_template_inits_git_and_returns_id_and_port() {
     let body = create(&app, "My Cool Site").await;
     assert_eq!(body["id"], "my-cool-site");
     assert_eq!(body["name"], "My Cool Site");
-    assert_eq!(body["devserver"], "starting");
+    // Template ships without orso.json — ask-first before the preview starts.
+    assert_eq!(body["devserver"], "needsSetup");
     let port = body["port"].as_u64().unwrap();
     assert!(port > 1024 && port < 65536);
 
@@ -277,7 +278,10 @@ async fn registry_survives_restart() {
 
     let second = app(tmp.path());
     let (_, list) = call(&second, req("GET", "/api/projects", None)).await;
-    assert_eq!(list["projects"], json!([created]));
+    // Devserver status is runtime-only; a fresh process starts as `starting` until resume.
+    let mut expected = created.clone();
+    expected["devserver"] = json!("starting");
+    assert_eq!(list["projects"], json!([expected]));
 
     // a project whose dir vanished is dropped on load
     std::fs::remove_dir_all(tmp.path().join("persist-me")).unwrap();

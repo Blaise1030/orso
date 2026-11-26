@@ -170,11 +170,13 @@ const DOT: Record<DevserverState, string> = {
   starting: "bg-warning animate-pulse",
   ready: "bg-success",
   crashed: "bg-error",
+  needsSetup: "bg-muted",
 };
 const LABEL: Record<DevserverState, string> = {
   starting: "Dev server starting",
   ready: "Dev server ready",
   crashed: "Dev server crashed",
+  needsSetup: "Project needs setup",
 };
 
 // --- Browser shell ---------------------------------------------------------------------------

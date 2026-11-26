@@ -111,6 +111,27 @@ describe("chunksToMessages", () => {
     ]);
   });
 
+  it("maps ACP authentication errors to a sign-in card", () => {
+    const [, assistant] = chunksToMessages([
+      { type: "user_text", session_id: s, text: "go" },
+      {
+        type: "error",
+        message:
+          'ACP error: {"code":-32000,"message":"Authentication required: provider authentication required","data":{}}',
+      },
+    ]);
+    expect(assistant!.parts).toEqual([
+      {
+        type: "data-agent-error",
+        data: {
+          code: "login",
+          message:
+            'ACP error: {"code":-32000,"message":"Authentication required: provider authentication required","data":{}}',
+        },
+      },
+    ]);
+  });
+
   it("drops agent errors from a sync transcript but keeps them for a normal chat", () => {
     const chunks = [
       { type: "user_text", session_id: s, text: "go" },
@@ -122,7 +143,10 @@ describe("chunksToMessages", () => {
     expect(normal[1]!.parts).toEqual([
       {
         type: "data-agent-error",
-        data: { code: "failed", message: "failed to spawn ACP agent `/usr/local/bin/cursor-agent`" },
+        data: {
+          code: "not_installed",
+          message: "failed to spawn ACP agent `/usr/local/bin/cursor-agent`",
+        },
       },
       { type: "text", text: "Your assistant isn't available." },
     ]);

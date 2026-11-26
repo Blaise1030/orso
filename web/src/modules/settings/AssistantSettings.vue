@@ -96,7 +96,7 @@ async function recheck() {
 
 /** An assistant's install guide shows under its row until it can chat. */
 function showGuide(row: AssistantRow): boolean {
-  return !row.chatReady && store.guideOpen(row.id);
+  return (!row.chatReady || row.signInRequired) && store.guideOpen(row.id);
 }
 
 function onAction(row: AssistantRow, action: RowAction) {

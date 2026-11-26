@@ -5,8 +5,31 @@ import { createPinia, setActivePinia } from "pinia";
 import { createFakeDaemon, type FakeDaemon } from "@/test/fakeDaemon";
 import type { SetupProvider } from "@/core/types";
 
-const h = vi.hoisted(() => ({ daemon: null as unknown as FakeDaemon }));
-vi.mock("@/core/daemon", () => ({ useDaemon: () => h.daemon }));
+const hStub = vi.hoisted(() => {
+  // Lazy stub so vi.mock factories can close over it without TDZ issues.
+  const run = vi.fn();
+  return { daemon: null as unknown as FakeDaemon, run };
+});
+vi.mock("@/core/daemon", () => ({ useDaemon: () => hStub.daemon }));
+vi.mock("@/app/SetupTerminal.vue", async () => {
+  const { defineComponent, h, ref } = await import("vue");
+  return {
+    default: defineComponent({
+      name: "SetupTerminal",
+      props: { label: { type: String, default: null } },
+      setup(_, { expose, emit }) {
+        const state = ref<"idle" | "running" | "done" | "failed">("idle");
+        function run(command: string) {
+          hStub.run(command);
+          state.value = "running";
+          emit("status", "running", `Running ${command}`);
+        }
+        expose({ run, state });
+        return () => h("div", { "data-testid": "setup-terminal" });
+      },
+    }),
+  };
+});
 
 import AssistantDialog from "./AssistantDialog.vue";
 import { assistantDialogOpen } from "./dialog";
@@ -25,7 +48,7 @@ const provider = (over: Partial<SetupProvider> = {}): SetupProvider => ({
 });
 
 function mountDialog(providers: SetupProvider[] = [provider()]) {
-  h.daemon = createFakeDaemon({
+  hStub.daemon = createFakeDaemon({
     setupStatus: vi.fn(async () => ({
       git: true,
       gh: true,
@@ -46,6 +69,7 @@ const el = (testId: string) =>
 enableAutoUnmount(afterEach);
 beforeEach(() => {
   assistantDialogOpen.value = false;
+  hStub.run.mockClear();
 });
 
 describe("AssistantDialog", () => {
@@ -77,5 +101,32 @@ describe("AssistantDialog", () => {
     await flushPromises();
     expect(document.body.textContent).toContain("Sign-in required");
     expect(document.body.textContent).not.toMatch(/\b(agent|cli|acp|sdk|npx|path|runtime)\b/i);
+  });
+
+  it("shows a side-by-side terminal and runs guide commands there", async () => {
+    mountDialog([
+      provider({
+        id: "codex",
+        name: "Codex",
+        signedIn: false,
+        chatReady: false,
+      }),
+    ]);
+    await flushPromises();
+
+    expect(el("setup-terminal")).not.toBeNull();
+    expect(el("assistant-dialog-terminal")).not.toBeNull();
+    expect(el("assistant-dialog-list")?.className).toContain("overflow-y-auto");
+    expect(el("assistant-dialog-terminal")?.className).toContain("overflow-hidden");
+
+    // Dialog auto-opens the guide for the assistant that still needs sign-in.
+    const run = el("assistant-guide-copy-sign-in-codex-run");
+    expect(run).not.toBeNull();
+    expect(run!.textContent).toContain("Run");
+    expect(run!.textContent).not.toContain("Run in Terminal");
+
+    run!.click();
+    await flushPromises();
+    expect(hStub.run).toHaveBeenCalledWith("codex login");
   });
 });

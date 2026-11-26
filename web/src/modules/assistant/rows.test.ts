@@ -159,14 +159,19 @@ describe("row state", () => {
       },
     ],
     [
-      "OpenCode with free models and no sign-in",
-      provider("opencode", { signedIn: null, chatReady: true, freeModels: true }),
+      "OpenCode signed in with free models",
+      provider("opencode", { signedIn: true, chatReady: true, freeModels: true }),
       { status: LABELS.connected, action: "connect", actionLabel: LABELS.connect, tone: "success" },
     ],
     [
-      "OpenCode signed in",
-      provider("opencode", { signedIn: true, chatReady: true, freeModels: true }),
-      { status: LABELS.connected, action: "connect", actionLabel: LABELS.connect, tone: "success" },
+      "OpenCode installed but signed out",
+      provider("opencode", { signedIn: false, chatReady: false, freeModels: true }),
+      { status: LABELS.signInRequired, action: "signIn", actionLabel: LABELS.signIn, tone: "warning" },
+    ],
+    [
+      "OpenCode with unknown sign-in still needs Console login",
+      provider("opencode", { signedIn: null, chatReady: true, freeModels: true }),
+      { status: LABELS.signInRequired, action: "signIn", actionLabel: LABELS.signIn, tone: "warning" },
     ],
     [
       "runtime ready but chat not",
@@ -179,8 +184,8 @@ describe("row state", () => {
       { status: LABELS.notReady, action: "setup", actionLabel: LABELS.setUp, tone: "warning" },
     ],
     [
-      "OpenCode installed on free models but the chat check fails",
-      provider("opencode", { signedIn: null, chatReady: false, freeModels: true }),
+      "OpenCode signed in but the chat check fails",
+      provider("opencode", { signedIn: true, chatReady: false, freeModels: true }),
       { status: LABELS.notReady, action: "setup", actionLabel: LABELS.setUp, tone: "warning" },
     ],
   ])("derives %s", (_name, p, expected) => {
@@ -250,12 +255,12 @@ describe("copy", () => {
   it("names the recommendation and its free models", () => {
     const rows = buildRows([
       provider("claude"),
-      provider("opencode", { freeModels: true, signedIn: null }),
+      provider("opencode", { freeModels: true, signedIn: true }),
     ]);
     expect(rows[0]).toMatchObject({
       id: "opencode",
       recommended: true,
-      description: "Free models, no account needed.",
+      description: "Free models after you sign in.",
     });
     expect(rows[1]!.recommended).toBe(false);
   });

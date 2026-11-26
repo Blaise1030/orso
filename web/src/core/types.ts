@@ -29,7 +29,7 @@ export const ERROR_CODES: readonly ErrorCode[] = [
   "CHANGE_REQUIRED",
 ];
 
-export type DevserverState = "starting" | "ready" | "crashed";
+export type DevserverState = "starting" | "ready" | "crashed" | "needsSetup";
 
 export interface Project {
   id: string;

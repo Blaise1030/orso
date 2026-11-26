@@ -34,7 +34,7 @@ function mountPreview(options: { props: InstanceType<typeof PreviewPanel>["$prop
  * iframe); attached frames get a `srcdoc` window the tests can post from and spy on.
  */
 async function mountPanel(
-  devserver: "starting" | "ready" | "crashed" = "ready",
+  devserver: "starting" | "ready" | "crashed" | "needsSetup" = "ready",
   api: Record<string, unknown> = {},
   opts: { attach?: boolean; path?: string } = {},
 ) {

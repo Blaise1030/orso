@@ -316,12 +316,15 @@ export const useAssistantStore = defineStore("assistant", () => {
   );
 
   // A guided assistant that turns ready closes its guide and says so.
+  // OpenCode can report chatReady while Console still needs reconnect — only
+  // celebrate when signedIn is true for that assistant.
   watch(providers, (next) => {
     for (const id of guides.value) {
-      if (next.find((p) => p.id === id)?.chatReady === true) {
-        closeGuide(id);
-        toast.success(`${nameOf(id)} is ready`, { id: `guide-${id}` });
-      }
+      const provider = next.find((p) => p.id === id);
+      if (!provider?.chatReady) continue;
+      if (id === "opencode" && provider.signedIn !== true) continue;
+      closeGuide(id);
+      toast.success(`${nameOf(id)} is ready`, { id: `guide-${id}` });
     }
   });
 
@@ -331,8 +334,8 @@ export const useAssistantStore = defineStore("assistant", () => {
       const provider = providers.value.find((p) => p.id === id);
       patchProvider(id, {
         signedIn: false,
-        // OpenCode keeps working on free models; the others need a sign-in.
-        chatReady: provider?.freeModels ? provider.chatReady : false,
+        // OpenCode free models still need Console login before chat works.
+        chatReady: false,
         reason: null,
       });
     } catch (e) {

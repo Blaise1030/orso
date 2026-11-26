@@ -35,6 +35,7 @@ const STATUS_COLOR = {
   starting: "warning",
   ready: "success",
   crashed: "error",
+  needsSetup: "neutral",
 } as const satisfies Record<Project["devserver"], string>;
 
 const showNew = ref(false);

@@ -65,6 +65,13 @@ export const useProjectsStore = defineStore("projects", () => {
     projects.value = projects.value.map((p) => (p.id === id ? { ...p, ...updated } : p));
   }
 
+  /** Write starter `orso.json` + skills, then start the preview. */
+  async function init(id: string): Promise<Project> {
+    const updated = await daemon.api.initProject(id);
+    projects.value = projects.value.map((p) => (p.id === id ? { ...p, ...updated } : p));
+    return updated;
+  }
+
   const offs = [
     daemon.on("devserver.status", (e) => {
       projects.value = projects.value.map((p) =>
@@ -90,5 +97,6 @@ export const useProjectsStore = defineStore("projects", () => {
     create,
     remove,
     setAutoApprove,
+    init,
   };
 });

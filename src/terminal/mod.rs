@@ -24,6 +24,7 @@ pub const ALLOWED: &[&str] = &[
     "curl -fsSL https://chatgpt.com/codex/install.sh | sh",
     "curl https://cursor.com/install -fsS | bash",
     // Assistants: sign in
+    "opencode auth login",
     "claude auth login",
     "codex login",
     "cursor-agent login",
@@ -132,6 +133,7 @@ mod tests {
 
     #[test]
     fn only_the_guides_commands_are_allowed() {
+        assert!(is_allowed("opencode auth login"));
         assert!(is_allowed("claude auth login"));
         assert!(is_allowed("gh auth login --web"));
         assert!(!is_allowed("claude auth login; rm -rf ~"));

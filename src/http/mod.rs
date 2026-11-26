@@ -99,6 +99,7 @@ pub fn router(state: AppState) -> Router {
             "/api/projects/{id}/protection-hint/dismiss",
             post(projects::dismiss_protection_hint),
         )
+        .route("/api/projects/{id}/init", post(projects::init))
         .route("/api/projects/{id}/deploy", get(changes::deploy))
         .route("/api/projects/{id}/deploy-url", get(changes::deploy_url))
         .route("/api/projects/{id}/reviews", get(reviews::list))

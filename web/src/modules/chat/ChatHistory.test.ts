@@ -77,6 +77,13 @@ describe("ChatHistory", () => {
     expect(w.find('[data-testid="chat-history-item"][data-status="combining"]').exists()).toBe(true);
   });
 
+  it("offers delete for a running chat so a stuck load can be cleared", () => {
+    const w = mountHistory([chat({ id: "run", title: "Stuck loading" })], ["run"]);
+    const row = w.get('[data-testid="chat-history-item"][data-status="running"]').element
+      .parentElement as HTMLElement;
+    expect(row.querySelector("[data-testid='chat-history-delete']")).not.toBeNull();
+  });
+
   it("shows no matching chats when the query misses", async () => {
     const w = mountHistory([chat({ id: "a", title: "Help docs" })]);
     await w.get("[data-testid='chat-history-search']").setValue("zzzz");

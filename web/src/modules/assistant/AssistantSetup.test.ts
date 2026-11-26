@@ -86,7 +86,7 @@ describe("AssistantSetup ordering", () => {
             provider("cursor"),
             provider("claude"),
             provider("codex"),
-            provider("opencode", { freeModels: true, signedIn: null }),
+            provider("opencode", { freeModels: true, signedIn: true }),
           ],
         }),
       ),
@@ -103,7 +103,7 @@ describe("AssistantSetup ordering", () => {
     ]);
 
     const first = w.get("[data-testid='assistant-row-opencode']");
-    expect(first.text()).toContain("Free models, no account needed.");
+    expect(first.text()).toContain("Free models after you sign in.");
     expect(first.text()).toContain("Recommended");
     expect(first.text()).toContain("Connected");
   });
@@ -287,7 +287,7 @@ describe("AssistantSetup install guides", () => {
 });
 
 describe("AssistantSetup sign-in", () => {
-  it("does not gate OpenCode on a sign-in", async () => {
+  it("gates OpenCode on a Console sign-in", async () => {
     const w = mountSetup({
       setupStatus: vi.fn(async () =>
         status({
@@ -298,8 +298,8 @@ describe("AssistantSetup sign-in", () => {
     await flushPromises();
 
     const row = w.get("[data-testid='assistant-row-opencode']");
-    expect(row.text()).toContain("Connected");
-    expect(row.text()).not.toContain("Sign-in required");
+    expect(row.text()).toContain("Sign-in required");
+    expect(row.text()).not.toContain("Connected");
     expect(w.get("[data-testid='assistant-action-opencode']").text()).toBe("Connect");
   });
 });

@@ -438,7 +438,7 @@ describe("assistant store", () => {
     }
   });
 
-  it("signs out and keeps OpenCode usable on free models", async () => {
+  it("disables OpenCode chat after signing out", async () => {
     const store = setup({
       setupStatus: vi.fn(async () =>
         status({
@@ -452,7 +452,7 @@ describe("assistant store", () => {
 
     await store.signOut("opencode");
 
-    expect(store.providers[0]).toMatchObject({ signedIn: false, chatReady: true });
+    expect(store.providers[0]).toMatchObject({ signedIn: false, chatReady: false });
   });
 
   it("disables chat after signing out of an account-only assistant", async () => {

@@ -144,6 +144,24 @@ pub struct Template;
 #[exclude = ".DS_Store"]
 pub struct OrsoAstro;
 
+/// Frontend-design skills vendored from Cloudflare VibeSDK (`skills/vendor/vibesdk/`).
+/// Written under the site root's `.agents/skills/` and `.claude/skills/` on init/scaffold.
+#[derive(RustEmbed)]
+#[folder = "skills/vendor/vibesdk/"]
+#[exclude = "README.md"]
+#[exclude = ".DS_Store"]
+pub struct BundledSkills;
+
+/// Skill folder names refreshed from [`BundledSkills`].
+pub const BUNDLED_SKILL_NAMES: &[&str] = &[
+    "frontend-design",
+    "frontend-design-landing-page",
+    "frontend-design-saas",
+];
+
+/// Agent skill trees under the Astro site root (see `orso.json` `root`).
+const SITE_SKILL_TREES: &[&str] = &[".agents/skills", ".claude/skills"];
+
 fn embed_paths<T: RustEmbed>() -> Vec<String> {
     let mut v: Vec<String> = T::iter().map(|p| p.into_owned()).collect();
     v.sort();
@@ -161,11 +179,13 @@ pub fn orso_astro_paths() -> Vec<String> {
 }
 
 /// Write the embedded template into `dest` (created if missing), with the Orso integration
-/// sources under `dest/integrations/orso`. Manifests are copied unchanged. Existing files are
+/// sources under `dest/integrations/orso` and the bundled VibeSDK frontend-design skills under
+/// `.agents/skills/` / `.claude/skills/`. Manifests are copied unchanged. Existing files are
 /// overwritten.
 pub fn extract_template(dest: &Path) -> io::Result<()> {
     extract_embed::<Template>(dest)?;
     extract_orso_integration(dest)?;
+    extract_bundled_skills(dest)?;
     Ok(())
 }
 
@@ -177,6 +197,42 @@ pub fn extract_orso_integration(site_root: &Path) -> io::Result<()> {
         std::fs::remove_dir_all(&dest)?;
     }
     extract_embed::<OrsoAstro>(&dest)
+}
+
+/// Refresh the vendored VibeSDK frontend-design skills under `site_root`.
+///
+/// Only the [`BUNDLED_SKILL_NAMES`] folders are replaced; other project skills are left alone.
+/// Written into both `.agents/skills/` and `.claude/skills/` so Cursor and Claude Code see them.
+pub fn extract_bundled_skills(site_root: &Path) -> io::Result<()> {
+    for tree in SITE_SKILL_TREES {
+        for name in BUNDLED_SKILL_NAMES {
+            let dest = safe_join(site_root, &format!("{tree}/{name}"))?;
+            if dest.exists() {
+                std::fs::remove_dir_all(&dest)?;
+            }
+            std::fs::create_dir_all(&dest)?;
+        }
+    }
+    for rel in BundledSkills::iter() {
+        let rel = rel.as_ref();
+        let Some((skill, file)) = rel.split_once('/') else {
+            continue;
+        };
+        if !BUNDLED_SKILL_NAMES.contains(&skill) {
+            continue;
+        }
+        let file_data = BundledSkills::get(rel).ok_or_else(|| {
+            io::Error::new(io::ErrorKind::NotFound, rel.to_string())
+        })?;
+        for tree in SITE_SKILL_TREES {
+            let target = safe_join(site_root, &format!("{tree}/{skill}/{file}"))?;
+            if let Some(parent) = target.parent() {
+                std::fs::create_dir_all(parent)?;
+            }
+            std::fs::write(&target, file_data.data.as_ref())?;
+        }
+    }
+    Ok(())
 }
 
 fn extract_embed<T: RustEmbed>(dest: &Path) -> io::Result<()> {
@@ -327,6 +383,56 @@ mod tests {
         assert!(tmp.path().join("src/content/posts/hello-orso.md").is_file());
         assert!(!tmp.path().join("src/content/blog").exists());
         assert!(!tmp.path().join("src/pages/blog").exists());
+    }
+
+    #[test]
+    fn extract_template_installs_bundled_frontend_skills() {
+        let tmp = tempfile::tempdir().unwrap();
+        extract_template(tmp.path()).unwrap();
+        // Custom skill written after scaffold — a later bundled refresh must keep it.
+        let keep = tmp.path().join(".agents/skills/custom-keep");
+        std::fs::create_dir_all(&keep).unwrap();
+        std::fs::write(keep.join("SKILL.md"), "# keep\n").unwrap();
+        extract_bundled_skills(tmp.path()).unwrap();
+
+        for name in BUNDLED_SKILL_NAMES {
+            let agents = tmp.path().join(".agents/skills").join(name).join("SKILL.md");
+            let claude = tmp.path().join(".claude/skills").join(name).join("SKILL.md");
+            assert!(agents.is_file(), "missing {name}");
+            assert!(claude.is_file(), "missing claude {name}");
+            let body = std::fs::read_to_string(&agents).unwrap();
+            assert!(
+                body.contains("name:"),
+                "{name} should keep skill frontmatter"
+            );
+        }
+        let landing = std::fs::read_to_string(
+            tmp.path()
+                .join(".agents/skills/frontend-design-landing-page/SKILL.md"),
+        )
+        .unwrap();
+        assert!(landing.contains("frontend-design-landing-page"));
+        assert_eq!(
+            std::fs::read_to_string(tmp.path().join(".agents/skills/custom-keep/SKILL.md")).unwrap(),
+            "# keep\n"
+        );
+    }
+
+    #[test]
+    fn bundled_skills_embed_the_three_frontend_design_skills() {
+        let paths = embed_paths::<BundledSkills>();
+        for name in BUNDLED_SKILL_NAMES {
+            let want = format!("{name}/SKILL.md");
+            assert!(
+                paths.iter().any(|p| p == &want),
+                "missing {want} in {paths:?}"
+            );
+        }
+        assert!(
+            !paths.iter().any(|p| p.contains("app-file-structure")
+                || p.contains("app-ai-binding")),
+            "CF-only VibeSDK skills must not be bundled: {paths:?}"
+        );
     }
 
     #[test]

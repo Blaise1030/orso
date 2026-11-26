@@ -215,6 +215,32 @@ describe("AgentFloatingHost", () => {
     expect(w.get("[data-testid='agent-session-tab']").text()).toContain("SEO audit");
   });
 
+  it("lets you delete a running session from the bar", async () => {
+    const listed = [chat("c1", "Stuck auth", true)];
+    const deleteChat = vi.fn(async () => ({ deleted: true }));
+    h.daemon = createFakeDaemon({
+      listChats: async () => ({ chats: listed, running: "c1" }),
+      deleteChat,
+    });
+    setActivePinia(createPinia());
+    const store = useChatStore();
+
+    const w = mountHost();
+    await flushPromises();
+    store.setActive("p1", "c1");
+    store.setChatRunning("p1", "c1", true);
+    await nextTick();
+
+    const tab = w.get("[data-testid='agent-session-tab']");
+    expect(tab.attributes("data-status")).toBe("running");
+    await tab.get("[data-testid='agent-tab-delete']").trigger("click");
+    await flushPromises();
+    document.body.querySelector<HTMLButtonElement>("[data-testid='agent-tab-delete-confirm']")!.click();
+    await flushPromises();
+
+    expect(deleteChat).toHaveBeenCalledWith("p1", "c1");
+  });
+
   it("reorders sessions when a pill is dropped on another", async () => {
     localStorage.clear();
     const listed = [chat("c1", "SEO audit"), chat("c2", "Homepage")];

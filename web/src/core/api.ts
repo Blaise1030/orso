@@ -304,6 +304,8 @@ export function createApi(
       (await json<{ repos: GithubRepo[] }>("GET", "/api/github/repos")).repos,
     dismissProtectionHint: (id: string) =>
       json<{ dismissed: true }>("POST", `/api/projects/${enc(id)}/protection-hint/dismiss`),
+    /** Write starter `orso.json` + skills, then start the preview. */
+    initProject: (id: string) => json<Project>("POST", `/api/projects/${enc(id)}/init`),
     restartDevserver: (id: string) =>
       json<unknown>("POST", `/api/projects/${enc(id)}/devserver/restart`),
 

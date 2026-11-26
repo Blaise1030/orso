@@ -36,6 +36,9 @@ pub enum DevserverStatus {
     Starting,
     Ready,
     Crashed,
+    /// No `orso.json` yet — ask before writing one and starting the preview.
+    #[serde(rename = "needsSetup")]
+    NeedsSetup,
 }
 
 impl DevserverStatus {
@@ -44,6 +47,7 @@ impl DevserverStatus {
             Self::Starting => "starting",
             Self::Ready => "ready",
             Self::Crashed => "crashed",
+            Self::NeedsSetup => "needsSetup",
         }
     }
 }

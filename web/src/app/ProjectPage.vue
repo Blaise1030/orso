@@ -12,6 +12,7 @@ import SharePreviewButton from "@/modules/changes/SharePreviewButton.vue";
 import { report } from "@/modules/changes/getLatest";
 import { useChangesStore } from "@/modules/changes/store";
 import GithubAccount from "@/modules/github/GithubAccount.vue";
+import ProjectSetupPrompt from "@/modules/projects/ProjectSetupPrompt.vue";
 import { useProjectsStore } from "@/modules/projects/store";
 import AgentFloatingHost from "@/modules/chat/AgentFloatingHost.vue";
 import AgentPanel from "@/modules/chat/AgentPanel.vue";
@@ -32,11 +33,14 @@ const shell = ref<InstanceType<typeof Shell> | null>(null);
 const floatingHost = ref<InstanceType<typeof AgentFloatingHost> | null>(null);
 
 const project = computed(() => projects.projects.find((p) => p.id === props.id) ?? null);
+/** No `orso.json` yet — ask before writing one and starting the preview. */
+const needsSetup = computed(() => project.value?.devserver === "needsSetup");
 /** Review and History bring their own header row; the change picker and Publish aren't needed there. */
 const TABS_WITHOUT_TOP_BAR = new Set(["review", "history"]);
 /** Something was sent to the agent from a tab that normally hides it. */
 const chatRequested = ref(false);
 const showChat = computed(() => {
+  if (needsSetup.value) return false;
   const tab = projectTabFromRoute(route.name);
   return chatRequested.value || tab === "preview" || tab === "content" || tab === "design" || tab === "code";
 });
@@ -121,17 +125,18 @@ watch(
     </template>
     <template #actions>
       <SharePreviewButton
-        v-if="project"
+        v-if="project && !needsSetup"
         :project-id="project.id"
         :repo="project.repo"
       />
     </template>
     <template #workspace>
-      <Workspace v-if="project" :project="project" :floating-chat="floatingChat" />
+      <ProjectSetupPrompt v-if="project && needsSetup" :project-id="project.id" />
+      <Workspace v-else-if="project" :project="project" :floating-chat="floatingChat" />
     </template>
     <template #chat>
       <AgentPanel
-        v-if="project"
+        v-if="project && !needsSetup"
         :key="project.id"
         :project-id="project.id"
       />

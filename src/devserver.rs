@@ -293,7 +293,29 @@ impl DevServerManager {
 
     /// (Re)start supervision for a project with a fresh crash budget. Any previous
     /// process is stopped first. If the persisted port is busy a new one is allocated.
+    /// Without `orso.json`, parks as [`DevserverStatus::NeedsSetup`] and does not spawn.
     pub async fn start(&self, id: &str) -> Result<(), ApiError> {
+        let Some(project) = self.shared.projects.get(id).await else {
+            return Err(ApiError::enoent(format!("no such project: {id}")));
+        };
+        if !project
+            .dir
+            .join(crate::settings::SETTINGS_FILE)
+            .is_file()
+        {
+            let old = {
+                let mut running = self.running.lock().await;
+                self.tokens().remove(id);
+                running.remove(id)
+            };
+            if let Some(old) = old {
+                old.stop().await;
+            }
+            self.shared
+                .set_state(id, DevserverStatus::NeedsSetup, project.port, None)
+                .await;
+            return Ok(());
+        }
         if !self.enabled() {
             return Ok(());
         }

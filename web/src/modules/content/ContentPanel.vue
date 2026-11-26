@@ -35,6 +35,7 @@ import { useContentStore } from "./store";
 import { IMAGE_REGISTRY } from "./ImageDialog.vue";
 import { REFERENCE_ENTRIES } from "./references";
 import { useAgentOutboxStore } from "@/modules/chat/outbox";
+import { askAgentToSetupToolkit } from "./agentRequests";
 // Tiptap and CodeMirror load with the first Markdown/MDX entry, not with the app shell.
 const MarkdownBodyEditor = defineAsyncComponent(() => import("./MarkdownBodyEditor.vue"));
 const props = defineProps<{projectId: string; collection?: string; entry?: string}>();
@@ -400,6 +401,16 @@ function askAI(text: string) {
         <UEmpty v-else-if="!store.loading && !store.error && !store.collections.length" variant="naked" icon="i-hugeicons-file-01" title="No content collections" class="h-full pb-11" data-testid="content-empty-catalog">
           <template #description>
             Content editing needs the orso-astro integration: <code>orso()</code> in astro.config and <code>orsoGlob</code> loaders in src/content.config.ts. Collections appear once the preview starts.
+          </template>
+          <template #actions>
+            <UButton
+              color="neutral"
+              variant="outline"
+              icon="i-hugeicons-sparkles"
+              label="Set up with assistant"
+              data-testid="content-setup-toolkit"
+              @click="askAgentToSetupToolkit"
+            />
           </template>
         </UEmpty>
         <p v-else-if="store.loading" class="text-muted px-4 text-sm">Loading content…</p>

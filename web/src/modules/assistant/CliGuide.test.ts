@@ -61,13 +61,15 @@ describe("CliGuide", () => {
     expect(w.find("[data-testid='assistant-guide-copy-sign-in-claude']").exists()).toBe(true);
   });
 
-  it("needs no account for OpenCode", () => {
+  it("shows OpenCode's own sign-in command as the second step", () => {
     const w = render(
       provider("opencode", { runtime: notInstalled, installed: false, signedIn: null, chatReady: false }),
     );
 
-    expect(w.text()).toContain("No account needed");
-    expect(w.find("[data-testid='assistant-guide-sign-in-opencode']").exists()).toBe(false);
+    const signIn = byId(w, "assistant-guide-sign-in-opencode");
+    expect(signIn.text()).toContain("Sign in to OpenCode");
+    expect(signIn.text()).toContain("opencode auth login");
+    expect(w.find("[data-testid='assistant-guide-copy-sign-in-opencode']").exists()).toBe(true);
   });
 
   it("ticks off install once installed, and sign-in once signed in", () => {

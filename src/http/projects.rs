@@ -151,6 +151,34 @@ pub async fn dismiss_protection_hint(
     Ok(Json(json!({ "dismissed": true })))
 }
 
+/// `POST /api/projects/{id}/init` — write starter `orso.json` + bundled skills (when missing),
+/// then start the preview. Ask-first from the UI before calling this.
+pub async fn init(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> Result<Json<ProjectInfo>, ApiError> {
+    let project = state
+        .projects
+        .get(&id)
+        .await
+        .ok_or_else(|| ApiError::enoent(format!("no such project: {id}")))?;
+    let dir = project.dir.clone();
+    tokio::task::spawn_blocking(move || crate::init::run(&dir, false))
+        .await
+        .map_err(|e| ApiError::io(format!("init task failed: {e}")))?
+        .map_err(ApiError::badreq)?;
+    state.watch_project(&id).await;
+    if let Err(e) = state.devservers.start(&id).await {
+        eprintln!("orso: cannot start dev server for {id} after init: {e}");
+    }
+    let project = state
+        .projects
+        .get(&id)
+        .await
+        .ok_or_else(|| ApiError::enoent(format!("no such project: {id}")))?;
+    Ok(Json(ProjectInfo::from(&project)))
+}
+
 /// `DELETE /api/projects/{id}?confirm=true` — destructive, so the flag is mandatory.
 pub async fn remove(
     State(state): State<AppState>,

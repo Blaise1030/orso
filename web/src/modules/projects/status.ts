@@ -6,10 +6,12 @@ export const STATUS_LABEL: Record<DevserverState, string> = {
   starting: "Starting",
   ready: "Ready",
   crashed: "Crashed",
+  needsSetup: "Needs setup",
 };
 
 export const STATUS_TONE: Record<DevserverState, BadgeTone> = {
   starting: "secondary",
   ready: "default",
   crashed: "destructive",
+  needsSetup: "secondary",
 };

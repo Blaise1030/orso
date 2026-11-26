@@ -794,7 +794,7 @@ fn parse_opencode_auth(output: &std::process::Output) -> Option<bool> {
         return output.status.success().then_some(false);
     }
     if let Ok(value) = serde_json::from_str::<serde_json::Value>(trimmed) {
-        return Some(json_has_entries(&value));
+        return Some(opencode_has_usable_auth(&value));
     }
     let lower = trimmed.to_lowercase();
     if lower.contains("no credentials") || lower.contains("not logged in") {
@@ -803,12 +803,50 @@ fn parse_opencode_auth(output: &std::process::Output) -> Option<bool> {
     None
 }
 
-fn json_has_entries(value: &serde_json::Value) -> bool {
+/// Free models and ACP need **OpenCode Console** (`id: "opencode"`), not a
+/// stray Go/DeepSeek API key. Any Console connection marked `needs_auth`
+/// ("Reconnect OpenCode Console") means signed out until they run
+/// `opencode auth login` again.
+fn opencode_has_usable_auth(value: &serde_json::Value) -> bool {
     match value {
-        serde_json::Value::Array(items) => !items.is_empty(),
-        serde_json::Value::Object(entries) => !entries.is_empty(),
+        serde_json::Value::Array(items) => {
+            let Some(console) = items.iter().find(|provider| {
+                provider.get("id").and_then(|id| id.as_str()) == Some("opencode")
+                    || provider.get("provider").and_then(|id| id.as_str()) == Some("opencode")
+            }) else {
+                return false;
+            };
+            opencode_console_usable(console)
+        }
+        // Older list shapes: a bare map of provider → credentials.
+        serde_json::Value::Object(entries) => entries
+            .get("opencode")
+            .is_some_and(|entry| !entry.is_null() && entry != &serde_json::json!([])),
         _ => false,
     }
+}
+
+fn opencode_console_usable(provider: &serde_json::Value) -> bool {
+    let Some(connections) = provider.get("connections").and_then(|c| c.as_array()) else {
+        // Older list shapes used a bare provider id with no connections array.
+        return provider.get("id").or_else(|| provider.get("provider")).is_some();
+    };
+    if connections.is_empty() {
+        return false;
+    }
+    // One expired Console session is enough to block free models / ACP.
+    if connections.iter().any(opencode_connection_needs_auth) {
+        return false;
+    }
+    true
+}
+
+fn opencode_connection_needs_auth(connection: &serde_json::Value) -> bool {
+    connection
+        .get("status")
+        .and_then(|status| status.get("status"))
+        .and_then(|status| status.as_str())
+        == Some("needs_auth")
 }
 
 async fn run_status(
@@ -1056,6 +1094,32 @@ mod tests {
         assert_eq!(
             parse_claude_status(&output("Not logged in", "", 1)),
             Some(false)
+        );
+        assert_eq!(parse_opencode_auth(&output("[]", "", 0)), Some(false));
+        // Go/DeepSeek keys alone do not count — Console is required.
+        assert_eq!(
+            parse_opencode_auth(&output(
+                r#"[{"id":"opencode-go","connections":[{"type":"credential","method":"key"}]},{"id":"deepseek","connections":[{"type":"credential","method":"key"}]}]"#,
+                "",
+                0,
+            )),
+            Some(false)
+        );
+        assert_eq!(
+            parse_opencode_auth(&output(
+                r#"[{"id":"opencode","connections":[{"type":"credential","method":"oauth"},{"type":"credential","status":{"status":"needs_auth"}}]}]"#,
+                "",
+                0,
+            )),
+            Some(false)
+        );
+        assert_eq!(
+            parse_opencode_auth(&output(
+                r#"[{"id":"opencode","connections":[{"type":"credential","method":"oauth"}]},{"id":"deepseek","connections":[{"type":"credential","method":"key"}]}]"#,
+                "",
+                0,
+            )),
+            Some(true)
         );
         assert_eq!(
             parse_login_status(&output("Logged in as a@b.test", "", 0)),

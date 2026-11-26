@@ -152,13 +152,16 @@ const selectedCardId = computed(() =>
 );
 
 /**
- * The selected assistant's install guide shows until it can chat. Opening it in
- * the store starts the status polling, so the steps tick off and onboarding
- * moves on by itself once the user has run the commands in Terminal.
+ * The selected assistant's install guide shows until it can chat (and, for
+ * OpenCode, until Console sign-in is done). Opening it in the store starts the
+ * status polling, so the steps tick off once the user has run the commands.
  */
-const guideRow = computed<AssistantRow | null>(() =>
-  step.value === 1 && selectedRow.value && !selectedRow.value.chatReady ? selectedRow.value : null,
-);
+const guideRow = computed<AssistantRow | null>(() => {
+  if (step.value !== 1 || !selectedRow.value) return null;
+  const row = selectedRow.value;
+  if (row.chatReady && !row.signInRequired) return null;
+  return row;
+});
 
 watch(
   () => guideRow.value?.id ?? null,
@@ -468,7 +471,10 @@ const nextLabel = computed(() => {
 });
 
 const nextDisabled = computed(() => {
-  if (step.value === 1) return !selectedRow.value?.chatReady;
+  if (step.value === 1) {
+    const row = selectedRow.value;
+    return !row?.chatReady || row.signInRequired;
+  }
   if (step.value === 2) return !siteReady.value;
   return false;
 });

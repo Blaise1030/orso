@@ -9,8 +9,9 @@ export interface InstallGuide {
   /** One-line install command for macOS, pasted into Terminal. */
   install: string;
   /**
-   * The CLI's own sign-in command, or `null` when the assistant works without
-   * an account (OpenCode's free models).
+   * The CLI's own sign-in command. OpenCode's free models still need an
+   * OpenCode Console login (`opencode auth login`); ACP returns
+   * "Authentication required" until that finishes.
    */
   signIn: string | null;
   /** The vendor's install page, for other install methods and troubleshooting. */
@@ -20,7 +21,8 @@ export interface InstallGuide {
 export const INSTALL_GUIDES: Record<string, InstallGuide> = {
   opencode: {
     install: "curl -fsSL https://opencode.ai/v2/install | bash",
-    signIn: null,
+    // Matches OpenCode ACP authMethods description and `opencode acp --help`.
+    signIn: "opencode auth login",
     docsUrl: "https://opencode.ai/docs",
   },
   claude: {

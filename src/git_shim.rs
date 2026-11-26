@@ -1,10 +1,12 @@
-//! Hard-block agent `git checkout`/`switch`: only the app may switch drafts.
+//! Agent `git` policy: PATH shim default-denies except an allowlist.
 //!
 //! Chat agents run with a daemon-generated `git` launcher first on their
-//! `PATH`; the launcher execs this binary's `git-shim` subcommand, which refuses any
-//! HEAD-moving checkout/switch unless the app set [`ALLOW_ENV`]. Allowed commands are
-//! `exec`'d into the real git ([`REAL_GIT_ENV`], else the next `git` on `PATH`) so exit
-//! codes, stdio and argv pass through faithfully.
+//! `PATH`; the launcher execs this binary's `git-shim` subcommand. Allowed
+//! commands are `exec`'d into the real git ([`REAL_GIT_ENV`], else the next
+//! `git` on `PATH`) so exit codes, stdio and argv pass through faithfully.
+//!
+//! The app may set [`ALLOW_ENV`] to permit a single HEAD-moving checkout/switch
+//! when switching drafts; agents never get that env.
 
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
@@ -19,8 +21,10 @@ use crate::config::Config;
 pub const ALLOW_ENV: &str = "ORSO_ALLOW_CHECKOUT";
 /// The real git to exec for allowed commands, resolved at spawn time.
 pub const REAL_GIT_ENV: &str = "ORSO_REAL_GIT";
-/// The one-line stderr the shim prints (for the agent's logs) before exiting `1`.
+/// Stderr when the assistant tries to switch drafts (HEAD-moving checkout/switch).
 pub const BLOCKED_MSG: &str = "orso: switching drafts is only allowed from the app";
+/// Stderr when the assistant runs a git command outside the allowlist.
+pub const DENIED_MSG: &str = "orso: that git command is not allowed from the assistant";
 /// Marker near the top of the generated `git` launcher, used to skip it when falling back
 /// to "the next git on PATH".
 const SHIM_MARKER: &str = "orso git-shim";
@@ -37,7 +41,6 @@ pub fn shim_dir(projects_dir: &Path) -> PathBuf {
 /// Path restores (`checkout -- <path>` and `checkout <tree-ish> -- <path>`) and every
 /// non-checkout command pass through.
 pub fn is_head_moving(args: &[String]) -> bool {
-    // Global options (`git -C <dir> checkout ...`) precede the subcommand; skip them.
     let Some(start) = subcommand_start(args) else {
         return false;
     };
@@ -46,6 +49,55 @@ pub fn is_head_moving(args: &[String]) -> bool {
         "switch" => !args[start + 1..].is_empty(),
         _ => false,
     }
+}
+
+/// Whether the agent may run this `git` argv (no leading `git`).
+///
+/// Default-deny. See the secured-agent toolbelt design for the allowlist.
+pub fn is_allowed(args: &[String]) -> bool {
+    if has_forbidden_globals(args) {
+        return false;
+    }
+    let Some(start) = subcommand_start(args) else {
+        // Only global flags / empty — nothing to do; harmless.
+        return true;
+    };
+    let cmd = args[start].as_str();
+    let rest = &args[start + 1..];
+    match cmd {
+        "status" | "diff" | "log" | "show" | "ls-files" | "rev-parse" | "blame" | "describe"
+        | "add" | "commit" | "rm" | "mv" | "restore" | "fetch" => true,
+        "merge" => true,
+        "branch" => branch_is_list_only(rest),
+        "remote" => remote_is_list_only(rest),
+        "checkout" => !checkout_moves_head(rest),
+        // Bare `switch` is a no-op; any args move HEAD and are denied.
+        "switch" => rest.is_empty(),
+        _ => false,
+    }
+}
+
+/// `-c` / `--exec-path` can redefine aliases or helpers and escape the allowlist.
+fn has_forbidden_globals(args: &[String]) -> bool {
+    let mut i = 0;
+    while let Some(a) = args.get(i) {
+        match a.as_str() {
+            "-c" | "--exec-path" => return true,
+            _ if a.starts_with("--exec-path=") => return true,
+            // `-c` attached form does not exist; `-Cdir` is cwd.
+            "-C" | "--git-dir" | "--work-tree" | "--namespace" => i += 2,
+            _ if a.starts_with("--git-dir=")
+                || a.starts_with("--work-tree=")
+                || a.starts_with("--namespace=")
+                || (a.starts_with("-C") && a.len() > 2) =>
+            {
+                i += 1
+            }
+            "-P" | "--no-pager" | "--paginate" | "--no-replace-objects" | "--bare" => i += 1,
+            _ => return false, // hit subcommand or unknown; not a forbidden global
+        }
+    }
+    false
 }
 
 /// Index of the subcommand in a full `git` argv (without the leading `git`), skipping
@@ -108,6 +160,43 @@ fn checkout_moves_head(args: &[String]) -> bool {
     head.iter().any(|a| a == "-" || !a.starts_with('-'))
 }
 
+fn branch_is_list_only(args: &[String]) -> bool {
+    for a in args {
+        let s = a.as_str();
+        if matches!(
+            s,
+            "-d" | "-D"
+                | "-m"
+                | "-M"
+                | "-c"
+                | "-C"
+                | "--delete"
+                | "--move"
+                | "--copy"
+                | "--set-upstream-to"
+                | "--unset-upstream"
+                | "--edit-description"
+        ) || s.starts_with("--set-upstream-to=")
+            || s.starts_with("--delete=")
+        {
+            return false;
+        }
+        // Non-flag argument would create or name a branch.
+        if !s.starts_with('-') {
+            return false;
+        }
+    }
+    true
+}
+
+fn remote_is_list_only(args: &[String]) -> bool {
+    if args.is_empty() {
+        return true;
+    }
+    // `remote -v` / `remote --verbose` only.
+    args.iter().all(|a| matches!(a.as_str(), "-v" | "--verbose"))
+}
+
 /// Ensure the `git` launcher exists in [`shim_dir`] and return that dir. `None` when there
 /// is no projects dir (tests) or the launcher cannot be written.
 pub fn ensure_shim_dir(config: &Config) -> Option<PathBuf> {
@@ -126,7 +215,7 @@ pub fn ensure_shim_dir(config: &Config) -> Option<PathBuf> {
         .unwrap_or(true);
     if fresh && write_executable(&script, &content).is_err() {
         eprintln!(
-            "orso: cannot write the git launcher {}; agents may switch drafts",
+            "orso: cannot write the git launcher {}; agents may run unrestricted git",
             script.display()
         );
         return None;
@@ -147,10 +236,16 @@ pub fn resolve_system_git() -> OsString {
     OsString::from("git")
 }
 
-/// The shim entry point: block a HEAD move, else `exec` the real git.
+/// The shim entry point: enforce the allowlist (and draft-switch rules), else `exec` real git.
 pub fn run(args: Vec<String>) -> ExitCode {
-    if std::env::var_os(ALLOW_ENV).as_deref() != Some(OsStr::new("1")) && is_head_moving(&args) {
+    let app_checkout = std::env::var_os(ALLOW_ENV).as_deref() == Some(OsStr::new("1"));
+    if app_checkout && is_head_moving(&args) {
+        // App draft switch — fall through.
+    } else if is_head_moving(&args) {
         eprintln!("{BLOCKED_MSG}");
+        return ExitCode::from(1);
+    } else if !is_allowed(&args) {
+        eprintln!("{DENIED_MSG}");
         return ExitCode::from(1);
     }
     let git = real_git();
@@ -230,7 +325,7 @@ fn sh_quote(s: &str) -> String {
 
 fn shim_script(orso: &Path) -> String {
     format!(
-        "#!/bin/sh\n# {SHIM_MARKER}: only the app switches drafts; do not edit.\nexec {} git-shim -- \"$@\"\n",
+        "#!/bin/sh\n# {SHIM_MARKER}: allowlisted git for agents; do not edit.\nexec {} git-shim -- \"$@\"\n",
         sh_quote(&orso.to_string_lossy())
     )
 }
@@ -272,7 +367,7 @@ mod tests {
     }
 
     #[test]
-    fn pass_through_matrix() {
+    fn pass_through_head_moving_negatives() {
         for allowed in [
             &[] as &[&str],
             &["status"][..],
@@ -280,7 +375,6 @@ mod tests {
             &["commit", "-m", "x"][..],
             &["fetch", "origin", "main"][..],
             &["merge", "origin/main"][..],
-            &["push"][..],
             &["checkout"][..],
             &["checkout", "--", "content/file.md"][..],
             &["checkout", "main", "--", "file.md"][..],
@@ -292,12 +386,74 @@ mod tests {
             &["switch"][..],
             &["-C", "/tmp", "status"][..],
             &["-C", "/tmp", "checkout", "--", "file.md"][..],
-            &["-c", "user.name=x", "checkout", "main", "--", "file.md"][..],
         ] {
             assert!(
                 !is_head_moving(&v(allowed)),
-                "{allowed:?} must pass through"
+                "{allowed:?} must not be head-moving"
             );
+        }
+    }
+
+    #[test]
+    fn allowlist_allows_repo_work() {
+        for allowed in [
+            &["status"][..],
+            &["diff", "--staged"][..],
+            &["log", "-1", "--oneline"][..],
+            &["show", "HEAD"][..],
+            &["ls-files"][..],
+            &["rev-parse", "HEAD"][..],
+            &["blame", "file.md"][..],
+            &["describe", "--tags"][..],
+            &["add", "-A"][..],
+            &["commit", "-m", "x"][..],
+            &["rm", "old.md"][..],
+            &["mv", "a.md", "b.md"][..],
+            &["restore", "--staged", "file.md"][..],
+            &["fetch", "origin", "main"][..],
+            &["merge", "origin/main"][..],
+            &["merge", "--abort"][..],
+            &["branch"][..],
+            &["branch", "-a"][..],
+            &["branch", "-vv"][..],
+            &["remote"][..],
+            &["remote", "-v"][..],
+            &["checkout", "--", "file.md"][..],
+            &["checkout", "HEAD", "--", "file.md"][..],
+            &["-C", "/tmp", "status"][..],
+            &["switch"][..],
+        ] {
+            assert!(is_allowed(&v(allowed)), "{allowed:?} must be allowed");
+        }
+    }
+
+    #[test]
+    fn allowlist_denies_dangerous_git() {
+        for denied in [
+            &["push"][..],
+            &["push", "origin", "HEAD"][..],
+            &["pull"][..],
+            &["pull", "origin", "main"][..],
+            &["rebase", "main"][..],
+            &["reset", "--hard", "HEAD~1"][..],
+            &["clean", "-fd"][..],
+            &["stash"][..],
+            &["stash", "push"][..],
+            &["worktree", "add", "../x"][..],
+            &["branch", "-d", "old"][..],
+            &["branch", "-D", "old"][..],
+            &["branch", "new-branch"][..],
+            &["remote", "add", "x", "url"][..],
+            &["remote", "remove", "origin"][..],
+            &["config", "user.email", "x"][..],
+            &["tag", "v1"][..],
+            &["checkout", "main"][..],
+            &["switch", "main"][..],
+            &["-c", "alias.x=!touch /tmp/x", "x"][..],
+            &["--exec-path=/tmp", "status"][..],
+            &["--exec-path", "/tmp", "status"][..],
+        ] {
+            assert!(!is_allowed(&v(denied)), "{denied:?} must be denied");
         }
     }
 

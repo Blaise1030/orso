@@ -121,7 +121,6 @@ function confirmDelete() {
             </span>
           </UButton>
           <UButton
-            v-if="!runningIds.includes(c.id)"
             color="neutral"
             variant="ghost"
             size="sm"

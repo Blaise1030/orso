@@ -28,7 +28,7 @@ export const PROVIDER_NAMES: Record<string, string> = {
 
 /** What each row says about the account it needs (or what it is for). */
 export const PROVIDER_DESCRIPTIONS: Record<string, string> = {
-  opencode: "Free models, no account needed.",
+  opencode: "Free models after you sign in.",
   codex: "Uses your ChatGPT plan.",
   claude: "Uses your Claude plan.",
   cursor: "Uses your Cursor plan.",
@@ -156,7 +156,11 @@ export function deriveRow(provider: SetupProvider): AssistantRow {
   const signedIn = provider.signedIn ?? null;
   const freeModels = provider.freeModels === true;
   const chatReady = provider.chatReady ?? (phase === "ready" || phase === "updateAvailable");
-  const signInRequired = phase === "ready" && signedIn === false && !freeModels;
+  // OpenCode free models need a working Console login (`signedIn === true`).
+  // Other assistants only force sign-in when the daemon says signed out.
+  const signInRequired =
+    phase === "ready" &&
+    (provider.id === "opencode" ? signedIn !== true : signedIn === false);
 
   const base: RowBase = {
     id: provider.id,
@@ -234,10 +238,10 @@ function readyRow(
   base: RowBase,
   signInRequired: boolean,
   chatReady: boolean,
-  freeModels: boolean,
+  _freeModels: boolean,
   signedIn: boolean | null,
 ): AssistantRow {
-  if (signInRequired || (!chatReady && signedIn !== true && !freeModels)) {
+  if (signInRequired || (!chatReady && signedIn !== true)) {
     return {
       ...base,
       status: LABELS.signInRequired,

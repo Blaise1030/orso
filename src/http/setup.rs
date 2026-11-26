@@ -444,7 +444,14 @@ async fn provider_status(
     } else {
         None
     };
-    let chat_ready = runnable && (free_models || signed_in != Some(false));
+    // OpenCode free models need a working Console login (`signed_in == true`).
+    // Other assistants treat an unknown probe as OK so a flaky status command
+    // does not block an already-working CLI.
+    let chat_ready = if id == "opencode" {
+        runnable && signed_in == Some(true)
+    } else {
+        runnable && signed_in != Some(false)
+    };
     let installed = available || managed || runtime.is_ready();
     let reason = if chat_ready {
         None
@@ -462,8 +469,12 @@ async fn provider_status(
     } else if acp.is_none() {
         super::chat::acp_unavailable_reason(state, id)
             .or_else(|| Some(format!("Chat isn't set up for {} yet.", display(id))))
-    } else if !free_models && signed_in == Some(false) {
-        Some(format!("Sign in to use your {} plan.", display(id)))
+    } else if signed_in == Some(false) {
+        Some(if free_models {
+            format!("Sign in to {} to use free models.", display(id))
+        } else {
+            format!("Sign in to use your {} plan.", display(id))
+        })
     } else {
         Some(format!("{} isn't ready yet.", display(id)))
     };
