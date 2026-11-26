@@ -38,7 +38,7 @@ const steps = [
       <p class="mt-4 max-w-measure text-muted">{t("home.howItWorks.body")}</p>
     </div>
 
-    <ol class="mt-14 grid list-none gap-12 p-0 md:mt-16 md:grid-cols-2 md:gap-x-10 md:gap-y-16">
+    <ol class="mt-10 grid list-none gap-8 p-0 md:mt-12 md:grid-cols-2 md:gap-x-6 md:gap-y-10">
       {steps.map((step, index) => (
         <li class="min-w-0">
           <figure class="m-0 max-w-md overflow-hidden border border-line bg-surface">
@@ -78,7 +78,7 @@ const steps = [
               </div>
             )}
           </figure>
-          <p class="mt-6 font-mono text-label text-muted">{String(index + 1).padStart(2, "0")}</p>
+          <p class="mt-4 font-mono text-label text-muted">{String(index + 1).padStart(2, "0")}</p>
           <h3 class="mt-2 max-w-measure text-heading tracking-normal text-ink">
             {t(`home.howItWorks.steps.${step.key}.title`)}
           </h3>
