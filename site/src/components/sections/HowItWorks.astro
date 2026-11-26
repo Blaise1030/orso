@@ -1,5 +1,6 @@
 ---
 import AgentComposerMock from "../vue/AgentComposerMock.vue";
+import BentoBranchTile from "../vue/BentoBranchTile.vue";
 import BentoHeroEditor from "../vue/BentoHeroEditor.vue";
 import BentoPreviewTile from "../vue/BentoPreviewTile.vue";
 import { getI18n } from "../../i18n";
@@ -23,11 +24,18 @@ const composer = group<{
   sendLabel: string;
   attachLabel: string;
 }>("home.howItWorks.steps.agent.composer");
+const publish = group<{
+  trigger: string;
+  liveLabel: string;
+  draftLabel: string;
+  draftDescription: string;
+}>("home.howItWorks.steps.publish.picker");
 
 const steps = [
   { key: "edit", mock: "editor" as const },
   { key: "preview", mock: "preview" as const },
   { key: "agent", mock: "agent" as const },
+  { key: "publish", mock: "publish" as const },
 ];
 ---
 
@@ -74,6 +82,17 @@ const steps = [
                   ask-label={composer.askLabel}
                   send-label={composer.sendLabel}
                   attach-label={composer.attachLabel}
+                />
+              </div>
+            )}
+            {step.mock === "publish" && (
+              <div class="relative aspect-4/3 w-full overflow-hidden md:aspect-video">
+                <BentoBranchTile
+                  client:visible
+                  trigger={publish.trigger}
+                  live-label={publish.liveLabel}
+                  draft-label={publish.draftLabel}
+                  draft-meta={publish.draftDescription}
                 />
               </div>
             )}

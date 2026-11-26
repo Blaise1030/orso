@@ -21,6 +21,9 @@ test("how-it-works is an ordered grid with inset figures", () => {
   assert.match(section, /md:grid-cols-2/);
   assert.match(section, /max-w-/);
   assert.match(section, /<figure\b/);
+  assert.match(section, /mock: "publish"/);
+  const messages = read("src/i18n/messages/en.json");
+  assert.match(messages, /"publish"\s*:\s*\{[\s\S]*?"title"/);
 });
 
 test("landing page hides the site header", () => {

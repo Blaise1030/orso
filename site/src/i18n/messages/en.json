@@ -194,6 +194,16 @@
             "sendLabel": "Send",
             "attachLabel": "Attach image or file"
           }
+        },
+        "publish": {
+          "title": "Review the draft, then Publish",
+          "body": "Compare the draft against live, keep or undo changes, and Publish when you are ready. Nothing merges until someone decides.",
+          "picker": {
+            "trigger": "FAQ on pricing",
+            "liveLabel": "Live site",
+            "draftLabel": "FAQ on pricing",
+            "draftDescription": "change/faq-pricing · 2h ago"
+          }
         }
       }
     },
