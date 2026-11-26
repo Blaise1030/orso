@@ -74,14 +74,14 @@ function onFocusOut(event: FocusEvent) {
     variant="link"
     color="neutral"
     :unmount-on-hide="false"
-    class="gap-0 overflow-hidden rounded-md border border-line bg-surface shadow-raised"
+    class="gap-0 bg-surface"
     :ui="{
       list: 'relative z-10 w-full items-stretch gap-0 overflow-x-auto rounded-none border-b border-line p-0 lg:overflow-visible',
       indicator: 'hidden',
       label: 'flex flex-col items-start gap-1 overflow-visible whitespace-normal',
       trigger:
-        'relative w-64 min-w-64 shrink-0 grow-0 flex-col items-start justify-start gap-1 rounded-none border-r border-line px-4 py-4 pb-5 text-left last:border-r-0 focus-visible:outline-none lg:w-auto lg:min-w-0 lg:flex-1 lg:grow lg:px-6 lg:py-5 lg:pb-6',
-      content: 'flex min-h-0 flex-1 flex-col items-center justify-center data-[state=inactive]:hidden',
+        'relative w-64 min-w-64 shrink-0 grow-0 flex-col items-start justify-start gap-1 rounded-none px-0 py-4 pb-5 text-left focus-visible:outline-none lg:w-auto lg:min-w-0 lg:flex-1 lg:grow lg:px-0 lg:py-5 lg:pb-6 lg:pr-8',
+      content: 'mt-6 flex min-h-0 flex-1 flex-col data-[state=inactive]:hidden',
     }"
     @update:model-value="select"
     @pointerenter="paused = true"
@@ -97,16 +97,17 @@ function onFocusOut(event: FocusEvent) {
       </span>
     </template>
     <template #content="{ item, index }">
-      <div class="relative flex aspect-video w-full items-center justify-center overflow-hidden bg-sand p-1.5 sm:p-4 md:p-6">
+      <!-- Block image on its own line, like a Markdown figure. -->
+      <figure class="m-0 w-full border border-line bg-surface">
         <AppShot
           :shot="props.shots[item.value]"
           :alt="item.alt"
           sizes="(min-width: 80rem) 76rem, 100vw"
           :eager="index === 0"
           :play="item.value === 'preview'"
-          class="h-full max-h-full w-auto max-w-full"
+          class="block h-auto w-full"
         />
-      </div>
+      </figure>
     </template>
   </UTabs>
 </template>

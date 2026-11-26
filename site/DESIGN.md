@@ -141,7 +141,7 @@ The home page is an **open canvas**: product-first, airy, Gui-inspired craft on 
 
 Home order: hero (left-aligned headline, lead, dual CTAs, three product tabs) → quiet logo strip → numbered how-it-works steps → feature bands → proof → FAQ → closing CTA. Sections use `--spacing-section` (4.5rem); the hero may use `--spacing-section-wide` (7rem) for top padding.
 
-The hero tab rail is three equal columns of title and one-line description (Content, Preview, Publish), hairline dividers, a 2px ink underline on the active tab, and one large product panel underneath on a light `sand` plate inside a `shadow-raised` + `border-line` frame. On narrow screens the rail scrolls horizontally.
+The hero tab rail is three equal columns of title and one-line description (Content, Preview, Publish) with a 2px ink underline on the active tab. The product shot sits on its own line below as a flat `border-line` figure — like a Markdown image — with no sand plate and no `shadow-raised`. On narrow screens the rail scrolls horizontally.
 
 ## Elevation & Depth
 
@@ -149,7 +149,7 @@ Depth comes from tone (surface, sand, night), 1px hairlines, and a black-tinted 
 
 ## Art
 
-The home page does **not** use painting stages: product mocks sit on `surface` / `sand` with `shadow-raised` and a hairline. Public-domain Renaissance landscapes remain available for unused section leftovers (`Ops`, `AgentBand`) and any future non-home surfaces — files, sources and licences in `public/paintings/CREDITS.md`; ids in `src/lib/paintings.ts` via `Painting.astro`. When a painting is used, crop to fill, add a flat `bg-night` scrim (20–30%), and never use it for meaning.
+The home page does **not** use painting stages or raised shadows on product plates. Product shots read like a Markdown file: copy first, then a flat hairline figure on its own line. Public-domain Renaissance landscapes remain available for unused section leftovers (`Ops`, `AgentBand`) and any future non-home surfaces — files, sources and licences in `public/paintings/CREDITS.md`; ids in `src/lib/paintings.ts` via `Painting.astro`. When a painting is used, crop to fill, add a flat `bg-night` scrim (20–30%), and never use it for meaning.
 
 
 ## Shapes
@@ -173,10 +173,10 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 ## Components
 
 - **Header**: wordmark plus name, plain muted nav, outline secondary CTA and ink primary CTA. No pill buttons.
-- **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs (Content, Preview, Publish) that switch one large product panel on a sand plate inside a raised hairline frame — no painted stage.
+- **Hero**: left-aligned display headline, lead, dual CTAs, then three product tabs; the active shot is a flat block figure on the next line.
 - **Logo strip**: one muted intro line and inline marks (Astro, Markdown, GitHub, Claude, Cursor, Codex); no bordered cells.
-- **How it works**: numbered open rows (edit → preview → agent) with short copy and the existing Vue mocks in raised sand plates.
-- **Bands**: three open essays (git statement, draft branches + mock, stack logos) separated by whitespace.
+- **How it works**: numbered steps (edit → preview → agent); each step is copy, then a flat hairline figure on its own line.
+- **Bands**: open essays (git statement, draft branches + flat figure, stack logos) separated by whitespace.
 - **Proof**: Lee Robinson's quote and a note from the maker on open paper.
 - **FAQ**: hairline accordion with FAQPage JSON-LD on open paper.
 - **Blog**: one text-only featured post (date · category, large headline, excerpt) above a "Recent posts" bar with rounded category filters and a client-side search. Posts sit in a hairline grid — three columns on wide screens, two on tablet, one on mobile — with the cover or proof-sheet artwork at the top of each padded cell. A post opens with a wide hero (the cover image, or proof-sheet artwork when there is none) and, when it has several sections, a sticky "On this page" rail on desktop that collapses into a disclosure above the body on mobile.
@@ -185,7 +185,7 @@ There is one orchestrated page-load moment: the hero headline arrives word by wo
 
 ## Do's and Don'ts
 
-Do use the tokens and shared utilities (`page`, `label`, `link`, `button`, `button-quiet`, `chip`). Keep every new product mock monochrome apart from the four status colours. Don't add hex values, Tailwind palette classes, arbitrary colour values or `dark:` colour variants outside the token file. Don't add decorative gradients, stock photography, rounded feature cards, or scroll-triggered reveals. Home product plates may use `shadow-raised`; don't sprinkle shadows on every decorative card.
+Do use the tokens and shared utilities (`page`, `label`, `link`, `button`, `button-quiet`, `chip`). Keep every new product mock monochrome apart from the four status colours. Don't add hex values, Tailwind palette classes, arbitrary colour values or `dark:` colour variants outside the token file. Don't add decorative gradients, stock photography, rounded feature cards, raised shadows on home product figures, or scroll-triggered reveals.
 
 ## Voice & Tone
 
