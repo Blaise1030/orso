@@ -101,12 +101,35 @@
         "drafts": {
           "title": "A Markdown editor for your content",
           "description": "Collections, fields and rich text — or the source itself — for the Markdown you already own. No second CMS to keep in sync.",
-          "alt": "Orso's history: a timeline of checkpoints, newest first, with author, commit and time."
+          "alt": "Orso's history: a timeline of checkpoints, newest first, with author, commit and time.",
+          "timeline": {
+            "dayLabel": "Today",
+            "currentLabel": "Current",
+            "items": [
+              { "summary": "Add FAQ section to pricing", "author": "Alex", "sha": "a3f81d2", "time": "Just now", "current": true },
+              { "summary": "Update pricing headline", "author": "Alex", "sha": "9c2e1ab", "time": "1h ago" },
+              { "summary": "Draft welcome post", "author": "Jordan", "sha": "4b7d0ee", "time": "Yesterday" }
+            ]
+          }
         },
         "review": {
           "title": "Preview every change on a branch",
           "description": "Each edit is a draft branch with a live preview of the real site. Share it, review the pull request, then Publish.",
-          "alt": "Orso previewing a draft, with the page details panel showing its title, description and social image."
+          "alt": "Orso previewing a draft, with the page details panel showing its title, description and social image.",
+          "details": {
+            "tabMeta": "Meta",
+            "tabIssues": "Issues",
+            "scriptsLabel": "scripts",
+            "scriptsValue": "4",
+            "stylesLabel": "styles",
+            "stylesValue": "2",
+            "titleLabel": "Title",
+            "titleValue": "Pricing — Project Orso",
+            "descriptionLabel": "Description",
+            "descriptionValue": "Plans for teams that want editors on the repo they already own.",
+            "pathLabel": "Path",
+            "pathValue": "/pricing/"
+          }
         },
         "agent": {
           "title": "An agent for bigger changes",
@@ -132,7 +155,16 @@
         "git": {
           "title": "Everything stays in Git",
           "body": "Posts, config and data stay as Markdown, YAML and JSON in your repository. Every save is history in the workflow you already use.",
-          "alt": "Orso history: a timeline of checkpoints with author, commit and time."
+          "alt": "Orso history: a timeline of checkpoints with author, commit and time.",
+          "timeline": {
+            "dayLabel": "Today",
+            "currentLabel": "Current",
+            "items": [
+              { "summary": "A fresh start for welcome.md", "author": "Alex", "sha": "a3f81d2", "time": "Just now", "current": true },
+              { "summary": "Tune homepage hero copy", "author": "Alex", "sha": "9c2e1ab", "time": "3h ago" },
+              { "summary": "Add pricing FAQ draft", "author": "Jordan", "sha": "4b7d0ee", "time": "Yesterday" }
+            ]
+          }
         },
         "editor": {
           "title": "Markdown editor",
@@ -144,7 +176,14 @@
         "preview": {
           "title": "Live preview",
           "body": "Your draft renders on the real site. Check desktop and mobile before you Publish.",
-          "alt": "Orso previewing a draft of the real site on the live preview canvas."
+          "alt": "Orso previewing a draft of the real site on the live preview canvas.",
+          "frame": {
+            "desktopLabel": "Desktop",
+            "mobileLabel": "Mobile",
+            "url": "localhost:4321/pricing/",
+            "pageTitle": "Pricing",
+            "pageBody": "Plans for teams editing the site in their own repo."
+          }
         },
         "branches": {
           "title": "Branching that feels like drafts",

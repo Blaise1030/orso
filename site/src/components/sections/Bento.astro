@@ -2,14 +2,25 @@
 import UBadge from "@nuxt/ui/components/Badge.vue";
 import UCard from "@nuxt/ui/components/Card.vue";
 import Painting from "../Painting.astro";
-import AppShot from "../vue/AppShot.vue";
 import BranchPickerMock from "../vue/BranchPickerMock.vue";
+import HistoryTimelineMock from "../vue/HistoryTimelineMock.vue";
+import PreviewFrameMock from "../vue/PreviewFrameMock.vue";
 import SlashMenuMock from "../vue/SlashMenuMock.vue";
-import { appShot } from "../../lib/appShots";
 import { getI18n } from "../../i18n";
-import type { PaintingId } from "../../lib/paintings";
+import type { TimelineItem } from "../vue/HistoryTimelineMock.vue";
 
 const { t, group } = getI18n(Astro.url);
+
+const gitTimeline = group<{ dayLabel: string; currentLabel: string; items: TimelineItem[] }>(
+  "home.bento.cells.git.timeline",
+);
+const previewFrame = group<{
+  desktopLabel: string;
+  mobileLabel: string;
+  url: string;
+  pageTitle: string;
+  pageBody: string;
+}>("home.bento.cells.preview.frame");
 const branchPicker = group<{
   trigger: string;
   searchPlaceholder: string;
@@ -22,17 +33,6 @@ const branchPicker = group<{
   reviewBadge: string;
   newChangeLabel: string;
 }>("home.bento.cells.branches.picker");
-
-type ShotCell = {
-  key: "git" | "preview";
-  painting: PaintingId;
-  shot: Awaited<ReturnType<typeof appShot>>;
-};
-
-const shotCells: ShotCell[] = [
-  { key: "git", painting: "bridge", shot: await appShot("ops-history") },
-  { key: "preview", painting: "rocks", shot: await appShot("ops-preview") },
-];
 
 const stack = [
   { name: "Astro", file: "astro" },
@@ -50,14 +50,14 @@ const cellBorder =
     <li class={cellBorder}>
       <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
         <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
-          <Painting id={shotCells[0].painting} />
+          <Painting id="bridge" />
           <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-          <div class="relative flex size-full items-center justify-center p-3 md:p-4">
-            <AppShot
-              shot={shotCells[0].shot}
-              alt={t("home.bento.cells.git.alt")}
-              sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 50vw, 100vw"
-              class="h-full max-h-full w-auto max-w-full"
+          <div class="relative flex size-full p-2 md:p-3">
+            <HistoryTimelineMock
+              client:visible
+              day-label={gitTimeline.dayLabel}
+              current-label={gitTimeline.currentLabel}
+              items={gitTimeline.items}
             />
           </div>
         </div>
@@ -83,14 +83,16 @@ const cellBorder =
     <li class={cellBorder}>
       <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
         <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
-          <Painting id={shotCells[1].painting} />
+          <Painting id="rocks" />
           <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-          <div class="relative flex size-full items-center justify-center p-3 md:p-4">
-            <AppShot
-              shot={shotCells[1].shot}
-              alt={t("home.bento.cells.preview.alt")}
-              sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 50vw, 100vw"
-              class="h-full max-h-full w-auto max-w-full"
+          <div class="relative flex size-full p-2 md:p-3">
+            <PreviewFrameMock
+              client:visible
+              desktop-label={previewFrame.desktopLabel}
+              mobile-label={previewFrame.mobileLabel}
+              url={previewFrame.url}
+              page-title={previewFrame.pageTitle}
+              page-body={previewFrame.pageBody}
             />
           </div>
         </div>

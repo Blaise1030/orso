@@ -2,11 +2,30 @@
 import UCard from "@nuxt/ui/components/Card.vue";
 import Painting from "../Painting.astro";
 import AgentComposerMock from "../vue/AgentComposerMock.vue";
-import AppShot from "../vue/AppShot.vue";
-import { appShot } from "../../lib/appShots";
+import HistoryTimelineMock from "../vue/HistoryTimelineMock.vue";
+import PageDetailsMock from "../vue/PageDetailsMock.vue";
 import { getI18n } from "../../i18n";
+import type { TimelineItem } from "../vue/HistoryTimelineMock.vue";
 
 const { t, group } = getI18n(Astro.url);
+
+const draftsTimeline = group<{ dayLabel: string; currentLabel: string; items: TimelineItem[] }>(
+  "home.features.cards.drafts.timeline",
+);
+const reviewDetails = group<{
+  tabMeta: string;
+  tabIssues: string;
+  scriptsLabel: string;
+  scriptsValue: string;
+  stylesLabel: string;
+  stylesValue: string;
+  titleLabel: string;
+  titleValue: string;
+  descriptionLabel: string;
+  descriptionValue: string;
+  pathLabel: string;
+  pathValue: string;
+}>("home.features.cards.review.details");
 const composer = group<{
   userMessage: string;
   assistantMessage: string;
@@ -19,22 +38,7 @@ const composer = group<{
   attachLabel: string;
 }>("home.features.cards.agent.composer");
 
-const shotCards = [
-  {
-    title: t("home.features.cards.drafts.title"),
-    description: t("home.features.cards.drafts.description"),
-    painting: "bridge" as const,
-    shot: await appShot("how-drafts"),
-    alt: t("home.features.cards.drafts.alt"),
-  },
-  {
-    title: t("home.features.cards.review.title"),
-    description: t("home.features.cards.review.description"),
-    painting: "toledo" as const,
-    shot: await appShot("how-review"),
-    alt: t("home.features.cards.review.alt"),
-  },
-];
+const cardUi = { header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" };
 ---
 
 <section class="mx-auto max-w-7xl border-x border-b border-line pt-section" id="how-it-works">
@@ -49,37 +53,55 @@ const shotCards = [
   </div></div>
 
   <ul class="mt-12 grid border-t border-line md:grid-cols-3">
-    {shotCards.map((card) => (
-      <li class="border-b border-line last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0">
-        <UCard
-          variant="ghost"
-          class="h-full rounded-none bg-transparent p-2"
-          ui={{ header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" }}
-        >
-          <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
-            <Painting id={card.painting} />
-            <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
-            <div class="relative flex size-full items-center justify-center p-3 md:p-4">
-              <AppShot
-                shot={card.shot}
-                alt={card.alt}
-                sizes="(min-width: 80rem) 25rem, (min-width: 48rem) 33vw, 100vw"
-                class="h-full max-h-full w-auto max-w-full"
-              />
-            </div>
+    <li class="border-b border-line md:border-r md:border-b-0">
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+          <Painting id="bridge" />
+          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+          <div class="relative flex size-full p-2 md:p-3">
+            <HistoryTimelineMock
+              client:visible
+              day-label={draftsTimeline.dayLabel}
+              current-label={draftsTimeline.currentLabel}
+              items={draftsTimeline.items}
+            />
           </div>
-          <h3 class="text-heading tracking-normal text-ink">{card.title}</h3>
-          <p class="mt-1 text-small leading-6 text-muted">{card.description}</p>
-        </UCard>
-      </li>
-    ))}
+        </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.features.cards.drafts.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.features.cards.drafts.description")}</p>
+      </UCard>
+    </li>
 
-    <li class="border-b border-line last:border-b-0 md:border-r-0 md:border-b-0">
-      <UCard
-        variant="ghost"
-        class="h-full rounded-none bg-transparent p-2"
-        ui={{ header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" }}
-      >
+    <li class="border-b border-line md:border-r md:border-b-0">
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+          <Painting id="toledo" />
+          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+          <div class="relative flex size-full p-2 md:p-3">
+            <PageDetailsMock
+              client:visible
+              tab-meta={reviewDetails.tabMeta}
+              tab-issues={reviewDetails.tabIssues}
+              scripts-label={reviewDetails.scriptsLabel}
+              scripts-value={reviewDetails.scriptsValue}
+              styles-label={reviewDetails.stylesLabel}
+              styles-value={reviewDetails.stylesValue}
+              title-label={reviewDetails.titleLabel}
+              title-value={reviewDetails.titleValue}
+              description-label={reviewDetails.descriptionLabel}
+              description-value={reviewDetails.descriptionValue}
+              path-label={reviewDetails.pathLabel}
+              path-value={reviewDetails.pathValue}
+            />
+          </div>
+        </div>
+        <h3 class="text-heading tracking-normal text-ink">{t("home.features.cards.review.title")}</h3>
+        <p class="mt-1 text-small leading-6 text-muted">{t("home.features.cards.review.description")}</p>
+      </UCard>
+    </li>
+
+    <li class="border-b border-line last:border-b-0 md:border-b-0">
+      <UCard variant="ghost" class="h-full rounded-none bg-transparent p-2" ui={cardUi}>
         <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
           <Painting id="rocks" />
           <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>

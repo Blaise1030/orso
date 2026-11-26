@@ -101,12 +101,51 @@
         "drafts": {
           "title": "Markdown 编辑器，面向你的内容",
           "description": "集合、字段和富文本——也可以直接编辑源码——针对你已拥有的 Markdown。无需再维护第二套需要同步的 CMS。",
-          "alt": "Orso 的历史记录：检查点时间线，最新的在前，包含作者、提交和时间。"
+          "alt": "Orso 的历史记录：检查点时间线，最新的在前，包含作者、提交和时间。",
+          "timeline": {
+            "dayLabel": "今天",
+            "currentLabel": "当前",
+            "items": [
+              {
+                "summary": "给定价页加常见问题版块",
+                "author": "Alex",
+                "sha": "a3f81d2",
+                "time": "刚刚",
+                "current": true
+              },
+              {
+                "summary": "更新定价页标题",
+                "author": "Alex",
+                "sha": "9c2e1ab",
+                "time": "1 小时前"
+              },
+              {
+                "summary": "起草欢迎文章",
+                "author": "Jordan",
+                "sha": "4b7d0ee",
+                "time": "昨天"
+              }
+            ]
+          }
         },
         "review": {
           "title": "在分支上预览每一次改动",
           "description": "每次编辑都是带真实网站实时预览的草稿分支。分享它，审核拉取请求，然后 Publish。",
-          "alt": "Orso 正在预览草稿，页面详情面板中显示其标题、描述和社交图片。"
+          "alt": "Orso 正在预览草稿，页面详情面板中显示其标题、描述和社交图片。",
+          "details": {
+            "tabMeta": "元数据",
+            "tabIssues": "问题",
+            "scriptsLabel": "脚本",
+            "scriptsValue": "4",
+            "stylesLabel": "样式",
+            "stylesValue": "2",
+            "titleLabel": "标题",
+            "titleValue": "定价 — Project Orso",
+            "descriptionLabel": "描述",
+            "descriptionValue": "面向希望在已有仓库上使用编辑器的团队的方案。",
+            "pathLabel": "路径",
+            "pathValue": "/pricing/"
+          }
         },
         "agent": {
           "title": "更大改动交给智能体",
@@ -132,7 +171,32 @@
         "git": {
           "title": "一切都留在 Git 里",
           "body": "文章、配置和数据都以 Markdown、YAML 和 JSON 的形式留在仓库中。每次保存都会进入你现有工作流的历史记录。",
-          "alt": "Orso 的历史记录：包含作者、提交和时间的检查点时间线。"
+          "alt": "Orso 的历史记录：包含作者、提交和时间的检查点时间线。",
+          "timeline": {
+            "dayLabel": "今天",
+            "currentLabel": "当前",
+            "items": [
+              {
+                "summary": "欢迎页换上新标题",
+                "author": "Alex",
+                "sha": "a3f81d2",
+                "time": "刚刚",
+                "current": true
+              },
+              {
+                "summary": "调整首页主视觉文案",
+                "author": "Alex",
+                "sha": "9c2e1ab",
+                "time": "3 小时前"
+              },
+              {
+                "summary": "添加定价页常见问题草稿",
+                "author": "Jordan",
+                "sha": "4b7d0ee",
+                "time": "昨天"
+              }
+            ]
+          }
         },
         "editor": {
           "title": "Markdown 编辑器",
@@ -144,7 +208,14 @@
         "preview": {
           "title": "实时预览",
           "body": "草稿会在真实网站上渲染。Publish 前可检查桌面端和移动端。",
-          "alt": "Orso 正在预览画布上预览真实网站的草稿。"
+          "alt": "Orso 正在预览画布上预览真实网站的草稿。",
+          "frame": {
+            "desktopLabel": "桌面端",
+            "mobileLabel": "移动端",
+            "url": "localhost:4321/pricing/",
+            "pageTitle": "定价",
+            "pageBody": "面向在自己仓库里编辑网站的团队的方案。"
+          }
         },
         "branches": {
           "title": "像草稿一样的分支",
