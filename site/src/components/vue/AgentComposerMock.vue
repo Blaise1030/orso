@@ -26,12 +26,12 @@ const text = ref(props.prompt);
 
 <template>
   <div
-    class="flex size-full min-h-0 flex-col gap-3 overflow-hidden rounded-md border border-line bg-surface-raised p-3 shadow-raised"
+    class="flex size-full min-h-0 flex-col gap-3 overflow-hidden"
     aria-hidden="true"
     @click.prevent
     @keydown.prevent
   >
-    <div class="min-h-0 flex-1 space-y-3 overflow-hidden">
+    <div class="min-h-0 flex-1 space-y-3 overflow-hidden rounded-md border border-line bg-surface-raised/90 p-3 shadow-raised backdrop-blur-sm">
       <UChatMessage
         id="demo-user"
         role="user"
@@ -56,7 +56,7 @@ const text = ref(props.prompt);
       as="div"
       variant="outline"
       class="w-full shrink-0"
-      :ui="{ root: 'bg-surface', header: 'flex-wrap' }"
+      :ui="{ root: 'bg-surface-raised shadow-raised', header: 'flex-wrap' }"
     >
       <template #header>
         <UBadge color="neutral" variant="soft" class="max-w-full gap-1.5">

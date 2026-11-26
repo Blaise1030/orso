@@ -80,19 +80,23 @@ const shotCards = [
         class="h-full rounded-none bg-transparent p-2"
         ui={{ header: "p-0 sm:p-0", body: "px-4 pt-5 pb-4 sm:px-4 sm:pt-5 sm:pb-4" }}
       >
-        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line bg-sand p-2 md:p-3">
-          <AgentComposerMock
-            client:visible
-            user-message={composer.userMessage}
-            assistant-message={composer.assistantMessage}
-            prompt={composer.prompt}
-            placeholder={composer.placeholder}
-            page-context={composer.pageContext}
-            model-label={composer.modelLabel}
-            ask-label={composer.askLabel}
-            send-label={composer.sendLabel}
-            attach-label={composer.attachLabel}
-          />
+        <div slot="header" class="relative aspect-4/3 overflow-hidden rounded-md border border-line">
+          <Painting id="rocks" />
+          <div class="absolute inset-0 bg-night/20" aria-hidden="true"></div>
+          <div class="relative flex size-full p-2 md:p-3">
+            <AgentComposerMock
+              client:visible
+              user-message={composer.userMessage}
+              assistant-message={composer.assistantMessage}
+              prompt={composer.prompt}
+              placeholder={composer.placeholder}
+              page-context={composer.pageContext}
+              model-label={composer.modelLabel}
+              ask-label={composer.askLabel}
+              send-label={composer.sendLabel}
+              attach-label={composer.attachLabel}
+            />
+          </div>
         </div>
         <h3 class="text-heading tracking-normal text-ink">{t("home.features.cards.agent.title")}</h3>
         <p class="mt-1 text-small leading-6 text-muted">{t("home.features.cards.agent.description")}</p>
