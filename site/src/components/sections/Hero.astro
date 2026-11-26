@@ -23,7 +23,7 @@ const words = locale === "zh" ? [headline] : headline.split(" ");
       <p class="rise-2 mt-5 max-w-measure text-body text-muted md:mt-6">
         {t("home.hero.body")}
       </p>
-      <div id="get-orso" class="rise-3 mt-8 flex flex-wrap items-center gap-3">
+      <div class="rise-3 mt-8 flex flex-wrap items-center gap-3">
         <DownloadButton client:load labels={group("download")} />
         <UButton color="neutral" variant="outline" size="lg" label={t("home.hero.secondary")} to={path("#how-it-works")} />
       </div>

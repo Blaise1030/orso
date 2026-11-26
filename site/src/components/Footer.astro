@@ -1,11 +1,12 @@
 ---
-// Site footer: wordmark above the link columns. Group and link data live in `src/site.ts`.
+// Site footer: wordmark, closing CTA, then link columns. Group and link data live in `src/site.ts`.
 import BearMark from "./BearMark.astro";
 import UButton from "@nuxt/ui/components/Button.vue";
+import DownloadButton from "./vue/DownloadButton.vue";
 import { getI18n } from "../i18n";
 import { site, type FooterLink } from "../site";
 
-const { t, path } = getI18n(Astro.url);
+const { t, path, group } = getI18n(Astro.url);
 const external = (link: string) => /^https?:\/\//.test(link);
 const navLink = (link: (typeof site.nav)[number]) => ({ label: t(`nav.${link.key}`), href: link.href });
 const footerLink = (link: FooterLink) => ({
@@ -32,7 +33,24 @@ const groups = [
       <span class="text-body font-medium tracking-tight">{site.name}</span>
     </a>
 
-    <nav class="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4" aria-label={t("footer.label")}>
+    <div class="mt-10 flex max-w-measure flex-col gap-4" id="cta">
+      <h2 class="text-title tracking-display text-ink">{t("home.cta.title")}</h2>
+      <p class="text-muted">{t("home.cta.body")}</p>
+      <div id="get-orso" class="mt-2 flex flex-wrap items-center gap-3">
+        <DownloadButton client:visible labels={group("download")} />
+        <UButton
+          color="neutral"
+          variant="outline"
+          size="lg"
+          label={t("home.cta.github")}
+          to="https://github.com/Blaise1030/cms"
+          rel="noopener noreferrer"
+        />
+      </div>
+      <p class="text-small text-muted">{t("home.cta.platforms")}</p>
+    </div>
+
+    <nav class="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4" aria-label={t("footer.label")}>
       {groups.map((group) => (
         <div>
           <p class="text-small font-medium text-ink">{group.label}</p>

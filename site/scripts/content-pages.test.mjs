@@ -28,9 +28,11 @@ test("built sample Blog and Help articles render Markdown and navigation", () =>
   assert.match(html(root, ""), /href="\/blog\/"[^>]*>(?:<[^>]+>)*Blog/);
   assert.match(html(root, ""), /href="\/help\/"[^>]*>(?:<[^>]+>)*Help/);
   const home = html(root, "");
-  for (const id of ["product", "logos", "how-it-works", "setup", "bands", "proof", "faq", "cta"]) {
+  for (const id of ["product", "logos", "how-it-works", "setup", "bands", "proof", "faq"]) {
     assert.match(home, new RegExp(`id="${id}"`));
   }
+  // Closing CTA sits in the shared footer, not the home section stack.
+  assert.match(html(root, ""), /id="site-footer"[\s\S]*?id="cta"/);
   // Gui-style home: numbered how-it-works steps, feature bands, no bento grid.
   assert.match(home, /id="how-it-works"[\s\S]*?<ol\b/);
   assert.match(home, /id="bands"/);
