@@ -77,7 +77,8 @@
       "title": "Works with the stack you already have",
       "body": "Astro, Markdown and GitHub for the site. Claude, Cursor, Codex or OpenCode for the agent — with the account and plan you already pay for. Orso adds no AI usage charges.",
       "stack": "Stack",
-      "agents": "Agents"
+      "agents": "Agents",
+      "comingSoon": "Coming soon"
     },
     "setup": {
       "title": "Cost and setup",
