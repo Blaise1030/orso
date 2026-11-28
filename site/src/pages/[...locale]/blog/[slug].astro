@@ -55,7 +55,8 @@ const jsonLd = [
       <div
         class:list={[
           "mt-8",
-          toc.length > 1 && "lg:grid lg:grid-cols-[minmax(0,1fr)_12rem] lg:items-start lg:gap-10",
+          // Omit items-start so the TOC aside stretches with the article (sticky needs that height).
+          toc.length > 1 && "lg:grid lg:grid-cols-[minmax(0,1fr)_12rem] lg:gap-10",
         ]}
       >
         <div class="min-w-0 w-full">

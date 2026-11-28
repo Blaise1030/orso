@@ -49,6 +49,10 @@ test("built sample blog categories link their posts", () => {
   assert.match(announcements, /href="\/blog\/introducing-orso\/"/);
   assert.doesNotMatch(announcements, /No posts in this category yet/);
   assert.match(html(root, "blog/introducing-orso"), /href="\/blog\/categories\/announcements\/"/);
+  // Desktop TOC rail sticks under the header; grid stretch (no items-start) gives sticky room.
+  const post = html(root, "blog/introducing-orso");
+  assert.match(post, /class="[^"]*lg:sticky[^"]*lg:top-header[^"]*"[^>]*data-toc/);
+  assert.doesNotMatch(post, /lg:grid-cols-\[[^\]]+\][^"]*lg:items-start/);
   // The search palette island points at its section's index.
   assert.match(html(root, "blog"), /bundlePath&quot;:\[0,&quot;\/pagefind-blog\/&quot;\]/);
   assert.ok(existsSync(join(root, "dist", "pagefind-blog", "pagefind.js")), "pagefind-blog index");
