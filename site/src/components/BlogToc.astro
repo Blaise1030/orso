@@ -5,7 +5,7 @@ import { getI18n } from "../i18n";
 
 interface Props {
   headings: MarkdownHeading[];
-  /** `inline` is the collapsible under the lead; `rail` remains for any sticky column use. */
+  /** `inline` is the mobile collapsible; `rail` is the sticky desktop sidebar. */
   variant: "rail" | "inline";
   /** Extra classes on the wrapper. */
   class?: string;
@@ -17,7 +17,7 @@ const railLink =
 ---
 
 {variant === "rail" ? (
-  <aside class:list={["hidden lg:block", className]}>
+  <aside class:list={["hidden min-w-0 lg:block", className]}>
     <nav class="lg:sticky lg:top-28" aria-label={t("toc.title")} data-toc>
       <p class="text-small font-medium text-ink">{t("toc.title")}</p>
       <ul class="mt-3 flex flex-col gap-2 text-small">

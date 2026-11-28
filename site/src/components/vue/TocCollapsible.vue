@@ -3,17 +3,21 @@ import UButton from "@nuxt/ui/components/Button.vue";
 import UCollapsible from "@nuxt/ui/components/Collapsible.vue";
 
 /** The collapsible "On this page" list under the lead of a post or help article. */
-defineProps<{ headings: { depth: number; slug: string; text: string }[]; title: string }>();
+const props = defineProps<{
+  headings: { depth: number; slug: string; text: string }[];
+  title: string;
+  class?: string;
+}>();
 </script>
 
 <template>
   <!-- The page script marks the link being read; keep the links in the DOM while collapsed. -->
-  <UCollapsible :unmount-on-hide="false" class="mt-10 border-y border-line" data-toc>
+  <UCollapsible :unmount-on-hide="false" :class="['border-y border-line', props.class]" data-toc>
     <UButton
       color="neutral"
       variant="ghost"
       block
-:label="title"
+      :label="title"
       trailing-icon="i-hugeicons-arrow-down-01"
       class="group justify-between rounded-none px-0 py-3 text-small font-medium text-ink hover:bg-transparent"
       :ui="{ trailingIcon: 'size-4 text-muted transition-transform group-data-[state=open]:rotate-180' }"

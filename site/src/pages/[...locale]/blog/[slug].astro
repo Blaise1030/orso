@@ -68,13 +68,23 @@ const jsonLd = [
             <div class="relative aspect-16/9 w-full"><Painting id={paintingFor(entry.id)} eager /></div>
           )}
         </div>
-        {toc.length > 1 && <BlogToc headings={toc} variant="inline" />}
-        <div class="prose mt-12 max-w-none border-t border-line pt-10 prose-img:h-auto prose-img:max-w-full prose-img:rounded-md"><Content /></div>
-        {entry.data.tags.length > 0 && (
-          <ul class="mt-10 flex flex-wrap gap-2" aria-label={t("blog.tags")}>
-            {entry.data.tags.map((tag) => <li><UBadge color="neutral" variant="soft" class="text-muted" label={`#${tag}`} /></li>)}
-          </ul>
-        )}
+      </div>
+      <div
+        class:list={[
+          "mt-12 border-t border-line pt-10",
+          toc.length > 1 && "lg:grid lg:grid-cols-[minmax(0,38rem)_12rem] lg:items-start lg:justify-between lg:gap-10",
+        ]}
+      >
+        <div class="min-w-0 max-w-measure">
+          {toc.length > 1 && <BlogToc headings={toc} variant="inline" class="lg:hidden" />}
+          <div class:list={["prose max-w-none prose-img:h-auto prose-img:max-w-full prose-img:rounded-md", toc.length > 1 && "mt-10 lg:mt-0"]}><Content /></div>
+          {entry.data.tags.length > 0 && (
+            <ul class="mt-10 flex flex-wrap gap-2" aria-label={t("blog.tags")}>
+              {entry.data.tags.map((tag) => <li><UBadge color="neutral" variant="soft" class="text-muted" label={`#${tag}`} /></li>)}
+            </ul>
+          )}
+        </div>
+        {toc.length > 1 && <BlogToc headings={toc} variant="rail" />}
       </div>
     </article>
     {more.length > 0 && (

@@ -58,7 +58,7 @@ const crumbs = [
     <article data-pagefind-body>
       <h1 class="rise mt-4 text-title tracking-display text-ink">{entry.data.title}</h1>
       <p class="rise-2 mt-4 max-w-prose text-body text-muted">{entry.data.description}</p>
-      {toc.length > 1 && <BlogToc headings={toc} variant="inline" />}
+      {toc.length > 1 && <BlogToc headings={toc} variant="inline" class="mt-10" />}
       <div class="prose mt-10 max-w-prose prose-img:h-auto prose-img:max-w-full prose-img:rounded-md prose-table:block prose-table:max-w-full prose-table:overflow-x-auto"><Content /></div>
     </article>
     {(previous || next) && (
