@@ -55,10 +55,10 @@ const jsonLd = [
       <div
         class:list={[
           "mt-8",
-          toc.length > 1 && "lg:grid lg:grid-cols-[minmax(0,32rem)_12rem] lg:items-start lg:justify-between lg:gap-10",
+          toc.length > 1 && "lg:grid lg:grid-cols-[minmax(0,1fr)_12rem] lg:items-start lg:gap-10",
         ]}
       >
-        <div class="min-w-0 max-w-lg">
+        <div class="min-w-0 w-full">
           <div class="rise flex flex-wrap items-center gap-x-4 gap-y-1">
             <time class="label" datetime={entry.data.pubDate}>{formatDate(entry.data.pubDate, locale)}</time>
             {postCategories.map((category) => (
@@ -66,10 +66,10 @@ const jsonLd = [
             ))}
           </div>
           <h1 class="rise mt-4 text-title tracking-display text-ink">{entry.data.title}</h1>
-          <p class="rise-2 mt-6 text-body text-muted">{entry.data.description}</p>
+          <p class="rise-2 mt-6 max-w-measure text-body text-muted">{entry.data.description}</p>
           <div class="rise-3 mt-10 overflow-hidden rounded-md bg-sand">
             {entry.data.coverImage ? (
-              <Image class="aspect-16/9 w-full object-cover" src={entry.data.coverImage} alt={entry.data.coverAlt!} widths={[800, 1200, 1600]} sizes="(min-width: 64rem) 32rem, 100vw" loading="eager" />
+              <Image class="aspect-16/9 w-full object-cover" src={entry.data.coverImage} alt={entry.data.coverAlt!} widths={[800, 1200, 1600]} sizes="(min-width: 64rem) 64rem, 100vw" loading="eager" />
             ) : (
               <div class="relative aspect-16/9 w-full"><Painting id={paintingFor(entry.id)} eager /></div>
             )}
