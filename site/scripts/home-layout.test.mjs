@@ -26,10 +26,10 @@ test("how-it-works is an ordered grid with inset figures", () => {
   assert.match(messages, /"publish"\s*:\s*\{[\s\S]*?"title"/);
 });
 
-test("landing page hides the site header", () => {
+test("landing page uses the site header", () => {
   const home = read("src/pages/[...locale]/index.astro");
   const base = read("src/layouts/Base.astro");
-  assert.match(home, /header=\{false\}/);
+  assert.doesNotMatch(home, /header=\{false\}/);
   assert.match(base, /header\s*=\s*true/);
   assert.match(base, /\{header && \(/);
 });
