@@ -10,4 +10,9 @@ integrations on the Orso marketing site. Marks remain trademarks of their owners
 | `github.svg`, `github-on-dark.svg` | [GitHub Logos](https://github.com/logos) (`GitHub_Lockup_Black.svg` / `GitHub_Lockup_White.svg`) |
 | `claude.svg`, `claude-on-dark.svg` | [Anthropic press kit](https://www.anthropic.com/news) (`Claude logo - Slate.svg` / `Claude logo - Ivory.svg`) |
 | `cursor.svg`, `cursor-on-dark.svg` | [Cursor brand](https://cursor.com/brand) (light-bg / dark-bg horizontal lockups) |
-| `codex.svg`, `codex-on-dark.svg` | [OpenAI brand](https://openai.com/brand/) (monoblossom; Codex has no separate mark in the kit) |
+| `codex.svg`, `codex-on-dark.svg` | [OpenAI brand](https://openai.com/brand/) (monoblossom icon only; Codex has no separate mark — the site captions it “Codex”) |
+| `opencode.svg`, `opencode-on-dark.svg` | [OpenCode brand](https://opencode.ai/brand) (`opencode-wordmark-simple-light.svg` / `opencode-wordmark-simple-dark.svg`) |
+| `nextjs.svg`, `nextjs-on-dark.svg` | [Simple Icons](https://simpleicons.org/icons/nextdotjs/) (`nextdotjs`, black / white fills) |
+| `nuxt.svg`, `nuxt-on-dark.svg` | [Simple Icons](https://simpleicons.org/icons/nuxtdotjs/) (`nuxtdotjs`, black / white fills) |
+| `remix.svg`, `remix-on-dark.svg` | [Simple Icons](https://simpleicons.org/icons/remix/) (`remix`, black / white fills) |
+| `svelte.svg`, `svelte-on-dark.svg` | [Simple Icons](https://simpleicons.org/icons/svelte/) (`svelte`, black / white fills) |

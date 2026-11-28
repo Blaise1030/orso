@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "appRoot": "/Users/blaise/orso-projects/cms/web",
+  "repoRoot": "/Users/blaise/orso-projects/cms",
+  "contextRoot": "/Users/blaise/orso-projects/cms",
+  "sessionRoot": "/Users/blaise/orso-projects/cms/web/.impeccable/live",
+  "productPath": "/Users/blaise/orso-projects/cms/PRODUCT.md",
+  "designPath": "/Users/blaise/orso-projects/cms/DESIGN.md",
+  "resolvedFrom": "target:web"
+}

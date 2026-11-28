@@ -45,6 +45,7 @@
   },
   "download": {
     "button": "下载 {platform} 版",
+    "short": "下载",
     "otherPlatform": "选择其他平台",
     "allReleases": "在 GitHub 上查看所有版本",
     "thanksTitle": "感谢下载 Orso",
@@ -121,15 +122,20 @@
           "description": "让它新建页面、润色常见问题，或添加新版块。智能体改仓库；Publish 仍由你决定。",
           "alt": "Orso 的智能体面板位于网站预览旁，随时待命。",
           "composer": {
-            "prompt": "给定价页加一个常见问题版块",
+            "prompt": "让助手修改你的网站",
             "placeholder": "让助手修改你的网站",
-            "pageContext": "pricing",
+            "previewContext": "Preview · /pricing",
+            "viewport": "Desktop",
+            "elementLabel": "section#pricing",
+            "stepsWorking": "已完成 1 个步骤",
+            "stepsDone": "已完成 4 个步骤",
+            "statusMessage": "正在编辑 pricing.md 并打开草稿预览。",
             "modelLabel": "Claude",
+            "autoLabel": "Auto",
             "sendLabel": "发送",
             "attachLabel": "附加图片或文件",
-            "userMessage": "能帮忙改一下定价页吗？",
-            "assistantMessage": "可以——想改什么？我可以改文案、加版块，或调整布局。",
-            "askLabel": "询问"
+            "userMessage": "给定价页加一个常见问题版块",
+            "assistantMessage": "已在定价页草稿中加入常见问题版块——请查看预览，确认后 Publish。"
           }
         }
       }

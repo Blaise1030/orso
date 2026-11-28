@@ -1,6 +1,6 @@
 {
   "site": {
-    "tagline": "Your repository is already the CMS",
+    "tagline": "Your repository is already a CMS",
     "description": "Give your team an editor for the Markdown in your repo. Every change is a pull request. Content stays yours.",
     "homeLabel": "{name} home",
     "alpha": "Alpha",
@@ -45,6 +45,7 @@
   },
   "download": {
     "button": "Download for {platform}",
+    "short": "Download",
     "otherPlatform": "Choose another platform",
     "allReleases": "All releases on GitHub",
     "thanksTitle": "Thanks for downloading Orso",
@@ -66,118 +67,24 @@
   },
   "home": {
     "hero": {
-      "headline": "Your repository is already the CMS.",
-      "body": "Give marketers and writers an editor for the Markdown you already have. Every change is a pull request you review. Nothing goes live until you Publish.",
+      "headline": "Your repository is already a CMS.",
+      "body": "Give marketers and writers an editor for the Markdown you already have. Every change is a pull request you review. Nothing goes live until you Publish. Developers keep the repo, the history and the deploy; the rest of the team gets drafts, previews and a Publish button.",
       "secondary": "See what it does",
       "note": "Free and open source. Runs on your machine. Content stays in your repo.",
-      "tabs": {
-        "content": {
-          "label": "Content",
-          "description": "Forms for the collections already in your repo.",
-          "alt": "Orso's editor open on a blog post: the markdown body beside its title, slug, date and tags."
-        },
-        "preview": {
-          "label": "Preview",
-          "description": "See the real site on desktop and mobile.",
-          "alt": "Orso previewing the same blog post rendered on the draft site, with the agent panel open beside it."
-        },
-        "publish": {
-          "label": "Publish",
-          "description": "Review the pull request, then one button goes live.",
-          "alt": "Orso's changes menu over the preview, listing the live site and open drafts, next to Review and Publish."
-        }
-      }
+      "shotAlt": "Orso previewing a blog post on the draft site, with the agent panel open beside it."
     },
     "logos": {
       "label": "Works with your stack",
-      "intro": "Works with the stack and agents you already have",
-      "outro": "Same files. Same history. Same deploy."
+      "title": "Works with the stack you already have",
+      "body": "Astro, Markdown and GitHub for the site. Claude, Cursor, Codex or OpenCode for the agent — with the account and plan you already pay for. Orso adds no AI usage charges.",
+      "stack": "Stack",
+      "agents": "Agents",
+      "comingSoon": "Coming soon"
     },
-    "features": {
-      "eyebrow": "Built on your repo",
-      "title": "Easy for editors. Safe for developers.",
-      "body": "Your team gets forms, live preview and an agent. Your repo keeps its Markdown, its history and its deploy.",
-      "cards": {
-        "drafts": {
-          "title": "A Markdown editor for your content",
-          "description": "Collections, fields and rich text — or the source itself — for the Markdown you already own. No second CMS to keep in sync.",
-          "alt": "Orso's Markdown editor open on a post, with the slash menu for headings and lists.",
-          "editor": {
-            "demoTitle": "A fresh start for our website"
-          }
-        },
-        "review": {
-          "title": "Preview every change on a branch",
-          "description": "Each edit is a draft branch with a live preview of the real site. Share it, review the pull request, then Publish.",
-          "alt": "Orso previewing a draft of the real site, with desktop and mobile toggles.",
-          "frame": {
-            "desktopLabel": "Desktop",
-            "mobileLabel": "Mobile",
-            "pageTitle": "Pricing"
-          }
-        },
-        "agent": {
-          "title": "An agent for bigger changes",
-          "description": "Ask for a page, a pass on the FAQ, or a new section. The agent edits the repo; you still own Publish.",
-          "alt": "Orso's agent panel next to the site preview, ready for a request.",
-          "composer": {
-            "userMessage": "Can you update the pricing page?",
-            "assistantMessage": "Sure — what should change? I can rewrite copy, add a section, or adjust the layout.",
-            "prompt": "Add an FAQ section to the pricing page",
-            "placeholder": "Ask your assistant to change your site",
-            "pageContext": "pricing",
-            "modelLabel": "Claude",
-            "askLabel": "Ask",
-            "sendLabel": "Send",
-            "attachLabel": "Attach image or file"
-          }
-        }
-      }
-    },
-    "bento": {
-      "label": "What you get",
-      "cells": {
-        "git": {
-          "title": "Stays in Git",
-          "body": "Markdown in your repo. Every save is a commit.",
-          "statement": "Every save is a commit.",
-          "statementMeta": "a3f81d2 · welcome.md"
-        },
-        "editor": {
-          "title": "Markdown editor",
-          "body": "Forms and rich text for the files you already own.",
-          "demoTitle": "A fresh start for our website"
-        },
-        "preview": {
-          "title": "Live preview",
-          "body": "See the real site before you Publish.",
-          "frame": {
-            "desktopLabel": "Desktop",
-            "mobileLabel": "Mobile",
-            "pageTitle": "Pricing"
-          }
-        },
-        "branches": {
-          "title": "Draft branches",
-          "body": "Each change is a branch you review, then Publish.",
-          "picker": {
-            "trigger": "FAQ on pricing",
-            "liveLabel": "Live site",
-            "draftLabel": "FAQ on pricing",
-            "draftDescription": "change/faq-pricing · 2h ago"
-          }
-        },
-        "stack": {
-          "title": "Your stack",
-          "body": "Astro, Markdown, GitHub — same deploy."
-        },
-        "open": {
-          "title": "Yours to run",
-          "body": "Local app. MIT licence. No paid tier.",
-          "statLead": "Licence",
-          "statValue": "MIT"
-        }
-      }
+    "setup": {
+      "title": "Cost and setup",
+      "body": "Orso is free and open source. Connect your own AI coding agent and use your existing account and plan. You pay the agent provider directly; Orso adds no AI usage charges.",
+      "detail": "Install on your machine, open a repo, and your Markdown collections show up. There is nothing to migrate and no content database to leave behind. Teammates get drafts, previews and Publish; developers keep the same Git history and deploy path."
     },
     "proof": {
       "eyebrow": "Delete the CMS. Keep the editors.",
@@ -241,20 +148,91 @@
       "title": "Ready for your team to run the site?",
       "body": "Install Orso once and connect the repo. After that, your team edits with drafts, previews and Publish.",
       "github": "View on GitHub",
-      "platforms": "macOS and Linux.",
-      "facts": {
-        "free": {
-          "title": "Free and open source",
-          "detail": "MIT licence, no paid tier."
+      "platforms": "macOS and Linux."
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "body": "Give teammates a GitHub account, access to the repo, and an agent seat you already subscribe to. They edit real pages and write content in real Markdown — the same proven workflow developers have used forever. Publish is still a human decision.",
+      "steps": {
+        "edit": {
+          "title": "Edit the Markdown in your repo",
+          "body": "Forms and rich text for the posts, pages and docs already in your repo. Editors never have to open a code editor for day-to-day copy.",
+          "editor": {
+            "demoTitle": "A fresh start for our website",
+            "demoBody": [
+              "We're rebuilding the marketing site around the content we already keep in Git — posts, pages and docs in Markdown.",
+              "Editors get forms and a live preview. Every save is a commit on a draft branch, and nothing goes live until someone clicks Publish."
+            ]
+          }
         },
-        "repo": {
-          "title": "Content stays in your repo",
-          "detail": "Plain Markdown you already own."
+        "preview": {
+          "title": "Ask the agent — pages update directly",
+          "body": "Describe a change in plain English. The agent edits the Markdown while you watch the real page update in the preview — desktop or phone.",
+          "frame": {
+            "desktopLabel": "Desktop",
+            "mobileLabel": "Mobile",
+            "headline": "Your repository is already a CMS.",
+            "chatUser": "Tighten the hero and add a how-it-works grid",
+            "chatStatus": "Worked through 3 steps",
+            "chatReply": "Updated the landing draft — check the preview.",
+            "chatPrompt": "Ask your assistant to change your site"
+          }
         },
-        "static": {
-          "title": "Static files, any host",
-          "detail": "No runtime and no lock-in."
+        "agent": {
+          "title": "Keep editing beside the preview",
+          "body": "The chat stays open next to the live draft. Point at a section, ask for another pass, and the page updates again before anyone Publishes.",
+          "composer": {
+            "userMessage": "Add an FAQ section to the pricing page",
+            "assistantMessage": "Added an FAQ section on the pricing draft — review the preview, then Publish when you are ready.",
+            "statusMessage": "Editing pricing.md and opening a draft preview.",
+            "prompt": "Ask your assistant to change your site",
+            "placeholder": "Ask your assistant to change your site",
+            "previewContext": "Preview · /pricing",
+            "viewport": "Desktop",
+            "elementLabel": "section#pricing",
+            "stepsWorking": "Worked through 1 step",
+            "stepsDone": "Worked through 4 steps",
+            "modelLabel": "Claude",
+            "autoLabel": "Auto",
+            "sendLabel": "Send",
+            "attachLabel": "Attach image or file"
+          }
+        },
+        "publish": {
+          "title": "Review the draft, then Publish",
+          "body": "Compare the draft against live, keep or undo changes, and Publish when you are ready. Nothing merges until someone decides.",
+          "picker": {
+            "trigger": "FAQ on pricing",
+            "liveLabel": "Live site",
+            "draftLabel": "FAQ on pricing",
+            "draftDescription": "change/faq-pricing · 2h ago",
+            "newChange": "New change"
+          }
         }
+      }
+    },
+    "bands": {
+      "label": "What you get",
+      "git": {
+        "title": "Stays in Git",
+        "body": "Your content is Markdown in your repo — not a proprietary database. Every save is a commit with a real author, a message and a history you can roll back.",
+        "statement": "Every save is a commit.",
+        "statementMeta": "a3f81d2 · welcome.md"
+      },
+      "branches": {
+        "title": "Draft branches",
+        "body": "Each change lands on its own draft branch with a live preview. Review the page, then Publish to merge into main. Branch protection still applies.",
+        "picker": {
+          "trigger": "FAQ on pricing",
+          "liveLabel": "Live site",
+          "draftLabel": "FAQ on pricing",
+          "draftDescription": "change/faq-pricing · 2h ago",
+          "newChange": "New change"
+        }
+      },
+      "stack": {
+        "title": "Your stack",
+        "body": "Astro for the site, Markdown for the words, GitHub for review and deploy. Orso does not replace your host or ask you to move the content elsewhere."
       }
     }
   },

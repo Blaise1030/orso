@@ -1,48 +1,103 @@
 ---
+import UBadge from "@nuxt/ui/components/Badge.vue";
 import { getI18n } from "../../i18n";
 
 const { t } = getI18n(Astro.url);
 
-const logos = [
-  { name: "Astro", file: "astro" },
-  { name: "Markdown", file: "markdown" },
-  { name: "GitHub", file: "github" },
+/** Stack marks are full lockups; Codex is icon-only (OpenAI monoblossom) so it gets a caption. */
+const stack = [
+  { name: "Astro", file: "astro", heightClass: "h-10" },
+  { name: "Markdown", file: "markdown", heightClass: "h-8" },
+  { name: "GitHub", file: "github", heightClass: "h-8" },
+];
+const agents = [
   { name: "Claude", file: "claude" },
   { name: "Cursor", file: "cursor" },
-  { name: "Codex", file: "codex" },
+  { name: "Codex", file: "codex", caption: "Codex" },
+  { name: "OpenCode", file: "opencode" },
+];
+/** Other meta-frameworks — shown stacked with a Coming soon badge (Astro is supported today). */
+const comingSoon = [
+  { name: "Next.js", file: "nextjs" },
+  { name: "Nuxt", file: "nuxt" },
+  { name: "Remix", file: "remix" },
+  { name: "Svelte", file: "svelte" },
 ];
 ---
 
-<section class="mx-auto max-w-7xl border-x border-line py-section" id="logos" aria-label={t("home.logos.label")}>
-  <p class="page mb-6 text-small text-muted">{t("home.logos.intro")}</p>
-  <ul class="grid grid-cols-2 gap-px border-y border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
-    {logos.map((logo) => (
-      <li class="flex min-h-20 items-center justify-center bg-surface px-4 py-5">
-        <span class="inline-flex h-7 w-full max-w-[7.5rem] items-center justify-center">
-          <img
-            src={`/logos/${logo.file}.svg`}
-            alt={logo.name}
-            width="120"
-            height="32"
-            class="logo-on-light h-auto max-h-7 w-auto max-w-full object-contain object-center"
-            loading="lazy"
-            decoding="async"
-          />
-          <img
-            src={`/logos/${logo.file}-on-dark.svg`}
-            alt=""
-            width="120"
-            height="32"
-            class="logo-on-dark h-auto max-h-7 w-auto max-w-full object-contain object-center"
-            loading="lazy"
-            decoding="async"
-            aria-hidden="true"
-          />
-        </span>
-      </li>
-    ))}
-  </ul>
-  <p class="page mt-5 text-small text-muted">
-    {t("home.logos.outro")}
-  </p>
+<section class="pt-section" id="logos" aria-labelledby="logos-title">
+  <div class="page">
+    <h2 id="logos-title" class="max-w-measure text-heading tracking-normal text-ink">
+      {t("home.logos.title")}
+    </h2>
+    <p class="mt-3 max-w-measure text-small leading-6 text-muted">{t("home.logos.body")}</p>
+
+    <div class="mt-10 space-y-8">
+      <ul class="grid list-none grid-cols-2 justify-items-center gap-x-8 gap-y-6 p-0 sm:grid-cols-4">
+        {stack.map((logo) => (
+          <li class="flex h-10 min-w-0 items-center justify-center">
+            <picture class="min-w-0">
+              <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
+              <img
+                src={`/logos/${logo.file}.svg`}
+                alt={logo.name}
+                width="160"
+                height="40"
+                class:list={[logo.heightClass, "w-auto max-w-full object-contain object-center"]}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+          </li>
+        ))}
+        <li class="flex min-w-0 flex-wrap items-center justify-center gap-3">
+          <div class="flex items-center -space-x-2" aria-hidden="true">
+            {comingSoon.map((logo) => (
+              <span class="relative flex size-9 items-center justify-center rounded-md border border-line bg-surface-raised shadow-soft">
+                <picture>
+                  <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
+                  <img
+                    src={`/logos/${logo.file}.svg`}
+                    alt=""
+                    width="24"
+                    height="24"
+                    class="size-5 object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
+              </span>
+            ))}
+          </div>
+          <span class="sr-only">{comingSoon.map((logo) => logo.name).join(", ")}</span>
+          <UBadge color="neutral" variant="outline" size="sm" class="rounded-full" label={t("home.logos.comingSoon")} />
+        </li>
+      </ul>
+
+      <ul class="grid list-none grid-cols-2 justify-items-center gap-x-8 gap-y-6 p-0 sm:grid-cols-4">
+        {agents.map((logo) => (
+          <li class="flex h-10 min-w-0 items-center justify-center gap-2.5">
+            <picture class="min-w-0">
+              <source srcset={`/logos/${logo.file}-on-dark.svg`} media="(prefers-color-scheme: dark)" />
+              <img
+                src={`/logos/${logo.file}.svg`}
+                alt={logo.caption ? "" : logo.name}
+                width="160"
+                height="40"
+                class:list={[
+                  "h-8 w-auto object-contain object-center",
+                  logo.caption ? "max-h-8 max-w-8" : "max-w-full",
+                ]}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+            {logo.caption && (
+              <span class="truncate text-body font-medium text-ink">{logo.caption}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
 </section>

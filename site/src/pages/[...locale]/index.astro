@@ -1,11 +1,9 @@
 ---
-import Bento from "../../components/sections/Bento.astro";
-import Cta from "../../components/sections/Cta.astro";
+import Bands from "../../components/sections/Bands.astro";
 import Faq from "../../components/sections/Faq.astro";
-import Features from "../../components/sections/Features.astro";
 import Hero from "../../components/sections/Hero.astro";
+import HowItWorks from "../../components/sections/HowItWorks.astro";
 import Logos from "../../components/sections/Logos.astro";
-import Proof from "../../components/sections/Proof.astro";
 import Base from "../../layouts/Base.astro";
 import { organization, website } from "../../lib/seo";
 import { getI18n, localeStaticPaths } from "../../i18n";
@@ -15,11 +13,11 @@ const { t } = getI18n(Astro.url);
 ---
 
 <Base description={t("site.description")} jsonLd={[website(), organization()]}>
-  <Hero />
-  <Logos />
-  <Features />
-  <Bento />
-  <Proof />
-  <Faq />
-  <Cta />
+  <div class="mx-auto w-full max-w-5xl">
+    <Hero />
+    <Logos />
+    <HowItWorks />
+    <Bands />
+    <Faq />
+  </div>
 </Base>

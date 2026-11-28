@@ -10,13 +10,20 @@ const items = props.items.map((faq) => ({ label: faq.question, content: faq.answ
 <template>
   <UAccordion
     :items="items"
-    trailing-icon="i-hugeicons-arrow-down-01"
     class="border-t border-line"
     :ui="{
       item: 'border-line',
-      trigger: 'py-5 text-body font-normal text-ink',
+      trigger: 'gap-3 py-5 text-body font-normal text-ink',
       content: 'max-w-prose',
       body: 'pb-6 pt-0 text-body text-muted',
+      trailingIcon: 'hidden',
     }"
-  />
+  >
+    <template #leading="{ open }">
+      <span class="shrink-0 font-mono text-muted" aria-hidden="true">{{ open ? "[-]" : "[+]" }}</span>
+    </template>
+    <template #trailing>
+      <span class="hidden" aria-hidden="true" />
+    </template>
+  </UAccordion>
 </template>

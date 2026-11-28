@@ -1,0 +1,132 @@
+---
+import AgentComposerMock from "../vue/AgentComposerMock.vue";
+import BentoBranchTile from "../vue/BentoBranchTile.vue";
+import BentoHeroEditor from "../vue/BentoHeroEditor.vue";
+import BentoPreviewTile from "../vue/BentoPreviewTile.vue";
+import { getI18n } from "../../i18n";
+
+const { t, group } = getI18n(Astro.url);
+
+const editor = group<{ demoTitle: string; demoBody: string[] }>("home.howItWorks.steps.edit.editor");
+const preview = group<{
+  desktopLabel: string;
+  mobileLabel: string;
+  headline: string;
+  chatUser: string;
+  chatStatus: string;
+  chatReply: string;
+  chatPrompt: string;
+}>("home.howItWorks.steps.preview.frame");
+const composer = group<{
+  userMessage: string;
+  assistantMessage: string;
+  statusMessage: string;
+  prompt: string;
+  placeholder: string;
+  previewContext: string;
+  viewport: string;
+  elementLabel: string;
+  stepsWorking: string;
+  stepsDone: string;
+  modelLabel: string;
+  autoLabel: string;
+  sendLabel: string;
+  attachLabel: string;
+}>("home.howItWorks.steps.agent.composer");
+const publish = group<{
+  trigger: string;
+  liveLabel: string;
+  draftLabel: string;
+  draftDescription: string;
+  newChange: string;
+}>("home.howItWorks.steps.publish.picker");
+
+const steps = [
+  { key: "edit", mock: "editor" as const },
+  { key: "preview", mock: "preview" as const },
+  { key: "agent", mock: "agent" as const },
+  { key: "publish", mock: "publish" as const },
+];
+---
+
+<section class="pt-section" id="how-it-works">
+  <div class="page">
+    <div class="w-full md:max-w-3/4">
+      <h2 class="text-title tracking-display text-ink">{t("home.howItWorks.title")}</h2>
+      <p class="mt-4 max-w-measure text-muted">{t("home.howItWorks.body")}</p>
+    </div>
+
+    <ol class="mt-10 grid list-none gap-8 p-0 md:mt-12 md:grid-cols-2 md:gap-x-6 md:gap-y-10">
+      {steps.map((step, index) => (
+        <li class="min-w-0">
+          <figure class="m-0 max-w-md overflow-hidden border border-line bg-surface">
+            {step.mock === "editor" && (
+              <div class="relative aspect-square w-full overflow-hidden">
+                <BentoHeroEditor
+                  client:visible
+                  title={editor.demoTitle}
+                  body={editor.demoBody}
+                  slash-hint="/"
+                />
+              </div>
+            )}
+            {step.mock === "preview" && (
+              <div class="relative aspect-square w-full overflow-hidden">
+                <BentoPreviewTile
+                  client:visible
+                  desktop-label={preview.desktopLabel}
+                  mobile-label={preview.mobileLabel}
+                  headline={preview.headline}
+                  chat-user={preview.chatUser}
+                  chat-status={preview.chatStatus}
+                  chat-reply={preview.chatReply}
+                  chat-prompt={preview.chatPrompt}
+                />
+              </div>
+            )}
+            {step.mock === "agent" && (
+              <div class="relative flex aspect-square w-full overflow-hidden p-2 md:p-3">
+                <AgentComposerMock
+                  client:visible
+                  user-message={composer.userMessage}
+                  assistant-message={composer.assistantMessage}
+                  status-message={composer.statusMessage}
+                  prompt={composer.prompt}
+                  placeholder={composer.placeholder}
+                  preview-context={composer.previewContext}
+                  viewport={composer.viewport}
+                  element-label={composer.elementLabel}
+                  steps-working={composer.stepsWorking}
+                  steps-done={composer.stepsDone}
+                  model-label={composer.modelLabel}
+                  auto-label={composer.autoLabel}
+                  send-label={composer.sendLabel}
+                  attach-label={composer.attachLabel}
+                />
+              </div>
+            )}
+            {step.mock === "publish" && (
+              <div class="relative aspect-square w-full overflow-hidden">
+                <BentoBranchTile
+                  client:visible
+                  trigger={publish.trigger}
+                  live-label={publish.liveLabel}
+                  draft-label={publish.draftLabel}
+                  draft-meta={publish.draftDescription}
+                  new-change-label={publish.newChange}
+                />
+              </div>
+            )}
+          </figure>
+          <p class="mt-4 font-mono text-label text-muted">{String(index + 1).padStart(2, "0")}</p>
+          <h3 class="mt-2 max-w-measure text-heading tracking-normal text-ink">
+            {t(`home.howItWorks.steps.${step.key}.title`)}
+          </h3>
+          <p class="mt-2 max-w-measure text-small leading-6 text-muted">
+            {t(`home.howItWorks.steps.${step.key}.body`)}
+          </p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

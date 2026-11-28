@@ -27,7 +27,18 @@ test("built sample Blog and Help articles render Markdown and navigation", () =>
   assert.match(html(root, "blog/introducing-orso"), /<h2[^>]*>.*What Orso is/);
   assert.match(html(root, ""), /href="\/blog\/"[^>]*>(?:<[^>]+>)*Blog/);
   assert.match(html(root, ""), /href="\/help\/"[^>]*>(?:<[^>]+>)*Help/);
-  for (const id of ["product", "logos", "how-it-works", "proof", "faq", "cta"]) assert.match(html(root, ""), new RegExp(`id="${id}"`));
+  const home = html(root, "");
+  for (const id of ["product", "logos", "how-it-works", "setup", "bands", "faq"]) {
+    assert.match(home, new RegExp(`id="${id}"`));
+  }
+  // Closing CTA sits in the shared footer, not the home section stack.
+  assert.match(html(root, ""), /id="site-footer"[\s\S]*?id="cta"/);
+  // Gui-style home: numbered how-it-works steps, feature bands, no bento grid.
+  assert.match(home, /id="how-it-works"[\s\S]*?<ol\b/);
+  assert.match(home, /id="bands"/);
+  assert.doesNotMatch(home, /id="capabilities"/);
+  // Open-canvas home: no painting stages behind hero / how-it-works mocks.
+  assert.doesNotMatch(home, /\/paintings\/[^"'\s]*(?:danube|bridge|toledo|rocks)/);
 });
 
 test("built sample blog categories link their posts", () => {
@@ -38,6 +49,10 @@ test("built sample blog categories link their posts", () => {
   assert.match(announcements, /href="\/blog\/introducing-orso\/"/);
   assert.doesNotMatch(announcements, /No posts in this category yet/);
   assert.match(html(root, "blog/introducing-orso"), /href="\/blog\/categories\/announcements\/"/);
+  // Desktop TOC rail sticks under the header; grid stretch (no items-start) gives sticky room.
+  const post = html(root, "blog/introducing-orso");
+  assert.match(post, /class="[^"]*lg:sticky[^"]*lg:top-header[^"]*"[^>]*data-toc/);
+  assert.doesNotMatch(post, /lg:grid-cols-\[[^\]]+\][^"]*lg:items-start/);
   // The search palette island points at its section's index.
   assert.match(html(root, "blog"), /bundlePath&quot;:\[0,&quot;\/pagefind-blog\/&quot;\]/);
   assert.ok(existsSync(join(root, "dist", "pagefind-blog", "pagefind.js")), "pagefind-blog index");
